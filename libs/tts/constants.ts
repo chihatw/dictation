@@ -1,4 +1,4 @@
-export const VOICES = {
+export const GOOGLE_VOICES = {
   standard: {
     male: {
       'ja-JP-Standard-C': 'ja-JP-Standard-C',
@@ -44,4 +44,12 @@ export const VOICES = {
       },
     },
   },
+};
+
+export const GOOGLE_DEFAULT_TTS_OPTIONS = {
+  languageCode: 'ja-JP',
+  voiceName: GOOGLE_VOICES.premium['Neural2'].male['ja-JP-Neural2-C'],
+  speakingRate: 1.0,
+  pitch: 0.0,
+  volumeGainDb: 0.0,
 };

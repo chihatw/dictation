@@ -1,6 +1,7 @@
 'use client';
 
 import { useTTS } from '@/hooks/useTTS';
+import { GOOGLE_VOICES } from '@/libs/tts/constants';
 import { useState } from 'react';
 
 export default function Home() {
@@ -19,7 +20,10 @@ export default function Home() {
 
   // Function to handle audio playback
   const handlePlayAudio = async () => {
-    play('こんにちは');
+    play('こんにちは', {
+      voiceName:
+        GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede'],
+    });
   };
 
   // Function to handle form submission

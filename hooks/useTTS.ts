@@ -1,3 +1,4 @@
+import { TTSOptions } from '@/libs/tts/types';
 import { playTTS } from '@/utils/playTTS';
 import { useRef, useState } from 'react';
 
@@ -6,30 +7,24 @@ export function useTTS() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const play = async (
-    text: string,
-    options?: {
-      languageCode?: string;
-      voiceName?: string;
-      speakingRate?: number;
-      pitch?: number;
-      volumeGainDb?: number;
-    }
-  ) => {
+  const play = async (text: string, options?: Partial<TTSOptions>) => {
     setLoading(true);
     setError(null);
     try {
-      // キャッシュ確認
       let url: string;
-
+      // キャッシュがあれば、再利用
       if (audioCache.current.has(text)) {
         url = audioCache.current.get(text)!;
         const audio = new Audio(url);
         await audio.play();
-      } else {
-        url = await playTTS(text, options);
-        audioCache.current.set(text, url);
+        return;
       }
+
+      // キャッシュがなければ 音声合成
+      url = await playTTS(text, options);
+
+      // キャッシュに保存
+      audioCache.current.set(text, url);
 
       return;
     } catch (err: unknown) {

@@ -1,16 +1,9 @@
-import { synthesizeText } from '@/utils/syntheSizeText';
-import { VOICES } from '@/utils/voices';
+import { synthesizeText } from '@/libs/tts';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const {
-    text,
-    languageCode = 'ja-JP',
-    voiceName = VOICES.premium['Neural2'].male['ja-JP-Neural2-C'],
-    speakingRate = 1.0,
-    pitch = 0.0,
-    volumeGainDb = 0.0,
-  } = await req.json();
+  const { text, languageCode, voiceName, speakingRate, pitch, volumeGainDb } =
+    await req.json();
 
   if (!text) {
     return NextResponse.json({ message: 'Text is required' }, { status: 400 });

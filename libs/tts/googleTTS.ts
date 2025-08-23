@@ -1,7 +1,7 @@
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
+import { TTSOptions } from './types';
 
-// Google Cloud Text-to-Speech API クライアントを作成
-export function createTTSClient(): TextToSpeechClient {
+function createGoogleTTSClient(): TextToSpeechClient {
   try {
     const encodedCredentials =
       process.env.NEXT_PUBLIC_GOOGLE_APPLICATION_CREDENTIALS;
@@ -26,4 +26,31 @@ export function createTTSClient(): TextToSpeechClient {
 
   // フォールバック: 認証なしで初期化
   return new TextToSpeechClient();
+}
+
+export async function synthesizeTextWithGoogle(
+  text: string,
+  options: TTSOptions
+): Promise<Buffer> {
+  const ttsClient = createGoogleTTSClient();
+
+  const [response] = await ttsClient.synthesizeSpeech({
+    input: { text: text.trim() },
+    voice: {
+      languageCode: options.languageCode,
+      name: options.voiceName,
+    },
+    audioConfig: {
+      audioEncoding: 'MP3',
+      speakingRate: options.speakingRate,
+      pitch: options.pitch,
+      volumeGainDb: options.volumeGainDb,
+    },
+  });
+
+  if (!response.audioContent) {
+    throw new Error('No audio content received from TTS API');
+  }
+
+  return Buffer.from(response.audioContent as string, 'base64');
 }
