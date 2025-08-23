@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
 
   try {
     // TTS API で音声を生成、Buffer を取得
+    // languageCode 以下は、undefined の場合があるため、synthesizeText 内でデフォルト値を設定
     const audioBuffer: Buffer = await synthesizeText(text, {
       languageCode,
       speakingRate,

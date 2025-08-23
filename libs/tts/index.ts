@@ -3,7 +3,7 @@ import { TTSOptions } from './types';
 
 export async function synthesizeText(
   text: string,
-  options: TTSOptions
+  options: Partial<TTSOptions>
 ): Promise<Buffer> {
   const provider = process.env.TTS_PROVIDER ?? 'google';
 

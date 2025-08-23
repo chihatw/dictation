@@ -2,7 +2,13 @@
 
 import { useTTS } from '@/hooks/useTTS';
 import { GOOGLE_VOICES } from '@/libs/tts/constants';
+import { GoogleGenAI } from '@google/genai';
 import { useState } from 'react';
+
+// GoogleGenAIクライアントをAPIキーで初期化
+const ai = new GoogleGenAI({
+  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+});
 
 export default function Home() {
   const [userInput, setUserInput] = useState('');
@@ -14,8 +20,9 @@ export default function Home() {
   const [audioPlayed, setAudioPlayed] = useState(false);
 
   const [loadingImageUrl, setLoadingImageUrl] = useState('');
-  const [correctScript, setCorrectScript] = useState('');
-  const userId = '12345'; // Example user ID
+
+  const correctScript = 'The quick brown fox jumps over the lazy dog.';
+
   const { play, loading, error } = useTTS();
 
   // Function to handle audio playback
@@ -24,17 +31,70 @@ export default function Home() {
       voiceName:
         GOOGLE_VOICES.premium['Chirp3-HD'].male['ja-JP-Chirp3-HD-Orus'],
     });
+    setAudioPlayed(true);
   };
 
   // Function to handle form submission
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => {
+    console.log('hello');
+    if (!userInput.trim()) {
+      setFeedback({ isCorrect: false, message: '何か入力してください' });
+      return;
+    }
+
+    setIsLoading(true);
+    setFeedback(null);
+
+    let attempts = 0;
+    const maxAttempts = 5;
+    let delay = 1000; // 最初の遅延は1秒
+
+    while (attempts < maxAttempts) {
+      try {
+        const chatHistory = [];
+        const prompt = `以下の『正しい音声スクリプト』と『学習者の入力』を比較し、間違いを具体的に指摘してください。
+                        間違いがない場合は、「完璧です！」と返答してください。
+                        フィードバックは日本語でお願いします。
+
+                        正しい音声スクリプト: "${correctScript}"
+                        学習者の入力: "${userInput}"`;
+        chatHistory.push({ role: 'user', parts: [{ text: prompt }] });
+        const payload = {
+          contents: chatHistory,
+          model: 'gemini-2.5-flash',
+          config: { thinkingConfig: { thinkingBudget: 0 } },
+        };
+
+        const response = await ai.models.generateContent(payload);
+
+        if (!!response.text) {
+          const aiFeedback = response.text;
+          const isCorrect = aiFeedback.includes('完璧です！');
+          setFeedback({ isCorrect, message: aiFeedback });
+          break; // 成功したら while を抜ける
+        } else {
+          console.error('予期しないAPIレスポンス:', response);
+        }
+      } catch (error) {
+        console.error('APIリクエストエラー:', error);
+        attempts++;
+        if (attempts < maxAttempts) {
+          console.log(`再試行 ${attempts}/${maxAttempts}...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          delay *= 2; // 次の遅延は倍にする
+        } else {
+          setFeedback({
+            isCorrect: false,
+            message:
+              'サーバーエラーが発生しました。後でもう一度お試しください。',
+          });
+        }
+      }
+    }
+    setIsLoading(false);
+  };
   return (
     <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 font-inter'>
-      {userId && (
-        <div className='absolute top-4 right-4 text-sm text-gray-600'>
-          ユーザーID: {userId}
-        </div>
-      )}
       <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-xl md:max-w-2xl lg:max-w-3xl'>
         <h2 className='text-3xl font-bold text-center mb-8 text-gray-800'>
           英語ディクテーション練習
@@ -81,7 +141,7 @@ export default function Home() {
           onClick={handleSubmit}
           className={`w-full py-4 rounded-lg text-white font-extrabold text-xl tracking-wide transition-all duration-300 shadow-lg
             ${
-              isLoading
+              isLoading || !audioPlayed
                 ? 'bg-gray-500 cursor-not-allowed'
                 : 'bg-green-600 hover:bg-green-700 active:bg-green-800'
             }`}

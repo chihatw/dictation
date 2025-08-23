@@ -1,4 +1,5 @@
 import { TextToSpeechClient } from '@google-cloud/text-to-speech';
+import { GOOGLE_DEFAULT_TTS_OPTIONS } from './constants';
 import { TTSOptions } from './types';
 
 function createGoogleTTSClient(): TextToSpeechClient {
@@ -30,21 +31,24 @@ function createGoogleTTSClient(): TextToSpeechClient {
 
 export async function synthesizeTextWithGoogle(
   text: string,
-  options: TTSOptions
+  options: Partial<TTSOptions>
 ): Promise<Buffer> {
   const ttsClient = createGoogleTTSClient();
 
   const [response] = await ttsClient.synthesizeSpeech({
     input: { text: text.trim() },
     voice: {
-      languageCode: options.languageCode,
-      name: options.voiceName,
+      languageCode:
+        options.languageCode ?? GOOGLE_DEFAULT_TTS_OPTIONS.languageCode,
+      name: options.voiceName ?? GOOGLE_DEFAULT_TTS_OPTIONS.voiceName,
     },
     audioConfig: {
       audioEncoding: 'MP3',
-      speakingRate: options.speakingRate,
-      pitch: options.pitch,
-      volumeGainDb: options.volumeGainDb,
+      speakingRate:
+        options.speakingRate ?? GOOGLE_DEFAULT_TTS_OPTIONS.speakingRate,
+      pitch: options.pitch ?? GOOGLE_DEFAULT_TTS_OPTIONS.pitch,
+      volumeGainDb:
+        options.volumeGainDb ?? GOOGLE_DEFAULT_TTS_OPTIONS.volumeGainDb,
     },
   });
 
