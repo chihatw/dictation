@@ -12,16 +12,16 @@ export const GOOGLE_VOICES = {
   premium: {
     'Chirp3-HD': {
       male: {
-        'ja-JP-Chirp3-HD-Charon': 'ja-JP-Chirp3-HD-Charon',
-        'ja-JP-Chirp3-HD-Fenrir': 'ja-JP-Chirp3-HD-Fenrir',
-        'ja-JP-Chirp3-HD-Orus': 'ja-JP-Chirp3-HD-Orus',
-        'ja-JP-Chirp3-HD-Puck': 'ja-JP-Chirp3-HD-Puck',
+        'ja-JP-Chirp3-HD-Charon': 'ja-JP-Chirp3-HD-Charon', // 暗いおじさん
+        'ja-JP-Chirp3-HD-Fenrir': 'ja-JP-Chirp3-HD-Fenrir', // ロボットみたいな青年
+        'ja-JP-Chirp3-HD-Orus': 'ja-JP-Chirp3-HD-Orus', // 好青年
+        'ja-JP-Chirp3-HD-Puck': 'ja-JP-Chirp3-HD-Puck', // 少し硬い、陽キャ青年
       },
       female: {
-        'ja-JP-Chirp3-HD-Aoede': 'ja-JP-Chirp3-HD-Aoede',
-        'ja-JP-Chirp3-HD-Kore': 'ja-JP-Chirp3-HD-Kore',
-        'ja-JP-Chirp3-HD-Leda': 'ja-JP-Chirp3-HD-Leda',
-        'ja-JP-Chirp3-HD-Zephyr': 'ja-JP-Chirp3-HD-Zephyr',
+        'ja-JP-Chirp3-HD-Aoede': 'ja-JP-Chirp3-HD-Aoede', // ハキハキした女性
+        'ja-JP-Chirp3-HD-Kore': 'ja-JP-Chirp3-HD-Kore', // 体育教師
+        'ja-JP-Chirp3-HD-Leda': 'ja-JP-Chirp3-HD-Leda', // 陰キャ早口
+        'ja-JP-Chirp3-HD-Zephyr': 'ja-JP-Chirp3-HD-Zephyr', // ロボット系
       },
     },
     Neural2: {

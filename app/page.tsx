@@ -22,7 +22,7 @@ export default function Home() {
   const handlePlayAudio = async () => {
     play('こんにちは', {
       voiceName:
-        GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede'],
+        GOOGLE_VOICES.premium['Chirp3-HD'].male['ja-JP-Chirp3-HD-Orus'],
     });
   };
 
