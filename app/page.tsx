@@ -13,22 +13,22 @@ export default async function Home() {
     redirect('/signin');
   }
 
-  const { data: threads, error } = await supabase
-    .from('chat_threads')
-    .select('id, title, created_at, meta')
+  const { data: articles, error } = await supabase
+    .from('dictation_articles')
+    .select('id, title, created_at')
     .eq('uid', user.id)
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching threads:', error);
+    console.error('Error fetching articles:', error);
   }
 
   return (
-    <div className='bg-gray-200 h-screen flex flex-col'>
+    <div className='h-screen flex flex-col'>
       <main className='p-6 space-y-4 max-w-lg mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
-        <h1 className='text-xl font-semibold'>Threads</h1>
+        <h1 className='text-xl font-semibold'>聽力練習</h1>
         <ul className='space-y-2'>
-          {threads?.map((t) => (
+          {articles?.map((t) => (
             <li key={t.id} className='rounded border p-3'>
               <div className='font-medium'>{t.title}</div>
             </li>
