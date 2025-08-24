@@ -1,14 +1,9 @@
 'use client';
 
+import { useChat } from '@/hooks/useChat';
 import { useTTS } from '@/hooks/useTTS';
 import { GOOGLE_VOICES } from '@/libs/tts/constants';
-import { GoogleGenAI } from '@google/genai';
-import { useState } from 'react';
-
-// GoogleGenAIクライアントをAPIキーで初期化
-const ai = new GoogleGenAI({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-});
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const [userInput, setUserInput] = useState('');
@@ -16,83 +11,65 @@ export default function Home() {
     isCorrect: boolean;
     message: string;
   } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [audioPlayed, setAudioPlayed] = useState(false);
 
-  const [loadingImageUrl, setLoadingImageUrl] = useState('');
+  const [audioPlayed, setAudioPlayed] = useState(false);
 
   const correctScript = 'The quick brown fox jumps over the lazy dog.';
 
-  const { play, loading, error } = useTTS();
+  const { play, loading: ttsLoading, error: ttsError } = useTTS();
+  const {
+    history,
+    sendMessage,
+    loading: chatLoading,
+    error: chatError,
+  } = useChat();
 
   // Function to handle audio playback
   const handlePlayAudio = async () => {
     play('こんにちは', {
       voiceName:
-        GOOGLE_VOICES.premium['Chirp3-HD'].male['ja-JP-Chirp3-HD-Orus'],
+        GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede'],
     });
     setAudioPlayed(true);
   };
 
   // Function to handle form submission
   const handleSubmit = async () => {
-    console.log('hello');
     if (!userInput.trim()) {
       setFeedback({ isCorrect: false, message: '何か入力してください' });
       return;
     }
 
-    setIsLoading(true);
     setFeedback(null);
 
-    let attempts = 0;
-    const maxAttempts = 5;
-    let delay = 1000; // 最初の遅延は1秒
-
-    while (attempts < maxAttempts) {
-      try {
-        const chatHistory = [];
-        const prompt = `以下の『正しい音声スクリプト』と『学習者の入力』を比較し、間違いを具体的に指摘してください。
+    // while (attempts < maxAttempts) {
+    try {
+      const prompt = `以下の『正しい音声スクリプト』と『学習者の入力』を比較し、間違いを具体的に指摘してください。
                         間違いがない場合は、「完璧です！」と返答してください。
                         フィードバックは日本語でお願いします。
+                        学習者を励ますこと、やる気を上げることを意識してください。
+                        一部でも正しく聞けていれば褒めてください。
+                        間違いがあった場合も、学習者の立場に立って優しく丁寧に指摘してください。
+　　　　　　　　　　　　　　回答は視認性が上がるように改行を入れてください。                        
+
 
                         正しい音声スクリプト: "${correctScript}"
                         学習者の入力: "${userInput}"`;
-        chatHistory.push({ role: 'user', parts: [{ text: prompt }] });
-        const payload = {
-          contents: chatHistory,
-          model: 'gemini-2.5-flash',
-          config: { thinkingConfig: { thinkingBudget: 0 } },
-        };
+      await sendMessage(prompt);
 
-        const response = await ai.models.generateContent(payload);
-
-        if (!!response.text) {
-          const aiFeedback = response.text;
-          const isCorrect = aiFeedback.includes('完璧です！');
-          setFeedback({ isCorrect, message: aiFeedback });
-          break; // 成功したら while を抜ける
-        } else {
-          console.error('予期しないAPIレスポンス:', response);
-        }
-      } catch (error) {
-        console.error('APIリクエストエラー:', error);
-        attempts++;
-        if (attempts < maxAttempts) {
-          console.log(`再試行 ${attempts}/${maxAttempts}...`);
-          await new Promise((resolve) => setTimeout(resolve, delay));
-          delay *= 2; // 次の遅延は倍にする
-        } else {
-          setFeedback({
-            isCorrect: false,
-            message:
-              'サーバーエラーが発生しました。後でもう一度お試しください。',
-          });
-        }
-      }
-    }
-    setIsLoading(false);
+      const aiFeedback = '';
+      const isCorrect = aiFeedback.includes('完璧です！');
+      setFeedback({ isCorrect, message: aiFeedback });
+    } catch (error) {}
   };
+  useEffect(() => {
+    if (history.length === 2) {
+      const aiFeedback = history[1].content;
+      const isCorrect = aiFeedback.includes('完璧です！');
+      setFeedback({ isCorrect, message: aiFeedback });
+    }
+  }, [history]);
+
   return (
     <div className='flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 font-inter'>
       <div className='bg-white p-8 rounded-lg shadow-lg w-full max-w-xl md:max-w-2xl lg:max-w-3xl'>
@@ -133,7 +110,7 @@ export default function Home() {
           placeholder='聞こえた文章をここに正確に入力してください...'
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-          disabled={isLoading}
+          disabled={chatLoading}
         ></textarea>
 
         {/* 提出ボタン */}
@@ -141,23 +118,14 @@ export default function Home() {
           onClick={handleSubmit}
           className={`w-full py-4 rounded-lg text-white font-extrabold text-xl tracking-wide transition-all duration-300 shadow-lg
             ${
-              isLoading || !audioPlayed
+              chatLoading || !audioPlayed
                 ? 'bg-gray-500 cursor-not-allowed'
                 : 'bg-green-600 hover:bg-green-700 active:bg-green-800'
             }`}
-          disabled={isLoading || !audioPlayed} // 音声が再生されるまでボタンを無効化
+          disabled={chatLoading || !audioPlayed} // 音声が再生されるまでボタンを無効化
         >
-          {isLoading ? (
+          {chatLoading ? (
             <div className='flex items-center justify-center space-x-2'>
-              {loadingImageUrl ? (
-                <img
-                  src={loadingImageUrl}
-                  alt='Loading'
-                  className='w-8 h-8 animate-spin rounded-full'
-                />
-              ) : (
-                <div className='w-6 h-6 border-4 border-t-4 border-t-white border-gray-200 rounded-full animate-spin'></div>
-              )}
               <span>判定中...</span>
             </div>
           ) : (
@@ -176,7 +144,9 @@ export default function Home() {
                 ? '✨ 完璧です！ ✨'
                 : '🤔 もう一度試してみましょう 🤔'}
             </p>
-            <p className='text-base leading-relaxed'>{feedback.message}</p>
+            <p className='text-base leading-relaxed whitespace-pre-wrap'>
+              {feedback.message}
+            </p>
             {!feedback.isCorrect && (
               <div className='mt-4 pt-4 border-t border-red-400'>
                 <p className='text-sm'>
@@ -185,16 +155,6 @@ export default function Home() {
                 </p>
               </div>
             )}
-            <button
-              onClick={() => {
-                setUserInput('');
-                setFeedback(null);
-                setAudioPlayed(false); // 次の問題のためにリセット
-              }}
-              className='mt-6 bg-white text-gray-800 px-5 py-2 rounded-full font-bold hover:bg-gray-200 transition-colors duration-200 shadow'
-            >
-              次の問題へ
-            </button>
           </div>
         )}
       </div>
