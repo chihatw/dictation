@@ -1,4 +1,4 @@
-import { TTSOptions } from '@/libs/tts/types';
+import { TTSOptions } from '@/lib/tts/types';
 
 export async function playTTS(text: string, options?: Partial<TTSOptions>) {
   const response = await fetch('/api/tts', {

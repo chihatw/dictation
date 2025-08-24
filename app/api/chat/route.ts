@@ -1,5 +1,5 @@
-import { chat } from '@/libs/chat';
-import { ChatMessage } from '@/libs/chat/types';
+import { chat } from '@/lib/chat';
+import { ChatMessage } from '@/lib/chat/types';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {

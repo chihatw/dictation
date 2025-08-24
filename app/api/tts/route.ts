@@ -1,4 +1,4 @@
-import { synthesizeText } from '@/libs/tts';
+import { synthesizeText } from '@/lib/tts';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {

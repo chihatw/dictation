@@ -1,4 +1,4 @@
-import { ChatMessage } from '@/libs/chat/types';
+import { ChatMessage } from '@/lib/chat/types';
 import { sendChatMessage } from '@/utils/sendChatMessage';
 import { useState } from 'react';
 

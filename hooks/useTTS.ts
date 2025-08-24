@@ -1,4 +1,4 @@
-import { TTSOptions } from '@/libs/tts/types';
+import { TTSOptions } from '@/lib/tts/types';
 import { playTTS } from '@/utils/playTTS';
 import { useRef, useState } from 'react';
 
