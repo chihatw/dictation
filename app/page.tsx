@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function Home() {
@@ -25,12 +26,14 @@ export default async function Home() {
 
   return (
     <div className='h-screen flex flex-col'>
-      <main className='p-6 space-y-4 max-w-lg mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
+      <main className='p-6 space-y-4 max-w-2xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
         <h1 className='text-xl font-semibold'>聽力練習</h1>
         <ul className='space-y-2'>
           {articles?.map((t) => (
-            <li key={t.id} className='rounded border p-3'>
-              <div className='font-medium'>{t.title}</div>
+            <li key={t.id} className='rounded border p-3 hover:bg-gray-50'>
+              <Link href={`/articles/${t.id}`}>
+                <div className='font-medium'>{t.title}</div>
+              </Link>
             </li>
           ))}
         </ul>
