@@ -10,8 +10,11 @@ const makeCacheKey = (text: string, options?: Partial<TTSOptions>) => {
 
 export function useTTS() {
   const audioCache = useRef<Map<string, string>>(new Map());
+  const currentAudio = useRef<HTMLAudioElement | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const play = async (text: string, options?: Partial<TTSOptions>) => {
     setLoading(true);
@@ -23,18 +26,32 @@ export function useTTS() {
       // キャッシュがあれば、再利用
       if (audioCache.current.has(key)) {
         url = audioCache.current.get(key)!;
-        const audio = new Audio(url);
-        await audio.play();
-        return;
+      } else {
+        // キャッシュがなければ 音声合成
+        url = await playTTS(text, options);
+
+        // キャッシュに保存
+        audioCache.current.set(key, url);
       }
 
-      // キャッシュがなければ 音声合成
-      url = await playTTS(text, options);
+      // すでに再生中なら止めてから新しい audio を再生
+      if (currentAudio.current) {
+        currentAudio.current.pause();
+        currentAudio.current.currentTime = 0;
+      }
 
-      // キャッシュに保存
-      audioCache.current.set(key, url);
+      const audio = new Audio(url);
+      currentAudio.current = audio;
 
-      return;
+      // 再生終了時にフラグを戻す
+      const onEnded = () => {
+        setIsPlaying(false);
+        currentAudio.current = null;
+      };
+      audio.addEventListener('ended', onEnded);
+
+      await audio.play();
+      setIsPlaying(true);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -46,5 +63,14 @@ export function useTTS() {
     }
   };
 
-  return { play, loading, error };
+  const stop = () => {
+    if (currentAudio.current) {
+      currentAudio.current.pause();
+      currentAudio.current.currentTime = 0; // 頭に戻す
+      currentAudio.current = null;
+    }
+    setIsPlaying(false);
+  };
+
+  return { play, stop, loading, error, isPlaying };
 }

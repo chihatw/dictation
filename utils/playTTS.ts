@@ -23,7 +23,5 @@ export async function playTTS(text: string, options?: Partial<TTSOptions>) {
   const arrayBuffer = await response.arrayBuffer();
   const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
   const url = URL.createObjectURL(blob);
-  const audio = new Audio(url);
-  await audio.play();
   return url;
 }

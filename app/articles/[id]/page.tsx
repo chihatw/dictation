@@ -1,7 +1,9 @@
 'use client';
 
+import { useTTS } from '@/hooks/useTTS';
 import { supabase } from '@/lib/supabase/browser';
-import { Home } from 'lucide-react';
+import { GOOGLE_VOICES } from '@/lib/tts/constants';
+import { Home, Loader2, Play, Square } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -30,6 +32,18 @@ const ArticlePage = ({}: Props) => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
+
+  const [playState, setPlayState] = useState<'idle' | 'loading' | 'playing'>(
+    'idle'
+  );
+
+  const {
+    play,
+    stop,
+    loading: ttsLoading,
+    error: ttsError,
+    isPlaying,
+  } = useTTS();
 
   useEffect(() => {
     let mounted = true;
@@ -105,6 +119,25 @@ const ArticlePage = ({}: Props) => {
 
   if (!article) return null;
 
+  // 全文テキスト：余計な半角スペースを入れたくない場合は join('') が無難
+  const fullText = article.sentences.map((s) => s.content).join('');
+
+  const handlePlayOrStop = async () => {
+    if (article.sentences.length === 0 || ttsLoading) return;
+
+    if (isPlaying) {
+      stop();
+      return;
+    }
+
+    // 任意: 音声オプションを渡したい場合
+    // 例) const options = { voiceName: 'ja-JP-Standard-A', speakingRate: 1.0 };
+    await play(fullText, {
+      voiceName:
+        GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede'],
+    });
+  };
+
   return (
     <div className='min-h-screen'>
       <main className='p-6 space-y-6 max-w-2xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
@@ -120,6 +153,37 @@ const ArticlePage = ({}: Props) => {
 
           {/* ホームへ戻るボタン */}
         </header>
+        <section className='flex flex-col items-center justify-center my-4'>
+          <button
+            type='button'
+            onClick={handlePlayOrStop}
+            disabled={article.sentences.length === 0 || ttsLoading}
+            aria-label={
+              ttsLoading ? '読み上げ準備中' : isPlaying ? '停止' : '全文を再生'
+            }
+            title={
+              ttsLoading
+                ? '読み上げの準備中…'
+                : isPlaying
+                ? '停止'
+                : '全文を再生'
+            }
+            className={[
+              'w-24 h-24 md:w-28 md:h-28 rounded-full border',
+              'flex items-center justify-center',
+              'shadow-sm hover:shadow transition',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              'bg-white',
+            ].join(' ')}
+          >
+            {ttsLoading && <Loader2 className='w-10 h-10 animate-spin' />}
+            {!ttsLoading && !isPlaying && <Play className='w-10 h-10' />}
+            {!ttsLoading && isPlaying && <Square className='w-10 h-10' />}
+          </button>
+
+          {/* 任意: エラー表示 */}
+          {ttsError && <p className='mt-2 text-sm text-red-600'>{ttsError}</p>}
+        </section>
         <section>
           {article.sentences.length === 0 ? (
             <p className='text-gray-500'>まだ文がありません。</p>
