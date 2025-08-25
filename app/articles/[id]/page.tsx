@@ -30,6 +30,8 @@ type Article = {
   id: string;
   title: string;
   created_at: string;
+  tts_voice_name: string;
+  speaking_rate: number;
   sentences: Sentence[];
 };
 
@@ -93,6 +95,7 @@ const ArticlePage = ({}: Props) => {
         .select(
           `
             id, title, created_at,
+            tts_voice_name, speaking_rate,
             sentences:dictation_sentences (
               id, seq, content, created_at,
               submission:dictation_submissions!left (
@@ -122,6 +125,8 @@ const ArticlePage = ({}: Props) => {
           title: data.title,
           created_at: data.created_at,
           sentences: data.sentences ?? [],
+          tts_voice_name: data.tts_voice_name,
+          speaking_rate: data.speaking_rate,
         });
 
         const nextAnswers: Record<string, string> = {};
@@ -147,6 +152,18 @@ const ArticlePage = ({}: Props) => {
       mounted = false;
     };
   }, [id, router, userId]);
+
+  // 記事を読み込んだら上書き
+  useEffect(() => {
+    if (!article) return;
+    setVoiceName(article.tts_voice_name ?? voiceName);
+    setSpeakingRate(
+      typeof article.speaking_rate === 'number'
+        ? article.speaking_rate
+        : speakingRate
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [article?.id]); // 記事が切り替わったときのみ
 
   if (loading) {
     return (
