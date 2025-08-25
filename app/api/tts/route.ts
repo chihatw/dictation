@@ -1,6 +1,8 @@
 import { synthesizeText } from '@/lib/tts';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'nodejs'; // ← Edge で動かさない
+
 export async function POST(req: NextRequest) {
   const { text, languageCode, voiceName, speakingRate, pitch, volumeGainDb } =
     await req.json();
