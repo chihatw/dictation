@@ -1,12 +1,13 @@
 'use client';
 
+import { TTSPlayButton } from '@/components/TTSPlayButton';
 import { useTTS } from '@/hooks/useTTS';
 import { supabase } from '@/lib/supabase/browser';
 import { GOOGLE_VOICES } from '@/lib/tts/constants';
-import { Home, Loader2, Play, Square } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type Props = {};
 
@@ -33,8 +34,18 @@ const ArticlePage = ({}: Props) => {
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
-  const [playState, setPlayState] = useState<'idle' | 'loading' | 'playing'>(
-    'idle'
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
+
+  const [voiceName, setVoiceName] = useState<string>(
+    GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede']
+  );
+  const [speakingRate, setSpeakingRate] = useState<number>(1.0);
+
+  // 全文テキスト：余計な半角スペースを入れたくない場合は join('') が無難
+  const fullText = useMemo(
+    () => article?.sentences.map((s) => s.content).join('') ?? '',
+    [article]
   );
 
   const {
@@ -119,88 +130,90 @@ const ArticlePage = ({}: Props) => {
 
   if (!article) return null;
 
-  // 全文テキスト：余計な半角スペースを入れたくない場合は join('') が無難
-  const fullText = article.sentences.map((s) => s.content).join('');
-
-  const handlePlayOrStop = async () => {
-    if (article.sentences.length === 0 || ttsLoading) return;
+  const handlePlayOrStop = async (text: string) => {
+    if (!text || ttsLoading) return;
 
     if (isPlaying) {
       stop();
       return;
     }
 
-    // 任意: 音声オプションを渡したい場合
-    // 例) const options = { voiceName: 'ja-JP-Standard-A', speakingRate: 1.0 };
-    await play(fullText, {
-      voiceName:
-        GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede'],
+    await play(text, {
+      voiceName,
+      speakingRate,
     });
   };
 
   return (
     <div className='min-h-screen'>
-      <main className='p-6 space-y-6 max-w-2xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
-        <header className='flex items-center gap-x-4'>
+      {/* ヘッダー（最小：戻る + タイトル + 全体再生/停止） */}
+      <header className='sticky top-0 z-10 border-b bg-white/90 backdrop-blur'>
+        <div className='mx-auto flex max-w-4xl items-center gap-3 px-4 py-3'>
           <Link
             href='/'
-            className='p-2 rounded-full hover:bg-gray-100 transition'
-            title='ホームへ戻る'
+            className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
-            <Home className='w-5 h-5 text-gray-600' />
+            <ChevronLeft className='h-4 w-4' /> 戻る
           </Link>
-          <h1 className='text-2xl font-semibold'>{article?.title}</h1>
+          <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>
+            {article?.title}
+          </h1>
+          <TTSPlayButton
+            text={fullText}
+            voiceName={voiceName}
+            speakingRate={speakingRate}
+            variant='solid'
+            size='md'
+            labels={{
+              idle: '全体再生',
+              loading: '読み上げ準備中',
+              stop: '停止',
+              aria: '全体を再生/停止',
+            }}
+          />
+        </div>
+      </header>
 
-          {/* ホームへ戻るボタン */}
-        </header>
-        <section className='flex flex-col items-center justify-center my-4'>
-          <button
-            type='button'
-            onClick={handlePlayOrStop}
-            disabled={article.sentences.length === 0 || ttsLoading}
-            aria-label={
-              ttsLoading ? '読み上げ準備中' : isPlaying ? '停止' : '全文を再生'
-            }
-            title={
-              ttsLoading
-                ? '読み上げの準備中…'
-                : isPlaying
-                ? '停止'
-                : '全文を再生'
-            }
-            className={[
-              'w-24 h-24 md:w-28 md:h-28 rounded-full border',
-              'flex items-center justify-center',
-              'shadow-sm hover:shadow transition',
-              'disabled:opacity-50 disabled:cursor-not-allowed',
-              'bg-white',
-            ].join(' ')}
-          >
-            {ttsLoading && <Loader2 className='w-10 h-10 animate-spin' />}
-            {!ttsLoading && !isPlaying && <Play className='w-10 h-10' />}
-            {!ttsLoading && isPlaying && <Square className='w-10 h-10' />}
-          </button>
-
-          {/* 任意: エラー表示 */}
-          {ttsError && <p className='mt-2 text-sm text-red-600'>{ttsError}</p>}
-        </section>
-        <section>
+      <main className='mx-auto max-w-4xl px-4 py-6'>
+        <div className='space-y-5'>
           {article.sentences.length === 0 ? (
             <p className='text-gray-500'>まだ文がありません。</p>
           ) : (
-            <ol className='space-y-2 list-decimal pl-6'>
-              {article.sentences.map((s) => (
-                <li key={s.id} className='rounded border p-3'>
-                  <div className='flex items-start gap-3'>
-                    <div className='flex-1'>
-                      <p className='whitespace-pre-wrap'>{s.content}</p>
+            <>
+              {article.sentences.map((s) => {
+                const value = answers[s.id] ?? '';
+                const isSubmitted = submitted[s.id] ?? false;
+                return (
+                  <section
+                    key={s.id}
+                    className='rounded-xl border bg-white p-4 shadow-sm'
+                  >
+                    {/* 文番号 + 再生（最小） */}
+                    <div className='mb-3 flex items-center justify-between'>
+                      <div className='text-sm font-medium text-gray-600'>
+                        文 #{s.seq}
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <TTSPlayButton
+                          text={s.content}
+                          voiceName={voiceName}
+                          speakingRate={speakingRate}
+                          variant='outline'
+                          size='sm'
+                          labels={{
+                            idle: '再生',
+                            loading: '準備中',
+                            stop: '停止',
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
+                  </section>
+                );
+              })}
+            </>
           )}
-        </section>
+        </div>
       </main>
     </div>
   );
