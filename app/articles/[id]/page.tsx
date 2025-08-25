@@ -11,11 +11,19 @@ import { useEffect, useMemo, useState } from 'react';
 
 type Props = {};
 
+type Submission = {
+  id: string;
+  answer: string | null;
+  feedback_md: string | null;
+  created_at: string;
+};
+
 type Sentence = {
   id: string;
   seq: number;
   content: string;
   created_at: string;
+  submission?: Submission[] | null;
 };
 
 type Article = {
@@ -29,6 +37,8 @@ const ArticlePage = ({}: Props) => {
   const { id } = useParams<{ id: string }>();
 
   const router = useRouter();
+
+  const [userId, setUserId] = useState<string | null>(null);
 
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,6 +66,20 @@ const ArticlePage = ({}: Props) => {
   );
 
   useEffect(() => {
+    const getUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error(error);
+        return;
+      }
+      setUserId(data.user?.id ?? null);
+    };
+
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
     let mounted = true;
 
     (async () => {
@@ -68,19 +92,21 @@ const ArticlePage = ({}: Props) => {
         .from('dictation_articles')
         .select(
           `
-            id,
-            title,
-            created_at,
+            id, title, created_at,
             sentences:dictation_sentences (
-              id,
-              seq,
-              content,
-              created_at
+              id, seq, content, created_at,
+              submission:dictation_submissions!left (
+                id, answer, feedback_md, created_at
+              )
             )
           `
         )
         .eq('id', id) // 対象記事
-        .order('seq', { foreignTable: 'dictation_sentences', ascending: true })
+        .eq('sentences.dictation_submissions.user_id', userId)
+        .order('seq', {
+          referencedTable: 'dictation_sentences',
+          ascending: true,
+        })
         .maybeSingle(); // 0 or 1 件を期待
 
       if (!mounted) return;
@@ -97,6 +123,21 @@ const ArticlePage = ({}: Props) => {
           created_at: data.created_at,
           sentences: data.sentences ?? [],
         });
+
+        const nextAnswers: Record<string, string> = {};
+        const nextSubmitted: Record<string, boolean> = {};
+        const nextFeedbacks: Record<string, string> = {};
+
+        for (const s of data.sentences ?? []) {
+          const one = (s.submission ?? [])[0]; // 0 or 1
+          nextAnswers[s.id] = one?.answer ?? '';
+          nextSubmitted[s.id] = !!one;
+          nextFeedbacks[s.id] = one?.feedback_md ?? '';
+        }
+
+        setAnswers(nextAnswers);
+        setSubmitted(nextSubmitted);
+        setFeedbacks(nextFeedbacks);
       }
 
       setLoading(false);
@@ -105,7 +146,7 @@ const ArticlePage = ({}: Props) => {
     return () => {
       mounted = false;
     };
-  }, [id, router]);
+  }, [id, router, userId]);
 
   if (loading) {
     return (
@@ -144,6 +185,7 @@ const ArticlePage = ({}: Props) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          sentenceId: s.id, // 文のID
           sentenceScript: s.content, // 正解スクリプト
           userAnswer: val, // ユーザーの回答
         }),

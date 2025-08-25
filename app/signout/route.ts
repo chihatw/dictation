@@ -3,6 +3,9 @@ import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
+  // サインアウトの場合は、Cookie をリセットする必要があるので、
+  // lib/supabase/server.ts のユーティリティは使えない
+
   const response = NextResponse.redirect(new URL('/', request.url));
 
   const supabase = createServerClient(

@@ -1,9 +1,21 @@
 import { chat } from '@/lib/chat';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
+  // クッキーを書き戻すためのレスポンス器
+  const res = new NextResponse();
+
+  // ルートハンドラ用の Supabase クライアント（クッキーアダプタ必須）
+  const supabase = await createClient();
+
   try {
-    const { sentenceScript, userAnswer } = (await req.json()) as {
+    // 認証ユーザーを取得
+    const { data: userRes } = await supabase.auth.getUser();
+    const userId = userRes.user!.id;
+
+    const { sentenceId, sentenceScript, userAnswer } = (await req.json()) as {
+      sentenceId: string;
       sentenceScript: string;
       userAnswer: string;
     };
@@ -30,6 +42,20 @@ export async function POST(req: NextRequest) {
     const updatedHistory = await chat([], userPrompt);
 
     const feedbackMarkdown = updatedHistory.at(-1)?.content ?? '';
+
+    const { data, error } = await supabase
+      .from('dictation_submissions')
+      .upsert(
+        {
+          user_id: userId,
+          sentence_id: sentenceId,
+          answer: userAnswer,
+          feedback_md: feedbackMarkdown,
+        },
+        { onConflict: 'user_id,sentence_id' } // ← 1:1を担保
+      )
+      .select()
+      .single();
 
     return NextResponse.json({ feedbackMarkdown });
   } catch (error) {
