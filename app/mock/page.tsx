@@ -4,8 +4,6 @@ import { ChevronLeft, Pause, Play, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-type Props = {};
-
 type Sentence = {
   id: string;
   index: number; // 1-based
@@ -40,7 +38,7 @@ function getArticleData() {
   return { title, sentences };
 }
 
-const MockPage = (props: Props) => {
+const MockPage = () => {
   const data = getArticleData();
   return (
     <div className='min-h-screen bg-gray-50'>

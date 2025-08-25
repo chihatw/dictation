@@ -4,9 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-type Props = {};
-
-const SigninPage = (props: Props) => {
+const SigninPage = () => {
   return (
     <main className='flex min-h-screen items-center justify-center'>
       <div className='w-full max-w-md'>

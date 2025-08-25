@@ -1,4 +1,5 @@
-// app/signout/route.ts
+export const runtime = 'nodejs'; // Edge ではなく Node で実行
+
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 

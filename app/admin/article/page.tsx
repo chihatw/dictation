@@ -2,7 +2,6 @@
 
 import { TTSPlayButton } from '@/components/TTSPlayButton';
 import { supabase } from '@/lib/supabase/browser';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type UserRow = {
@@ -10,8 +9,6 @@ type UserRow = {
   display: string;
   created_at: string;
 };
-
-type Props = {};
 
 // 選択可能な日本語音声
 const VOICES = [
@@ -34,9 +31,7 @@ const DEFAULT_RATE = 1.0;
 const clampRateForDB = (n: number) => Math.max(0.1, Math.min(4.0, n));
 const isReasonableRate = (n: number) => n > 0 && n <= 4.0;
 
-const CreateArticlePage = (props: Props) => {
-  const router = useRouter();
-
+const CreateArticlePage = () => {
   const [uid, setUid] = useState<string | null>(null);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -126,8 +121,8 @@ const CreateArticlePage = (props: Props) => {
       setUid(null);
       setTtsVoiceName(DEFAULT_VOICE);
       setSpeakingRate(DEFAULT_RATE);
-    } catch (e: any) {
-      setErr(e?.message ?? '作成に失敗しました。');
+    } catch {
+      setErr('作成に失敗しました。');
     } finally {
       setSubmitting(false);
     }
@@ -265,7 +260,7 @@ function UserPicker({ onChange }: { onChange?: (uid: string | null) => void }) {
     return () => {
       aborted = true;
     };
-  }, [supabase, onChange]);
+  }, [onChange]);
 
   useEffect(() => {
     onChange?.(value === '' ? null : value);

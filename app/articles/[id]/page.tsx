@@ -9,8 +9,6 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
-type Props = {};
-
 type Submission = {
   id: string;
   answer: string | null;
@@ -35,7 +33,7 @@ type Article = {
   sentences: Sentence[];
 };
 
-const ArticlePage = ({}: Props) => {
+const ArticlePage = () => {
   const { id } = useParams<{ id: string }>();
 
   const router = useRouter();
@@ -213,7 +211,7 @@ const ArticlePage = ({}: Props) => {
       }
       const data: { feedbackMarkdown: string } = await res.json();
       setFeedbacks((old) => ({ ...old, [s.id]: data.feedbackMarkdown }));
-    } catch (e) {
+    } catch {
       // 失敗時はロック解除（1回のみ送信厳守なら解除しない運用も可）
       setSubmitted((old) => ({ ...old, [s.id]: false }));
       alert('送信に失敗しました。ネットワーク等を確認してください。');

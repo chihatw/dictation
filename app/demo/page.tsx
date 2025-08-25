@@ -16,13 +16,8 @@ export default function Home() {
 
   const correctScript = 'The quick brown fox jumps over the lazy dog.';
 
-  const { play, loading: ttsLoading, error: ttsError } = useTTS();
-  const {
-    history,
-    sendMessage,
-    loading: chatLoading,
-    error: chatError,
-  } = useChat();
+  const { play } = useTTS();
+  const { history, sendMessage, loading: chatLoading } = useChat();
 
   // Function to handle audio playback
   const handlePlayAudio = async () => {
@@ -60,7 +55,7 @@ export default function Home() {
       const aiFeedback = '';
       const isCorrect = aiFeedback.includes('完璧です！');
       setFeedback({ isCorrect, message: aiFeedback });
-    } catch (error) {}
+    } catch {}
   };
   useEffect(() => {
     if (history.length === 2) {

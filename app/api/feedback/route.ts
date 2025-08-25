@@ -1,11 +1,10 @@
+export const runtime = 'nodejs'; // Edge ではなく Node で実行
+
 import { chat } from '@/lib/chat';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  // クッキーを書き戻すためのレスポンス器
-  const res = new NextResponse();
-
   // ルートハンドラ用の Supabase クライアント（クッキーアダプタ必須）
   const supabase = await createClient();
 
@@ -43,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     const feedbackMarkdown = updatedHistory.at(-1)?.content ?? '';
 
-    const { data, error } = await supabase
+    await supabase
       .from('dictation_submissions')
       .upsert(
         {
