@@ -15,7 +15,6 @@ export function createGeminiChatModel(): ChatModel {
           parts: [{ text: m.content }],
         })),
         model: 'gemini-2.5-flash',
-        config: { thinkingConfig: { thinkingBudget: 0 } },
       });
 
       if (!response.text) {

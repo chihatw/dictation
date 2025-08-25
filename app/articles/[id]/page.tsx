@@ -1,7 +1,7 @@
 'use client';
 
+import SentenceItem from '@/components/SentenceItem';
 import { TTSPlayButton } from '@/components/TTSPlayButton';
-import { useTTS } from '@/hooks/useTTS';
 import { supabase } from '@/lib/supabase/browser';
 import { GOOGLE_VOICES } from '@/lib/tts/constants';
 import { ChevronLeft } from 'lucide-react';
@@ -36,25 +36,24 @@ const ArticlePage = ({}: Props) => {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
+  const [feedbacks, setFeedbacks] = useState<Record<string, string>>({});
+  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
 
   const [voiceName, setVoiceName] = useState<string>(
     GOOGLE_VOICES.premium['Chirp3-HD'].female['ja-JP-Chirp3-HD-Aoede']
   );
   const [speakingRate, setSpeakingRate] = useState<number>(1.0);
 
+  const allSubmitted = useMemo(
+    () => article?.sentences.every((s) => submitted[s.id]),
+    [submitted, article?.sentences]
+  );
+
   // 全文テキスト：余計な半角スペースを入れたくない場合は join('') が無難
   const fullText = useMemo(
     () => article?.sentences.map((s) => s.content).join('') ?? '',
     [article]
   );
-
-  const {
-    play,
-    stop,
-    loading: ttsLoading,
-    error: ttsError,
-    isPlaying,
-  } = useTTS();
 
   useEffect(() => {
     let mounted = true;
@@ -130,18 +129,38 @@ const ArticlePage = ({}: Props) => {
 
   if (!article) return null;
 
-  const handlePlayOrStop = async (text: string) => {
-    if (!text || ttsLoading) return;
+  const submitOne = async (s: Sentence) => {
+    const val = (answers[s.id] ?? '').trim();
+    if (!val) return;
 
-    if (isPlaying) {
-      stop();
-      return;
+    if (!window.confirm('送出後不可再編輯')) return;
+
+    // 楽観的UI：ロックしてから送る（失敗時は解除）
+    setSubmitted((old) => ({ ...old, [s.id]: true }));
+    setLoadingMap((old) => ({ ...old, [s.id]: true }));
+
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sentenceScript: s.content, // 正解スクリプト
+          userAnswer: val, // ユーザーの回答
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data: { feedbackMarkdown: string } = await res.json();
+      setFeedbacks((old) => ({ ...old, [s.id]: data.feedbackMarkdown }));
+    } catch (e) {
+      // 失敗時はロック解除（1回のみ送信厳守なら解除しない運用も可）
+      setSubmitted((old) => ({ ...old, [s.id]: false }));
+      alert('送信に失敗しました。ネットワーク等を確認してください。');
+    } finally {
+      setLoadingMap((old) => ({ ...old, [s.id]: false }));
     }
-
-    await play(text, {
-      voiceName,
-      speakingRate,
-    });
   };
 
   return (
@@ -176,43 +195,25 @@ const ArticlePage = ({}: Props) => {
 
       <main className='mx-auto max-w-4xl px-4 py-6'>
         <div className='space-y-5'>
-          {article.sentences.length === 0 ? (
-            <p className='text-gray-500'>まだ文がありません。</p>
-          ) : (
-            <>
-              {article.sentences.map((s) => {
-                const value = answers[s.id] ?? '';
-                const isSubmitted = submitted[s.id] ?? false;
-                return (
-                  <section
-                    key={s.id}
-                    className='rounded-xl border bg-white p-4 shadow-sm'
-                  >
-                    {/* 文番号 + 再生（最小） */}
-                    <div className='mb-3 flex items-center justify-between'>
-                      <div className='text-sm font-medium text-gray-600'>
-                        文 #{s.seq}
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <TTSPlayButton
-                          text={s.content}
-                          voiceName={voiceName}
-                          speakingRate={speakingRate}
-                          variant='outline'
-                          size='sm'
-                          labels={{
-                            idle: '再生',
-                            loading: '準備中',
-                            stop: '停止',
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </section>
-                );
-              })}
-            </>
-          )}
+          {article.sentences.map((s) => (
+            <SentenceItem
+              key={s.id}
+              sentence={s}
+              value={answers[s.id] ?? ''}
+              isSubmitted={submitted[s.id] ?? false}
+              feedback={feedbacks[s.id]}
+              voiceName={voiceName}
+              speakingRate={speakingRate}
+              onChange={(val) =>
+                setAnswers((prev) => ({ ...prev, [s.id]: val }))
+              }
+              onSubmit={async () => submitOne(s)}
+            />
+          ))}
+        </div>
+
+        <div className='mt-8 text-center text-sm text-gray-600'>
+          {allSubmitted ? '所有句子都已送出。辛苦了！' : '未送出的回答'}
         </div>
       </main>
     </div>
