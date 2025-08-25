@@ -4,13 +4,21 @@ import { TTSOptions } from './types';
 
 function createGoogleTTSClient(): TextToSpeechClient {
   try {
-    return new TextToSpeechClient({
-      projectId: process.env.GOOGLE_PROJECT_ID,
-      credentials: {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY,
-      },
-    });
+    const encodedCredentials = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (encodedCredentials) {
+      const decodedCredentials = Buffer.from(
+        encodedCredentials,
+        'base64'
+      ).toString('utf-8');
+      const credentials = JSON.parse(decodedCredentials);
+      return new TextToSpeechClient({
+        projectId: process.env.GOOGLE_PROJECT_ID,
+        credentials: {
+          client_email: credentials.client_email,
+          private_key: credentials.private_key,
+        },
+      });
+    }
   } catch (error) {
     console.error('Failed to initialize Google Cloud client:', error);
   }
