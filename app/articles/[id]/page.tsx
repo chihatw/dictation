@@ -256,7 +256,7 @@ const ArticlePage = ({}: Props) => {
         </div>
 
         <div className='mt-8 text-center text-sm text-gray-600'>
-          {allSubmitted ? '所有句子都已送出。辛苦了！' : '未送出的回答'}
+          {allSubmitted ? '所有句子都已送出。辛苦了！' : '尚有未送出的回答'}
         </div>
       </main>
     </div>
