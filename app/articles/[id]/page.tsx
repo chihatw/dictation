@@ -208,6 +208,7 @@ const ArticlePage = ({}: Props) => {
                 setAnswers((prev) => ({ ...prev, [s.id]: val }))
               }
               onSubmit={async () => submitOne(s)}
+              submitting={loadingMap[s.id] ?? false}
             />
           ))}
         </div>

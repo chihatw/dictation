@@ -1,6 +1,6 @@
 'use client';
 
-import { Send } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { TTSPlayButton } from './TTSPlayButton';
 
@@ -48,6 +48,9 @@ export default function SentenceItem({
             variant='outline'
             size='sm'
             labels={{ idle: '再生', loading: '準備中', stop: '停止' }}
+            className={
+              submitting ? 'pointer-events-none opacity-50' : undefined
+            }
           />
         </div>
       </div>
@@ -68,6 +71,9 @@ export default function SentenceItem({
             placeholder='輸入你聽到的日文'
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            readOnly={!!submitting}
+            aria-busy={!!submitting}
+            style={submitting ? { opacity: 0.7 } : undefined}
           />
         )}
       </div>
@@ -76,11 +82,21 @@ export default function SentenceItem({
       <div className='mt-3 flex justify-end'>
         <button
           disabled={isSubmitted || !value.trim() || submitting}
-          onClick={() => onSubmit()}
+          onClick={() => {
+            if (!submitting) onSubmit();
+          }}
           className='inline-flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50'
         >
-          <Send className='h-4 w-4' />
-          {submitting ? '送出中…' : '送出'}
+          {submitting ? (
+            <>
+              <Loader2 className='h-4 w-4 animate-spin' /> 正在送出… ⏳
+              可能需要一些時間，請耐心等候
+            </>
+          ) : (
+            <>
+              <Send className='h-4 w-4' /> 送出
+            </>
+          )}
         </button>
       </div>
 
