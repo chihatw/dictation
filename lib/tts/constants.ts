@@ -45,3 +45,22 @@ export const GOOGLE_VOICES = {
     },
   },
 };
+
+export const VOICES = [
+  'ja-JP-Chirp3-HD-Charon',
+  'ja-JP-Chirp3-HD-Fenrir',
+  'ja-JP-Chirp3-HD-Orus',
+  'ja-JP-Chirp3-HD-Puck',
+  'ja-JP-Chirp3-HD-Aoede',
+  'ja-JP-Chirp3-HD-Kore',
+  'ja-JP-Chirp3-HD-Leda',
+  'ja-JP-Chirp3-HD-Zephyr',
+] as const;
+
+export type VoiceOption = (typeof VOICES)[number];
+
+export const DEFAULT_VOICE: VoiceOption = 'ja-JP-Chirp3-HD-Aoede';
+export const DEFAULT_RATE = 1.0;
+
+export const clampRateForDB = (n: number) => Math.max(0.1, Math.min(4.0, n));
+export const isReasonableRate = (n: number) => n > 0 && n <= 4.0;
