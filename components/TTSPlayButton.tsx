@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { Loader2, Play, Square } from 'lucide-react';
 
 type Props = {
+  audioUrl?: string;
   text: string;
   voiceName: string;
   speakingRate: number;
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export const TTSPlayButton = ({
+  audioUrl,
   text,
   voiceName,
   speakingRate,
@@ -28,15 +30,23 @@ export const TTSPlayButton = ({
   className,
   labels,
 }: Props) => {
-  const { play, stop, loading: ttsLoading, isPlaying } = useTTS();
+  const { play, playUrl, stop, loading: ttsLoading, isPlaying } = useTTS();
 
   const handlePlayOrStop = async () => {
-    if (!text || ttsLoading) return;
+    if (ttsLoading) return;
     if (isPlaying) {
       stop();
       return;
     }
-    await play(text, { voiceName, speakingRate });
+    if (audioUrl) {
+      // debug
+      console.log('playUrl');
+      await playUrl(audioUrl);
+    } else if (text) {
+      // debug
+      console.log('play');
+      await play(text, { voiceName, speakingRate });
+    }
   };
 
   const base =
@@ -54,13 +64,15 @@ export const TTSPlayButton = ({
   const textStop = labels?.stop ?? '停止';
   const aria = labels?.aria ?? '再生/停止';
 
+  const disabled = !audioUrl && !text;
+
   return (
     <button
       type='button'
       className={clsx(base, sizeCls, variantCls, className)}
       onClick={handlePlayOrStop}
       aria-label={aria}
-      disabled={!text}
+      disabled={disabled}
     >
       {ttsLoading ? (
         <>

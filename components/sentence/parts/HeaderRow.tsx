@@ -7,10 +7,11 @@ export type HeaderRowProps = {
   id: string;
   seq: number;
   tts: { text: string; voiceName: string; speakingRate: number };
+  audioUrl?: string;
   disabled?: boolean;
 };
 
-function HeaderRowBase({ id, seq, tts, disabled }: HeaderRowProps) {
+function HeaderRowBase({ id, seq, tts, audioUrl, disabled }: HeaderRowProps) {
   return (
     <div className='mb-3 flex items-center justify-between'>
       <h3 id={id} className='text-sm font-medium text-gray-600'>
@@ -18,6 +19,7 @@ function HeaderRowBase({ id, seq, tts, disabled }: HeaderRowProps) {
       </h3>
       <div className='flex items-center gap-2'>
         <TTSPlayButton
+          audioUrl={audioUrl}
           text={tts.text}
           voiceName={tts.voiceName}
           speakingRate={tts.speakingRate}

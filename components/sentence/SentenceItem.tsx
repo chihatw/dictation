@@ -1,11 +1,12 @@
 'use client';
 
+import { toPublicUrl } from '@/lib/tts/publicUrl';
+import { Sentence } from '@/types/dictation';
 import { memo, useMemo } from 'react';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
 import { HeaderRow } from './parts/HeaderRow';
 import { SubmitButton } from './parts/SubmitButton';
-import type { Sentence } from './types';
 
 export type SentenceItemProps = {
   sentence: Sentence;
@@ -35,6 +36,10 @@ function SentenceItemBase({
     [isSubmitted, value, submitting]
   );
 
+  const audioUrl = sentence.audio_path
+    ? toPublicUrl(sentence.audio_path)
+    : undefined;
+
   return (
     <section
       className='rounded-xl border bg-white p-4 shadow-sm'
@@ -43,6 +48,7 @@ function SentenceItemBase({
       <HeaderRow
         id={`sentence-${sentence.id}-title`}
         seq={sentence.seq}
+        audioUrl={audioUrl}
         tts={{ text: sentence.content, voiceName, speakingRate }}
         disabled={!!submitting}
       />

@@ -10,6 +10,7 @@ export type Sentence = {
   seq: number;
   content: string;
   created_at: string;
+  audio_path?: string | null;
   submission?: Submission[] | null;
 };
 
@@ -20,4 +21,5 @@ export type Article = {
   tts_voice_name: string;
   speaking_rate: number;
   sentences: Sentence[];
+  audio_path_full?: string | null;
 };

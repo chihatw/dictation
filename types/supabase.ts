@@ -544,26 +544,32 @@ export type Database = {
       }
       dictation_articles: {
         Row: {
+          audio_path_full: string | null
           created_at: string
           id: string
           speaking_rate: number
           title: string
+          tts_full_hash: string | null
           tts_voice_name: string
           uid: string
         }
         Insert: {
+          audio_path_full?: string | null
           created_at?: string
           id?: string
           speaking_rate?: number
           title?: string
+          tts_full_hash?: string | null
           tts_voice_name?: string
           uid: string
         }
         Update: {
+          audio_path_full?: string | null
           created_at?: string
           id?: string
           speaking_rate?: number
           title?: string
+          tts_full_hash?: string | null
           tts_voice_name?: string
           uid?: string
         }
@@ -607,24 +613,30 @@ export type Database = {
       dictation_sentences: {
         Row: {
           article_id: string
+          audio_path: string | null
           content: string
           created_at: string
           id: string
           seq: number
+          tts_hash: string | null
         }
         Insert: {
           article_id: string
+          audio_path?: string | null
           content: string
           created_at?: string
           id?: string
           seq: number
+          tts_hash?: string | null
         }
         Update: {
           article_id?: string
+          audio_path?: string | null
           content?: string
           created_at?: string
           id?: string
           seq?: number
+          tts_hash?: string | null
         }
         Relationships: [
           {

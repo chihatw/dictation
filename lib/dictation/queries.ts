@@ -11,8 +11,10 @@ export async function fetchArticleWithSentences(
       `
         id, title, created_at,
         tts_voice_name, speaking_rate,
+        audio_path_full,
         sentences:dictation_sentences (
           id, seq, content, created_at,
+          audio_path,
           submission:dictation_submissions!left (
             id, answer, feedback_md, created_at
           )
@@ -37,5 +39,6 @@ export async function fetchArticleWithSentences(
     sentences: data.sentences ?? [],
     tts_voice_name: data.tts_voice_name,
     speaking_rate: data.speaking_rate,
+    audio_path_full: data.audio_path_full ?? null,
   };
 }

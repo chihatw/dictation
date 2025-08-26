@@ -16,6 +16,29 @@ export function useTTS() {
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const playUrl = async (url: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (currentAudio.current) {
+        currentAudio.current.pause();
+        currentAudio.current.currentTime = 0;
+      }
+      const audio = new Audio(url);
+      currentAudio.current = audio;
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+        currentAudio.current = null;
+      });
+      await audio.play();
+      setIsPlaying(true);
+    } catch (e: any) {
+      setError(e?.message ?? 'playUrl failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const play = async (text: string, options?: Partial<TTSOptions>) => {
     setLoading(true);
     setError(null);
@@ -72,5 +95,5 @@ export function useTTS() {
     setIsPlaying(false);
   };
 
-  return { play, stop, loading, error, isPlaying };
+  return { play, playUrl, stop, loading, error, isPlaying };
 }

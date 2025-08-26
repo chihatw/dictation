@@ -1,6 +1,7 @@
 'use client';
 
 import { TTSPlayButton } from '@/components/TTSPlayButton';
+import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,6 +10,7 @@ type Props = {
   text: string;
   voiceName: string;
   speakingRate: number;
+  audioPathFull?: string | null;
 };
 
 export default function ArticleHeader({
@@ -16,7 +18,9 @@ export default function ArticleHeader({
   text,
   voiceName,
   speakingRate,
+  audioPathFull,
 }: Props) {
+  const audioUrl = audioPathFull ? toPublicUrl(audioPathFull) : undefined;
   return (
     <header className='sticky top-0 z-10 border-b bg-white/90 backdrop-blur'>
       <div className='mx-auto flex max-w-4xl items-center gap-3 px-4 py-3'>
@@ -28,6 +32,7 @@ export default function ArticleHeader({
         </Link>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>{title}</h1>
         <TTSPlayButton
+          audioUrl={audioUrl}
           text={text}
           voiceName={voiceName}
           speakingRate={speakingRate}

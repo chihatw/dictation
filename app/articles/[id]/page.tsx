@@ -72,6 +72,7 @@ export default function ArticlePage() {
         text={fullText}
         voiceName={voiceName}
         speakingRate={speakingRate}
+        audioPathFull={article.audio_path_full ?? null}
       />
 
       <main className='mx-auto max-w-4xl px-4 py-6'>
