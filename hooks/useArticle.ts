@@ -1,0 +1,116 @@
+'use client';
+
+import { submitFeedbackOnce } from '@/lib/dictation/feedback';
+import { fetchArticleWithSentences } from '@/lib/dictation/queries';
+import type { Article, Sentence } from '@/types/dictation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+export function useArticle(
+  articleId: string | undefined,
+  userId: string | null
+) {
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
+  const [feedbacks, setFeedbacks] = useState<Record<string, string>>({});
+  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!articleId || !userId) return;
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      setErrMsg(null);
+      const data = await fetchArticleWithSentences(articleId, userId);
+      if (!mounted) return;
+
+      if (!data) {
+        setErrMsg('記事の取得に失敗しました。');
+        setArticle(null);
+        setLoading(false);
+        return;
+      }
+
+      setArticle(data);
+
+      // 既存回答を状態へ
+      const nextAnswers: Record<string, string> = {};
+      const nextSubmitted: Record<string, boolean> = {};
+      const nextFeedbacks: Record<string, string> = {};
+
+      for (const s of data.sentences ?? []) {
+        const one = (s.submission ?? [])[0];
+        nextAnswers[s.id] = one?.answer ?? '';
+        nextSubmitted[s.id] = !!one;
+        nextFeedbacks[s.id] = one?.feedback_md ?? '';
+      }
+      setAnswers(nextAnswers);
+      setSubmitted(nextSubmitted);
+      setFeedbacks(nextFeedbacks);
+      setLoading(false);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [articleId, userId]);
+
+  const fullText = useMemo(
+    () => article?.sentences.map((s) => s.content).join('') ?? '',
+    [article]
+  );
+
+  const allSubmitted = useMemo(
+    () => article?.sentences.every((s) => submitted[s.id]) ?? false,
+    [submitted, article?.sentences]
+  );
+
+  const submitOne = useCallback(
+    async (s: Sentence) => {
+      const val = (answers[s.id] ?? '').trim();
+      if (!val) return;
+
+      if (!window.confirm('送出後不可再編輯')) return;
+
+      // 楽観的 UI
+      setSubmitted((old) => ({ ...old, [s.id]: true }));
+      setLoadingMap((old) => ({ ...old, [s.id]: true }));
+
+      const res = await submitFeedbackOnce({
+        sentenceId: s.id,
+        sentenceScript: s.content,
+        userAnswer: val,
+      });
+
+      if (!res.ok) {
+        // 失敗時はロック解除（厳格に1回のみならここ解除しない運用もOK）
+        setSubmitted((old) => ({ ...old, [s.id]: false }));
+        alert('送信に失敗しました。ネットワーク等を確認してください。');
+      } else {
+        setFeedbacks((old) => ({ ...old, [s.id]: res.feedbackMarkdown ?? '' }));
+      }
+      setLoadingMap((old) => ({ ...old, [s.id]: false }));
+    },
+    [answers]
+  );
+
+  return {
+    // データ
+    article,
+    loading,
+    errMsg,
+    // 派生
+    fullText,
+    allSubmitted,
+    // 入力状態
+    answers,
+    setAnswers,
+    submitted,
+    feedbacks,
+    loadingMap,
+    // 動作
+    submitOne,
+  };
+}
