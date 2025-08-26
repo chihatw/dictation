@@ -35,7 +35,7 @@ export default function ArticlePage() {
     if (article.tts_voice_name) setVoiceName(article.tts_voice_name);
     if (typeof article.speaking_rate === 'number')
       setSpeakingRate(article.speaking_rate);
-  }, [article?.id]); // 記事が切り替わった時のみ
+  }, [article, article?.id]); // 記事が切り替わった時のみ
 
   const handleSubmitOne = (sentenceId: string) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);

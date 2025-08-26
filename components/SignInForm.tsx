@@ -1,18 +1,14 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
-type Props = {};
-
-const SignInForm = ({}: Props) => {
+const SignInForm = ({ next = '/' }: { next?: string }) => {
   const { signIn, loading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = searchParams.get('next') || '/';
 
   const canSubmit = useMemo(
     () => !loading && email.length > 0 && password.length > 0,
