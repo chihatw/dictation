@@ -13,7 +13,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const updatedHistory = await chat(history, newMessage);
+    const feedback = await chat([
+      ...history,
+      { role: 'user', content: newMessage },
+    ]);
+    const updatedHistory = [
+      ...history,
+      { role: 'user', content: newMessage },
+      feedback,
+    ];
     return NextResponse.json(updatedHistory);
   } catch (error) {
     console.error(error);

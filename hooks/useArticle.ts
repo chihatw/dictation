@@ -1,6 +1,6 @@
 'use client';
 
-import { submitFeedbackOnce } from '@/lib/dictation/feedback';
+import { createFeedbackAction } from '@/app/articles/[id]/action';
 import { fetchArticleWithSentences } from '@/lib/dictation/queries';
 import type { Article, Sentence } from '@/types/dictation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -78,13 +78,13 @@ export function useArticle(
       setSubmitted((old) => ({ ...old, [s.id]: true }));
       setLoadingMap((old) => ({ ...old, [s.id]: true }));
 
-      const res = await submitFeedbackOnce({
+      const res = await createFeedbackAction({
         sentenceId: s.id,
         sentenceScript: s.content,
         userAnswer: val,
       });
 
-      if (!res.ok) {
+      if (!res?.ok) {
         // 失敗時はロック解除（厳格に1回のみならここ解除しない運用もOK）
         setSubmitted((old) => ({ ...old, [s.id]: false }));
         alert('送信に失敗しました。ネットワーク等を確認してください。');
