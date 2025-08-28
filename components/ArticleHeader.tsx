@@ -1,9 +1,10 @@
 'use client';
 
-import { TTSPlayButton } from '@/components/TTSPlayButton';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { TTSPlayButton } from './audio/TTSPlayButton';
+import { UrlPlayButton } from './audio/UrlPlayButton';
 
 type Props = {
   title: string;
@@ -31,20 +32,33 @@ export default function ArticleHeader({
           <ChevronLeft className='h-4 w-4' /> 返回首頁
         </Link>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>{title}</h1>
-        <TTSPlayButton
-          audioUrl={audioUrl}
-          text={text}
-          voiceName={voiceName}
-          speakingRate={speakingRate}
-          variant='solid'
-          size='md'
-          labels={{
-            idle: '全部播放',
-            loading: '朗讀準備中...',
-            stop: '停止',
-            aria: '全体を再生/停止',
-          }}
-        />
+        {audioUrl ? (
+          <UrlPlayButton
+            audioUrl={audioUrl}
+            variant='solid'
+            size='md'
+            labels={{
+              idle: '全部播放',
+              loading: '朗讀準備中...',
+              stop: '停止',
+              aria: '全体を再生/停止',
+            }}
+          />
+        ) : (
+          <TTSPlayButton
+            text={text}
+            voiceName={voiceName}
+            speakingRate={speakingRate}
+            variant='solid'
+            size='md'
+            labels={{
+              idle: '全部播放',
+              loading: '朗讀準備中...',
+              stop: '停止',
+              aria: '全体を再生/停止',
+            }}
+          />
+        )}
       </div>
     </header>
   );

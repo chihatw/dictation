@@ -2,7 +2,7 @@
 
 import { createArticleAction } from '@/app/admin/article/actions';
 import { UserPicker } from '@/components/admin/UserPicker';
-import { TTSPlayButton } from '@/components/TTSPlayButton';
+import { TTSPlayButton } from '@/components/audio/TTSPlayButton';
 import {
   DEFAULT_RATE,
   DEFAULT_VOICE,

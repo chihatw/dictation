@@ -1,6 +1,7 @@
 'use client';
 
-import { TTSPlayButton } from '@/components/TTSPlayButton';
+import { TTSPlayButton } from '@/components/audio/TTSPlayButton';
+import { UrlPlayButton } from '@/components/audio/UrlPlayButton';
 import { memo } from 'react';
 
 export type HeaderRowProps = {
@@ -18,16 +19,25 @@ function HeaderRowBase({ id, seq, tts, audioUrl, disabled }: HeaderRowProps) {
         文 #{seq}
       </h3>
       <div className='flex items-center gap-2'>
-        <TTSPlayButton
-          audioUrl={audioUrl}
-          text={tts.text}
-          voiceName={tts.voiceName}
-          speakingRate={tts.speakingRate}
-          variant='outline'
-          size='sm'
-          labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
-          className={disabled ? 'pointer-events-none opacity-50' : undefined}
-        />
+        {audioUrl ? (
+          <UrlPlayButton
+            audioUrl={audioUrl}
+            variant='solid'
+            size='md'
+            labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
+            className={disabled ? 'pointer-events-none opacity-50' : undefined}
+          />
+        ) : (
+          <TTSPlayButton
+            text={tts.text}
+            voiceName={tts.voiceName}
+            speakingRate={tts.speakingRate}
+            variant='outline'
+            size='sm'
+            labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
+            className={disabled ? 'pointer-events-none opacity-50' : undefined}
+          />
+        )}
       </div>
     </div>
   );
