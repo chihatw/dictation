@@ -10,9 +10,17 @@ export type HeaderRowProps = {
   tts: { text: string; voiceName: string; speakingRate: number };
   audioUrl?: string;
   disabled?: boolean;
+  onPlay?: () => void;
 };
 
-function HeaderRowBase({ id, seq, tts, audioUrl, disabled }: HeaderRowProps) {
+function HeaderRowBase({
+  id,
+  seq,
+  tts,
+  audioUrl,
+  disabled,
+  onPlay,
+}: HeaderRowProps) {
   return (
     <div className='mb-3 flex items-center justify-between'>
       <h3 id={id} className='text-sm font-medium text-gray-600'>
@@ -26,6 +34,7 @@ function HeaderRowBase({ id, seq, tts, audioUrl, disabled }: HeaderRowProps) {
             size='md'
             labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
             className={disabled ? 'pointer-events-none opacity-50' : undefined}
+            onPlayStart={onPlay}
           />
         ) : (
           <TTSPlayButton
@@ -36,6 +45,7 @@ function HeaderRowBase({ id, seq, tts, audioUrl, disabled }: HeaderRowProps) {
             size='sm'
             labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
             className={disabled ? 'pointer-events-none opacity-50' : undefined}
+            onPlayStart={onPlay}
           />
         )}
       </div>

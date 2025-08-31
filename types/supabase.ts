@@ -648,6 +648,67 @@ export type Database = {
           },
         ]
       }
+      dictation_submission_logs: {
+        Row: {
+          answer: string | null
+          created_at: string
+          elapsed_ms_since_first_play: number
+          elapsed_ms_since_item_view: number
+          id: string
+          listened_full_count: number
+          plays_count: number
+          sentence_id: string
+          used_play_all: boolean
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          created_at?: string
+          elapsed_ms_since_first_play: number
+          elapsed_ms_since_item_view: number
+          id?: string
+          listened_full_count?: number
+          plays_count?: number
+          sentence_id: string
+          used_play_all?: boolean
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          created_at?: string
+          elapsed_ms_since_first_play?: number
+          elapsed_ms_since_item_view?: number
+          id?: string
+          listened_full_count?: number
+          plays_count?: number
+          sentence_id?: string
+          used_play_all?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_submission_logs_sentence_id_fkey"
+            columns: ["sentence_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_sentences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_submission_logs_userid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "article_pitch_quizzes_view"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "dictation_submission_logs_userid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
+          },
+        ]
+      }
       dictation_submissions: {
         Row: {
           answer: string

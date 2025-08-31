@@ -21,6 +21,7 @@ type BaseProps = {
   disabled?: boolean;
   onPlay: () => void | Promise<void>;
   onStop: () => void;
+  onPlayStart?: () => void;
 };
 
 export const BasePlayButton = ({
@@ -33,6 +34,7 @@ export const BasePlayButton = ({
   disabled,
   onPlay,
   onStop,
+  onPlayStart,
 }: BaseProps) => {
   const base =
     'inline-flex items-center gap-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
@@ -51,7 +53,10 @@ export const BasePlayButton = ({
   const handleClick = async () => {
     if (loading) return;
     if (isPlaying) onStop();
-    else await onPlay();
+    else {
+      onPlayStart?.();
+      await onPlay();
+    }
   };
 
   return (

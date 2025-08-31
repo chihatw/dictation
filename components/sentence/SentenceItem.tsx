@@ -1,8 +1,9 @@
 'use client';
 
+import { createLogAction } from '@/app/articles/[id]/createLogAction';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { Sentence } from '@/types/dictation';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useRef, useState } from 'react';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
 import { HeaderRow } from './parts/HeaderRow';
@@ -31,6 +32,15 @@ function SentenceItemBase({
   onSubmit,
   submitting,
 }: SentenceItemProps) {
+  const [playsCount, setPlaysCount] = useState(0);
+  const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
+  const itemViewAt = useRef(Date.now());
+
+  const handlePlay = () => {
+    setPlaysCount((c) => c + 1);
+    if (!firstPlayAt) setFirstPlayAt(Date.now());
+  };
+
   const canSubmit = useMemo(
     () => !isSubmitted && !!value.trim() && !submitting,
     [isSubmitted, value, submitting]
@@ -39,6 +49,20 @@ function SentenceItemBase({
   const audioUrl = sentence.audio_path
     ? toPublicUrl(sentence.audio_path)
     : undefined;
+
+  const handleSubmit = async () => {
+    await createLogAction({
+      sentenceId: sentence.id,
+      answer: value,
+      playsCount,
+      listenedFullCount: playsCount,
+      usedPlayAll: false,
+      elapsedMsSinceItemView: Date.now() - itemViewAt.current,
+      elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
+    });
+
+    onSubmit(sentence.id); // 元のsubmitOne呼び出し
+  };
 
   return (
     <section
@@ -51,6 +75,7 @@ function SentenceItemBase({
         audioUrl={audioUrl}
         tts={{ text: sentence.content, voiceName, speakingRate }}
         disabled={!!submitting}
+        onPlay={handlePlay}
       />
 
       <div className='mt-3'>
@@ -71,7 +96,7 @@ function SentenceItemBase({
         <SubmitButton
           loading={!!submitting}
           disabled={!canSubmit}
-          onClick={() => onSubmit(sentence.id)}
+          onClick={handleSubmit}
         />
       </div>
 

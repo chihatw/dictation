@@ -15,9 +15,10 @@ type Props = {
     stop?: string;
     aria?: string;
   };
+  onPlayStart?: () => void;
 };
 
-export const UrlPlayButton = ({ audioUrl, ...rest }: Props) => {
+export const UrlPlayButton = ({ audioUrl, onPlayStart, ...rest }: Props) => {
   const { playUrl, stop, loading, isPlaying } = useAudioPlayer();
   return (
     <BasePlayButton
@@ -26,6 +27,7 @@ export const UrlPlayButton = ({ audioUrl, ...rest }: Props) => {
       isPlaying={isPlaying}
       onPlay={() => playUrl(audioUrl)}
       onStop={stop}
+      onPlayStart={onPlayStart}
       disabled={!audioUrl}
     />
   );

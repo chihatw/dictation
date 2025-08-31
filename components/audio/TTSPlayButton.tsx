@@ -17,12 +17,14 @@ type Props = {
     stop?: string;
     aria?: string;
   };
+  onPlayStart?: () => void;
 };
 
 export const TTSPlayButton = ({
   text,
   voiceName,
   speakingRate,
+  onPlayStart,
   ...rest
 }: Props) => {
   const { play, stop, loading, isPlaying } = useTTS();
@@ -33,6 +35,7 @@ export const TTSPlayButton = ({
       isPlaying={isPlaying}
       onPlay={() => play(text, { voiceName, speakingRate })}
       onStop={stop}
+      onPlayStart={onPlayStart}
       disabled={!text}
     />
   );
