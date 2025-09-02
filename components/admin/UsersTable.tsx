@@ -12,7 +12,7 @@ export default function UsersTable({
   grantAdmin: (uid: string) => Promise<void>;
   revokeAdmin: (uid: string) => Promise<void>;
 }) {
-  const [isPending, start] = useTransition();
+  const [, start] = useTransition();
   const [optimisticUsers, setOptimistic] = useOptimistic(
     initialUsers,
     (state, upd: Partial<User> & { id: string }) =>

@@ -2,9 +2,7 @@ import UsersTable from '@/components/admin/UsersTable';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { grantAdmin, revokeAdmin } from './actions';
 
-type Props = {};
-
-const AdminUsersPage = async (props: Props) => {
+const AdminUsersPage = async () => {
   const { data, error } = await supabaseAdmin.auth.admin.listUsers({
     page: 1,
     perPage: 50,
