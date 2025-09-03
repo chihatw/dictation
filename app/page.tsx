@@ -30,10 +30,9 @@ export default async function Home() {
   // 2) そのリリースに紐づく記事をpos昇順で取得
   //    dictation_release_items.article_id -> dictation_articles.id
   let articles: { id: string; title: string; created_at: string }[] = [];
-  let itemsErr = null;
 
   if (rel?.id) {
-    const { data: items, error } = await supabase
+    const { data: items } = await supabase
       .from('dictation_release_items')
       .select('pos, dictation_articles(id, title, created_at)')
       .eq('release_id', rel.id)
