@@ -1,5 +1,5 @@
 // lib/tts/persist.ts
-import { createClient } from '@/lib/supabase/server';
+import { createClientAction } from '@/lib/supabase/server-action';
 
 import { synthesizeText } from '.';
 import { buildTtsHash, TtsKey } from './hash';
@@ -8,7 +8,7 @@ export async function synthesizeToStorage(input: TtsKey) {
   const hash = await buildTtsHash(input);
   const path = `tts/${hash}.mp3`;
 
-  const supabase = await createClient();
+  const supabase = await createClientAction();
 
   // 直接アップロードを試み、失敗したら既存とみなす（並行リクエストの競合を吸収）
   const audioBuffer = await synthesizeText(input.text, {

@@ -1,7 +1,7 @@
 'use server';
 
 import { chat } from '@/lib/chat';
-import { createClient } from '@/lib/supabase/server';
+import { createClientAction } from '@/lib/supabase/server-action';
 import { z } from 'zod';
 
 type CreateFeedbackResult =
@@ -21,7 +21,7 @@ export async function createFeedbackAction(
   if (!parsed.success) return { ok: false, error: '入力が不正です。' };
   const { sentenceId, sentenceScript, userAnswer } = parsed.data;
 
-  const supabase = await createClient();
+  const supabase = await createClientAction();
   const { data } = await supabase.auth.getUser();
   const userId = data.user?.id;
   if (!userId) return { ok: false, error: '未認証です。' };

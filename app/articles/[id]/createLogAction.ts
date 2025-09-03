@@ -1,7 +1,7 @@
 // app/actions/createLogAction.ts
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClientAction } from '@/lib/supabase/server-action';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -27,7 +27,7 @@ export async function createLogAction(input: unknown) {
     elapsedMsSinceFirstPlay,
   } = parsed.data;
 
-  const supabase = await createClient();
+  const supabase = await createClientAction();
   const { data } = await supabase.auth.getUser();
   const userId = data.user?.id;
   if (!userId) return { ok: false, error: '未認証' };

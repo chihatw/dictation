@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server'; // 既存のサーバークライアントに合わせて
+import { createClientAction } from '@/lib/supabase/server-action';
 import { clampRateForDB } from '@/lib/tts/constants';
 import { synthesizeToStorage } from '@/lib/tts/persist';
 import { splitIntoSentences } from '@/lib/tts/splitSentences';
@@ -16,7 +16,7 @@ export async function createArticleAction(input: unknown) {
   if (sentences.length === 0)
     return { ok: false, error: '本文から文が抽出できませんでした。' };
 
-  const supabase = await createClient();
+  const supabase = await createClientAction();
 
   // 1) 記事作成
   const { data: article, error: insErr } = await supabase

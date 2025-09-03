@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 
 // 参考: https://supabase.com/docs/guides/getting-started/ai-prompts/nextjs-supabase-auth
 
-export const createClient = async () => {
+export const createClientAction = async () => {
   const cookieStore = await cookies();
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,10 +15,10 @@ export const createClient = async () => {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll() {
-          // no-op
-          // RSC ではクライアント側の Cookie を操作できない
-          // Server Action では setAll が必要なので、別ファイルに分けている
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
         },
       },
     }
