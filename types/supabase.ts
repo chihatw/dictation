@@ -575,40 +575,65 @@ export type Database = {
         }
         Relationships: []
       }
-      dictation_chat_messages: {
+      dictation_release_items: {
         Row: {
-          content: string
-          created_at: string
+          article_id: string
           id: string
-          meta: Json
-          role: Database["public"]["Enums"]["chat_role"]
-          sentence_id: string
+          pos: number
+          release_id: string
         }
         Insert: {
-          content: string
-          created_at?: string
+          article_id: string
           id?: string
-          meta?: Json
-          role: Database["public"]["Enums"]["chat_role"]
-          sentence_id: string
+          pos: number
+          release_id: string
         }
         Update: {
-          content?: string
-          created_at?: string
+          article_id?: string
           id?: string
-          meta?: Json
-          role?: Database["public"]["Enums"]["chat_role"]
-          sentence_id?: string
+          pos?: number
+          release_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "dictation_chat_messages_sentence_id_fkey"
-            columns: ["sentence_id"]
+            foreignKeyName: "dictation_release_items_article_id_fkey"
+            columns: ["article_id"]
             isOneToOne: false
-            referencedRelation: "dictation_sentences"
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_release_items_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_releases"
             referencedColumns: ["id"]
           },
         ]
+      }
+      dictation_releases: {
+        Row: {
+          created_at: string
+          due_at: string | null
+          id: string
+          published_at: string | null
+          uid: string
+        }
+        Insert: {
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          published_at?: string | null
+          uid: string
+        }
+        Update: {
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          published_at?: string | null
+          uid?: string
+        }
+        Relationships: []
       }
       dictation_sentences: {
         Row: {
@@ -1930,6 +1955,10 @@ export type Database = {
         Returns: {
           image_id: string
         }[]
+      }
+      publish_release: {
+        Args: { p_release_id: string; p_user_id: string }
+        Returns: undefined
       }
     }
     Enums: {

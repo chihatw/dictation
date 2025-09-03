@@ -8,29 +8,44 @@ import Link from 'next/link';
 export default async function Home() {
   const supabase = await createClient();
 
-  // middleware で非ログインユーザーは弾かれる想定
+  // 認証済み前提（middlewareで非ログインを排除）
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data, error } = await supabase
-    .from('dictation_articles')
-    .select('id, title, created_at')
+  // 1) ユーザーの最新公開リリースを1件取得
+  const { data: rel, error: relErr } = await supabase
+    .from('dictation_releases')
+    .select('id, published_at, due_at')
     .eq('uid', user!.id)
-    .order('created_at', { ascending: true });
+    .not('published_at', 'is', null)
+    .order('published_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  const articles = data ?? [];
+  if (relErr) {
+    console.error(relErr);
+  }
+
+  // 2) そのリリースに紐づく記事をpos昇順で取得
+  //    dictation_release_items.article_id -> dictation_articles.id
+  let articles: { id: string; title: string; created_at: string }[] = [];
+  let itemsErr = null;
+
+  if (rel?.id) {
+    const { data: items, error } = await supabase
+      .from('dictation_release_items')
+      .select('pos, dictation_articles(id, title, created_at)')
+      .eq('release_id', rel.id)
+      .order('pos', { ascending: true });
+
+    articles = (items ?? []).map((it) => it.dictation_articles).filter(Boolean);
+  }
 
   return (
     <div className='min-h-screen'>
       <main className='p-6 space-y-4 max-w-2xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
         <h1 className='text-xl font-semibold'>聽力練習</h1>
-
-        {error && (
-          <p className='rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700'>
-            取得に失敗しました。しばらくしてから再度お試しください。
-          </p>
-        )}
 
         {articles.length === 0 ? (
           <div className='rounded border p-4 text-sm text-gray-600'>
