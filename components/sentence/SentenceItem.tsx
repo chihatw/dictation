@@ -4,7 +4,8 @@ import { createLogAction } from '@/app/articles/[id]/createLogAction';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { Sentence } from '@/types/dictation';
 import { memo, useMemo, useRef, useState } from 'react';
-import { TeacherFeedbackTextForm } from '../articles/TeacherFeedbackTextForm';
+
+import { AdminFeedbackBlock } from '../articles/AdminFeedbackBlock';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
 import { HeaderRow } from './parts/HeaderRow';
@@ -109,7 +110,7 @@ function SentenceItemBase({
         transcript={sentence.content}
         ariaLiveId={`sentence-${sentence.id}-feedback`}
       />
-      {isAdmin && <TeacherFeedbackTextForm sentenceId={sentence.id} />}
+      <AdminFeedbackBlock sentenceId={sentence.id} isAdmin={isAdmin} />
     </section>
   );
 }

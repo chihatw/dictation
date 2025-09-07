@@ -89,7 +89,7 @@ export async function listFeedback(sentenceId: string) {
     .from('dictation_teacher_feedback')
     .select('id, created_at, sentence_id, note_md')
     .eq('sentence_id', sentenceId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: true });
 
   if (error) throw new Error(error.message);
   return data;
