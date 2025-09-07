@@ -5,6 +5,7 @@ import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { Sentence } from '@/types/dictation';
 import { memo, useMemo, useRef, useState } from 'react';
 
+import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { AdminFeedbackBlock } from '../articles/AdminFeedbackBlock';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
@@ -22,6 +23,11 @@ export type SentenceItemProps = {
   onSubmit: (sentenceId: string) => void;
   submitting?: boolean;
   isAdmin?: boolean;
+  items: FeedbackWithTags[];
+  onCreated?: (created: FeedbackWithTags) => void;
+  onDelete?: (feedbackId: string) => void;
+  onDeleteTag?: (tagId: string) => void;
+  onAddTag?: (label: string, feedbackId: string) => void;
 };
 
 function SentenceItemBase({
@@ -35,6 +41,11 @@ function SentenceItemBase({
   onSubmit,
   submitting,
   isAdmin = false,
+  items,
+  onCreated,
+  onDelete,
+  onDeleteTag,
+  onAddTag,
 }: SentenceItemProps) {
   const [playsCount, setPlaysCount] = useState(0);
   const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
@@ -55,17 +66,21 @@ function SentenceItemBase({
     : undefined;
 
   const handleSubmit = async () => {
-    await createLogAction({
-      sentenceId: sentence.id,
-      answer: value,
-      playsCount,
-      listenedFullCount: playsCount,
-      usedPlayAll: false,
-      elapsedMsSinceItemView: Date.now() - itemViewAt.current,
-      elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
-    });
-
-    onSubmit(sentence.id); // 元のsubmitOne呼び出し
+    try {
+      await createLogAction({
+        sentenceId: sentence.id,
+        answer: value,
+        playsCount,
+        listenedFullCount: playsCount,
+        usedPlayAll: false,
+        elapsedMsSinceItemView: Date.now() - itemViewAt.current,
+        elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
+      });
+    } catch {
+      // ここで黙殺 or console.error(e)
+    } finally {
+      onSubmit(sentence.id);
+    }
   };
 
   return (
@@ -110,7 +125,15 @@ function SentenceItemBase({
         transcript={sentence.content}
         ariaLiveId={`sentence-${sentence.id}-feedback`}
       />
-      <AdminFeedbackBlock sentenceId={sentence.id} isAdmin={isAdmin} />
+      <AdminFeedbackBlock
+        items={items}
+        sentenceId={sentence.id}
+        isAdmin={isAdmin}
+        onCreated={onCreated}
+        onDelete={onDelete}
+        onDeleteTag={onDeleteTag}
+        onAddTag={onAddTag}
+      />
     </section>
   );
 }

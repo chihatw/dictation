@@ -1,27 +1,38 @@
-import { useState } from 'react';
+import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { TeacherFeedbackForm } from './TeacherFeedbackForm';
 import { TeacherFeedbackList } from './TeacherFeedbackList';
 
-// isAdmin が true のときだけフォームも表示
 export function AdminFeedbackBlock({
   sentenceId,
   isAdmin,
+  items,
+  onDelete,
+  onDeleteTag,
+  onCreated,
+  onAddTag,
 }: {
   sentenceId: string;
   isAdmin: boolean;
+  items: FeedbackWithTags[];
+  onDelete?: (feedbackId: string) => void;
+  onDeleteTag?: (tagId: string) => void;
+  onCreated?: (created: FeedbackWithTags) => void;
+  onAddTag?: (label: string, feedbackId: string) => void;
 }) {
-  const [refreshToken, setRefreshToken] = useState(0);
-  const bump = () => setRefreshToken((n) => n + 1);
-
   return (
     <div className='mt-4 space-y-3'>
       {isAdmin && (
-        <TeacherFeedbackForm sentenceId={sentenceId} onSubmitted={bump} />
+        <TeacherFeedbackForm
+          sentenceId={sentenceId}
+          onSubmitted={onCreated} // フォーム完了→親へ通知
+        />
       )}
       <TeacherFeedbackList
-        sentenceId={sentenceId}
-        isAdmin={isAdmin} // 非管理者には false を渡す
-        refreshToken={refreshToken}
+        items={items}
+        isAdmin={isAdmin}
+        onDelete={onDelete}
+        onDeleteTag={onDeleteTag}
+        onAddTag={onAddTag}
       />
     </div>
   );

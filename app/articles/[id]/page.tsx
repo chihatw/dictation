@@ -5,16 +5,27 @@ import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
 import { supabase } from '@/lib/supabase/browser';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  addFeedbackTag,
+  deleteFeedback,
+  deleteFeedbackTag,
+  FeedbackWithTags,
+  listFeedbackWithTagsBulkBySentence,
+} from './action';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
 
-  // 記事の TTS 初期値
   const [voiceName, setVoiceName] = useState('ja-JP-Chirp3-HD-Aoede');
   const [speakingRate, setSpeakingRate] = useState(1.0);
-
   const [isAdmin, setIsAdmin] = useState(false);
+
+  // sentenceId -> feedbacks(with tags)
+  const [fbMap, setFbMap] = useState<Record<string, FeedbackWithTags[]>>({});
+
+  // StrictMode の二重実行を避けつつ、記事IDごとに一回だけ取得
+  const lastFetchedArticleId = useRef<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -37,13 +48,71 @@ export default function ArticlePage() {
     submitOne,
   } = useArticle(id);
 
-  // 記事読込後に TTS 設定を記事値へ上書き
   useEffect(() => {
     if (!article) return;
     if (article.tts_voice_name) setVoiceName(article.tts_voice_name);
     if (typeof article.speaking_rate === 'number')
       setSpeakingRate(article.speaking_rate);
-  }, [article, article?.id]); // 記事が切り替わった時のみ
+  }, [article]); // 記事切替時のみ
+
+  // フィードバック+タグを一括取得
+  useEffect(() => {
+    if (!article) return;
+    if (lastFetchedArticleId.current === article.id) return;
+    lastFetchedArticleId.current = article.id;
+
+    const ids = article.sentences.map((s) => s.id);
+    (async () => {
+      const m = await listFeedbackWithTagsBulkBySentence(ids);
+      setFbMap(m);
+    })();
+  }, [article]);
+
+  // 追加の反映（楽観更新）
+  const handleCreatedFeedback = (
+    created: FeedbackWithTags,
+    sentenceId: string
+  ) => {
+    setFbMap((m) => ({
+      ...m,
+      [sentenceId]: [...(m[sentenceId] ?? []), created], // 下に追加
+    }));
+  };
+
+  // 送信・削除の反映（楽観更新）
+  const handleDeleteFeedback = async (fbId: string, sentenceId: string) => {
+    await deleteFeedback(fbId);
+    setFbMap((m) => ({
+      ...m,
+      [sentenceId]: (m[sentenceId] ?? []).filter((x) => x.id !== fbId),
+    }));
+  };
+
+  const handleDeleteTag = async (tagId: string, sentenceId: string) => {
+    await deleteFeedbackTag(tagId);
+    setFbMap((m) => ({
+      ...m,
+      [sentenceId]: (m[sentenceId] ?? []).map((f) => ({
+        ...f,
+        tags: f.tags.filter((t) => t.id !== tagId),
+      })),
+    }));
+  };
+
+  const handleAddTag = async (
+    label: string,
+    sentenceId: string,
+    fbId: string
+  ) => {
+    if (!article) return;
+    const created = await addFeedbackTag(fbId, label.trim(), article.uid);
+    setFbMap((m) => ({
+      ...m,
+      [sentenceId]: (m[sentenceId] ?? []).map((f) =>
+        f.id === fbId ? { ...f, tags: [...(f.tags ?? []), created] } : f
+      ),
+    }));
+  };
 
   const handleSubmitOne = (sentenceId: string) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
@@ -62,7 +131,6 @@ export default function ArticlePage() {
       </div>
     );
   }
-
   if (errMsg) {
     return (
       <div className='p-6 max-w-2xl mx-auto'>
@@ -70,7 +138,6 @@ export default function ArticlePage() {
       </div>
     );
   }
-
   if (!article) return null;
 
   return (
@@ -90,11 +157,19 @@ export default function ArticlePage() {
           submitted={submitted}
           feedbacks={feedbacks}
           loadingMap={loadingMap}
-          onChangeAnswer={(id, val) => setAnswers((p) => ({ ...p, [id]: val }))}
+          onChangeAnswer={(sid, val) =>
+            setAnswers((p) => ({ ...p, [sid]: val }))
+          }
           onSubmitOne={handleSubmitOne}
           voiceName={voiceName}
           speakingRate={speakingRate}
           isAdmin={isAdmin}
+          /** 重要：文ごとのマップを渡す（子で sid をキーに取り出す） */
+          feedbackMap={fbMap}
+          onCreatedFeedback={handleCreatedFeedback}
+          onDeleteFeedback={handleDeleteFeedback}
+          onDeleteTag={handleDeleteTag}
+          onAddTag={handleAddTag}
         />
 
         <div className='mt-8 text-center text-sm text-gray-600'>

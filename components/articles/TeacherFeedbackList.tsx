@@ -1,73 +1,106 @@
 'use client';
 
-import { deleteFeedback, listFeedback } from '@/app/articles/[id]/action';
+import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import { useEffect, useState, useTransition } from 'react';
-
-type Feedback = {
-  id: string;
-  created_at: string;
-  sentence_id: string;
-  note_md: string;
-};
+import { useState } from 'react';
 
 export function TeacherFeedbackList({
-  sentenceId,
+  items,
   isAdmin = false,
-  refreshToken = 0, // 親が増やすと再読込
+  onDelete,
+  onDeleteTag,
+  onAddTag,
 }: {
-  sentenceId: string;
+  items: FeedbackWithTags[];
   isAdmin?: boolean;
-  refreshToken?: number;
+  onDelete?: (feedbackId: string) => void;
+  onDeleteTag?: (tagId: string) => void;
+  onAddTag?: (label: string, fbId: string) => void;
 }) {
-  const [items, setItems] = useState<Feedback[]>([]);
-  const [isPending, startTransition] = useTransition();
-
-  const load = async () => {
-    const data = await listFeedback(sentenceId);
-    setItems(data);
-  };
-
-  useEffect(() => {
-    load();
-  }, [sentenceId]);
-  useEffect(() => {
-    load();
-  }, [refreshToken]);
-
-  const remove = (id: string) => {
-    if (!isAdmin) return;
-    startTransition(async () => {
-      await deleteFeedback(id);
-      await load();
-    });
-  };
+  if (items.length === 0) {
+    return <></>;
+  }
 
   return (
     <div className='rounded-lg border p-3'>
       <h3 className='text-sm font-semibold'>短評</h3>
-
       <div className='mt-3 space-y-3'>
         {items.map((f) => (
           <div key={f.id} className='rounded border p-3'>
-            <div className='mb-1 grid grid-cols-[1fr_auto] items-center justify-end'>
-              <div className='prose prose-sm max-w-none'>
-                <MarkdownRenderer markdown={f.note_md} />
-              </div>
+            {/* 行ヘッダ：日時＋削除 */}
+            <div className='mb-2 flex items-center justify-end'>
               {isAdmin && (
                 <button
                   type='button'
-                  onClick={() => remove(f.id)}
-                  disabled={isPending}
-                  className='text-xs text-red-600 disabled:opacity-50'
+                  onClick={() => onDelete?.(f.id)}
+                  className='h-6 whitespace-nowrap rounded border px-2 text-xs text-red-600'
                 >
                   削除
                 </button>
               )}
             </div>
+
+            {/* 本文 */}
+            <div className='prose prose-sm max-w-none'>
+              <MarkdownRenderer markdown={f.note_md} />
+            </div>
+
+            {/* タグ列 */}
+            <div className='mt-2 flex flex-wrap gap-2'>
+              {(f.tags ?? []).map((t) => (
+                <span
+                  key={t.id}
+                  className='inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs'
+                >
+                  {t.label}
+                  {isAdmin && (
+                    <button
+                      type='button'
+                      onClick={() => onDeleteTag?.(t.id)}
+                      className='text-gray-500 hover:text-red-600'
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              ))}
+              {!f.tags?.length && (
+                <span className='text-xs text-gray-500'>タグなし</span>
+              )}
+            </div>
+
+            {/* 追加入力（管理者のみ表示） */}
+            {isAdmin && <TagAdder onAdd={(label) => onAddTag?.(label, f.id)} />}
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function TagAdder({ onAdd }: { onAdd: (label: string) => void }) {
+  const [val, setVal] = useState('');
+  const submit = () => {
+    const label = val.trim();
+    if (!label) return;
+    onAdd(label);
+    setVal('');
+  };
+  return (
+    <div className='mt-2 flex gap-2'>
+      <input
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        placeholder='タグを入力してEnter'
+        className='w-48 rounded border px-2 py-1 text-xs'
+      />
+      <button
+        type='button'
+        onClick={submit}
+        className='rounded border px-2 py-1 text-xs'
+      >
+        追加
+      </button>
     </div>
   );
 }

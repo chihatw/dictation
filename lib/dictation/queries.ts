@@ -8,7 +8,7 @@ export async function fetchArticleWithSentences(
     .from('dictation_articles')
     .select(
       `
-        id, title, created_at,
+        id, uid, title, created_at,
         tts_voice_name, speaking_rate,
         audio_path_full,
         sentences:dictation_sentences (
@@ -32,6 +32,7 @@ export async function fetchArticleWithSentences(
 
   return {
     id: data.id,
+    uid: data.uid,
     title: data.title,
     created_at: data.created_at,
     sentences: data.sentences ?? [],

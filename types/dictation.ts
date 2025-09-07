@@ -16,6 +16,7 @@ export type Sentence = {
 
 export type Article = {
   id: string;
+  uid: string;
   title: string;
   created_at: string;
   tts_voice_name: string;
