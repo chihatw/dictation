@@ -2,8 +2,7 @@ import { supabase } from '@/lib/supabase/browser';
 import type { Article } from '@/types/dictation';
 
 export async function fetchArticleWithSentences(
-  articleId: string,
-  userId: string
+  articleId: string
 ): Promise<Article | null> {
   const { data, error } = await supabase
     .from('dictation_articles')
@@ -22,7 +21,6 @@ export async function fetchArticleWithSentences(
       `
     )
     .eq('id', articleId)
-    .eq('sentences.dictation_submissions.user_id', userId)
     .order('seq', { referencedTable: 'dictation_sentences', ascending: true })
     .maybeSingle();
 

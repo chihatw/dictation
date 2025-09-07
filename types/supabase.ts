@@ -603,6 +603,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dictation_release_items_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles_recent10"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "dictation_release_items_release_id_fkey"
             columns: ["release_id"]
             isOneToOne: false
@@ -669,6 +676,13 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_sentences_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles_recent10"
             referencedColumns: ["id"]
           },
         ]
@@ -765,6 +779,67 @@ export type Database = {
             columns: ["sentence_id"]
             isOneToOne: false
             referencedRelation: "dictation_sentences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dictation_teacher_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          note_md: string
+          sentence_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note_md: string
+          sentence_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note_md?: string
+          sentence_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_teacher_feedback_sentence_id_fkey"
+            columns: ["sentence_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_sentences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dictation_teacher_feedback_tags: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          teacher_feedback_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          teacher_feedback_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          teacher_feedback_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_teacher_feedback_tags_teacher_feedback_id_fkey"
+            columns: ["teacher_feedback_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_teacher_feedback"
             referencedColumns: ["id"]
           },
         ]
@@ -1775,6 +1850,15 @@ export type Database = {
           display: string | null
           id: number | null
           title: string | null
+        }
+        Relationships: []
+      }
+      dictation_articles_recent10: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          title: string | null
+          uid: string | null
         }
         Relationships: []
       }

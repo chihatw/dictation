@@ -3,13 +3,11 @@
 import ArticleHeader from '@/components/ArticleHeader';
 import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
-import { useAuthUserId } from '@/hooks/useAuthUserId';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
-  const userId = useAuthUserId();
 
   // 記事の TTS 初期値
   const [voiceName, setVoiceName] = useState('ja-JP-Chirp3-HD-Aoede');
@@ -27,7 +25,7 @@ export default function ArticlePage() {
     feedbacks,
     loadingMap,
     submitOne,
-  } = useArticle(id, userId);
+  } = useArticle(id);
 
   // 記事読込後に TTS 設定を記事値へ上書き
   useEffect(() => {

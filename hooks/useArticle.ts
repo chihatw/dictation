@@ -5,10 +5,7 @@ import { fetchArticleWithSentences } from '@/lib/dictation/queries';
 import type { Article, Sentence } from '@/types/dictation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export function useArticle(
-  articleId: string | undefined,
-  userId: string | null
-) {
+export function useArticle(articleId: string | undefined) {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
@@ -19,12 +16,12 @@ export function useArticle(
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (!articleId || !userId) return;
+    if (!articleId) return;
     let mounted = true;
     (async () => {
       setLoading(true);
       setErrMsg(null);
-      const data = await fetchArticleWithSentences(articleId, userId);
+      const data = await fetchArticleWithSentences(articleId);
       if (!mounted) return;
 
       if (!data) {
@@ -55,7 +52,7 @@ export function useArticle(
     return () => {
       mounted = false;
     };
-  }, [articleId, userId]);
+  }, [articleId]);
 
   const fullText = useMemo(
     () => article?.sentences.map((s) => s.content).join('') ?? '',
