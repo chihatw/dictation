@@ -13,6 +13,7 @@ type Props = {
   onSubmitOne: (sentenceId: string) => void;
   voiceName: string;
   speakingRate: number;
+  isAdmin: boolean;
 };
 
 export default function SentencesList({
@@ -25,6 +26,7 @@ export default function SentencesList({
   onSubmitOne,
   voiceName,
   speakingRate,
+  isAdmin,
 }: Props) {
   return (
     <div className='space-y-5'>
@@ -40,6 +42,7 @@ export default function SentencesList({
           onChange={(val) => onChangeAnswer(s.id, val)}
           onSubmit={() => onSubmitOne(s.id)}
           submitting={loadingMap[s.id] ?? false}
+          isAdmin={isAdmin}
         />
       ))}
     </div>

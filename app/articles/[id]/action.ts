@@ -51,3 +51,46 @@ export async function createFeedbackAction(
   if (error) return { ok: false, error: '保存に失敗しました。' };
   return { ok: true, feedbackMarkdown };
 }
+
+/**
+ * 文章にフィードバックを追加
+ */
+export async function addFeedback(sentenceId: string, noteMd: string) {
+  const supabase = await createClientAction();
+  const { data, error } = await supabase
+    .from('dictation_teacher_feedback')
+    .insert({ sentence_id: sentenceId, note_md: noteMd })
+    .select('id, created_at, sentence_id, note_md')
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+/**
+ * 特定フィードバックを削除
+ */
+export async function deleteFeedback(id: string) {
+  const supabase = await createClientAction();
+  const { error } = await supabase
+    .from('dictation_teacher_feedback')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * 文にひもづく全フィードバックを取得
+ */
+export async function listFeedback(sentenceId: string) {
+  const supabase = await createClientAction();
+  const { data, error } = await supabase
+    .from('dictation_teacher_feedback')
+    .select('id, created_at, sentence_id, note_md')
+    .eq('sentence_id', sentenceId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data;
+}

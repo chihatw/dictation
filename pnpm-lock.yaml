@@ -75,6 +75,9 @@ importers:
       tailwindcss:
         specifier: ^4.1.13
         version: 4.1.13
+      tailwindcss-github-markdown:
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@4.1.13)
       typescript:
         specifier: ^5.9.2
         version: 5.9.2
@@ -2323,6 +2326,11 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  tailwindcss-github-markdown@0.1.1:
+    resolution: {integrity: sha512-51FiI7q7w/Zfof18NX8qsAcwn8cUc8Z40k13vam/cEClk3x7/Xl1xq+ybPI+JK6xVCVnY07rnE8xehKE29o4Ew==}
+    peerDependencies:
+      tailwindcss: ^4
 
   tailwindcss@4.1.13:
     resolution: {integrity: sha512-i+zidfmTqtwquj4hMEwdjshYYgMbOrPzb9a0M3ZgNa0JMoZeFC6bxZvO8yr8ozS6ix2SDz0+mvryPeBs2TFE+w==}
@@ -5264,6 +5272,10 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  tailwindcss-github-markdown@0.1.1(tailwindcss@4.1.13):
+    dependencies:
+      tailwindcss: 4.1.13
 
   tailwindcss@4.1.13: {}
 

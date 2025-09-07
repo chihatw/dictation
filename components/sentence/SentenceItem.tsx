@@ -4,6 +4,7 @@ import { createLogAction } from '@/app/articles/[id]/createLogAction';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { Sentence } from '@/types/dictation';
 import { memo, useMemo, useRef, useState } from 'react';
+import { TeacherFeedbackTextForm } from '../articles/TeacherFeedbackTextForm';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
 import { HeaderRow } from './parts/HeaderRow';
@@ -19,6 +20,7 @@ export type SentenceItemProps = {
   onChange: (val: string) => void;
   onSubmit: (sentenceId: string) => void;
   submitting?: boolean;
+  isAdmin?: boolean;
 };
 
 function SentenceItemBase({
@@ -31,6 +33,7 @@ function SentenceItemBase({
   onChange,
   onSubmit,
   submitting,
+  isAdmin = false,
 }: SentenceItemProps) {
   const [playsCount, setPlaysCount] = useState(0);
   const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
@@ -106,6 +109,7 @@ function SentenceItemBase({
         transcript={sentence.content}
         ariaLiveId={`sentence-${sentence.id}-feedback`}
       />
+      {isAdmin && <TeacherFeedbackTextForm sentenceId={sentence.id} />}
     </section>
   );
 }

@@ -1,1 +1,12 @@
 @import 'tailwindcss';
+
+@plugin 'tailwindcss-github-markdown';
+
+/* GitHub Markdownスタイルのインラインコードを上書き */
+.markdown-body :not(pre) > code {
+  color: theme('colors.red.600'); /* Tailwindのred-600相当 */
+  background-color: transparent !important;
+  font-size: inherit !important;
+  padding: 0; /* GitHub風の余白を消したい場合 */
+  border-radius: 0; /* 丸みも不要なら */
+}

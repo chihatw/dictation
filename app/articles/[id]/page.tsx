@@ -3,6 +3,7 @@
 import ArticleHeader from '@/components/ArticleHeader';
 import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
+import { supabase } from '@/lib/supabase/browser';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -12,6 +13,15 @@ export default function ArticlePage() {
   // 記事の TTS 初期値
   const [voiceName, setVoiceName] = useState('ja-JP-Chirp3-HD-Aoede');
   const [speakingRate, setSpeakingRate] = useState(1.0);
+
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const role = data.user?.app_metadata?.role;
+      setIsAdmin(role === 'admin');
+    });
+  }, []);
 
   const {
     article,
@@ -84,6 +94,7 @@ export default function ArticlePage() {
           onSubmitOne={handleSubmitOne}
           voiceName={voiceName}
           speakingRate={speakingRate}
+          isAdmin={isAdmin}
         />
 
         <div className='mt-8 text-center text-sm text-gray-600'>
