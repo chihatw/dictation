@@ -1862,6 +1862,13 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_teacher_tags_view: {
+        Row: {
+          norm_label: string | null
+          sample_label: string | null
+        }
+        Relationships: []
+      }
       page_states_view: {
         Row: {
           display: string | null

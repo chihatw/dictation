@@ -2,7 +2,7 @@
 
 import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import { useState } from 'react';
+import TagAdder from './TagAdder';
 
 export function TeacherFeedbackList({
   items,
@@ -74,33 +74,6 @@ export function TeacherFeedbackList({
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-function TagAdder({ onAdd }: { onAdd: (label: string) => void }) {
-  const [val, setVal] = useState('');
-  const submit = () => {
-    const label = val.trim();
-    if (!label) return;
-    onAdd(label);
-    setVal('');
-  };
-  return (
-    <div className='mt-2 flex gap-2'>
-      <input
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        placeholder='タグを入力してEnter'
-        className='w-48 rounded border px-2 py-1 text-xs'
-      />
-      <button
-        type='button'
-        onClick={submit}
-        className='rounded border px-2 py-1 text-xs'
-      >
-        追加
-      </button>
     </div>
   );
 }
