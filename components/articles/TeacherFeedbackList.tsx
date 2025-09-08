@@ -2,6 +2,7 @@
 
 import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
+import { Tags } from '../tag/Tags';
 import TagAdder from './TagAdder';
 
 export function TeacherFeedbackList({
@@ -46,24 +47,12 @@ export function TeacherFeedbackList({
             </div>
 
             {/* タグ列 */}
-            <div className='mt-2 flex flex-wrap gap-2'>
-              {(f.tags ?? []).map((t) => (
-                <span
-                  key={t.id}
-                  className='inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs'
-                >
-                  {t.label}
-                  {isAdmin && (
-                    <button
-                      type='button'
-                      onClick={() => onDeleteTag?.(t.id)}
-                      className='text-gray-500 hover:text-red-600'
-                    >
-                      ×
-                    </button>
-                  )}
-                </span>
-              ))}
+            <div className='mt-2 flex flex-wrap gap-2 text-pink-600'>
+              <Tags
+                items={f.tags}
+                isAdmin={isAdmin}
+                onDeleteTag={onDeleteTag}
+              />
               {!f.tags?.length && (
                 <span className='text-xs text-gray-500'>タグなし</span>
               )}

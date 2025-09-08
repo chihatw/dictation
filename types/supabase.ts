@@ -2041,6 +2041,36 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
+      get_release_article_tags: {
+        Args: { p_uid: string }
+        Returns: {
+          created_at: string
+          id: string
+          pos: number
+          tags: string[]
+          title: string
+        }[]
+      }
+      gtrgm_compress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_decompress: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      gtrgm_options: {
+        Args: { "": unknown }
+        Returns: undefined
+      }
+      gtrgm_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
       insert_thumbnail_with_image: {
         Args: { p_file_name: string; p_storage_path: string; p_user_id: string }
         Returns: {
@@ -2050,6 +2080,18 @@ export type Database = {
       publish_release: {
         Args: { p_release_id: string; p_user_id: string }
         Returns: undefined
+      }
+      set_limit: {
+        Args: { "": number }
+        Returns: number
+      }
+      show_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      show_trgm: {
+        Args: { "": string }
+        Returns: string[]
       }
     }
     Enums: {

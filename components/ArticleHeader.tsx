@@ -12,6 +12,7 @@ type Props = {
   voiceName: string;
   speakingRate: number;
   audioPathFull?: string | null;
+  isAdmin?: boolean;
 };
 
 export default function ArticleHeader({
@@ -20,6 +21,7 @@ export default function ArticleHeader({
   voiceName,
   speakingRate,
   audioPathFull,
+  isAdmin = false,
 }: Props) {
   const audioUrl = audioPathFull ? toPublicUrl(audioPathFull) : undefined;
   return (
@@ -32,6 +34,14 @@ export default function ArticleHeader({
           <ChevronLeft className='h-4 w-4' /> 返回首頁
         </Link>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>{title}</h1>
+        {isAdmin && (
+          <Link
+            href={'/admin/articles'}
+            className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
+          >
+            管理
+          </Link>
+        )}
         {audioUrl ? (
           <UrlPlayButton
             audioUrl={audioUrl}

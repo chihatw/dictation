@@ -135,7 +135,7 @@ export async function listFeedbackWithTagsBulkBySentence(
     `
     )
     .in('sentence_id', sentenceIds)
-    .order('created_at', { ascending: false }) // フィードバック：新→旧
+    .order('created_at', { ascending: true }) // フィードバック：旧→新
     .order('created_at', {
       referencedTable: 'dictation_teacher_feedback_tags',
       ascending: true,
