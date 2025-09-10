@@ -732,20 +732,6 @@ export type Database = {
             referencedRelation: "dictation_sentences"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "dictation_submission_logs_userid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "article_pitch_quizzes_view"
-            referencedColumns: ["uid"]
-          },
-          {
-            foreignKeyName: "dictation_submission_logs_userid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
         ]
       }
       dictation_submissions: {
@@ -783,6 +769,24 @@ export type Database = {
           },
         ]
       }
+      dictation_tag_master: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+        }
+        Relationships: []
+      }
       dictation_teacher_feedback: {
         Row: {
           created_at: string
@@ -817,6 +821,7 @@ export type Database = {
           created_at: string
           id: string
           label: string
+          tag_master_id: string | null
           teacher_feedback_id: string
           user_id: string
         }
@@ -824,6 +829,7 @@ export type Database = {
           created_at?: string
           id?: string
           label: string
+          tag_master_id?: string | null
           teacher_feedback_id: string
           user_id: string
         }
@@ -831,6 +837,7 @@ export type Database = {
           created_at?: string
           id?: string
           label?: string
+          tag_master_id?: string | null
           teacher_feedback_id?: string
           user_id?: string
         }
@@ -840,6 +847,13 @@ export type Database = {
             columns: ["teacher_feedback_id"]
             isOneToOne: false
             referencedRelation: "dictation_teacher_feedback"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dtft_tag_master_fkey"
+            columns: ["tag_master_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_tag_master"
             referencedColumns: ["id"]
           },
         ]
@@ -2071,6 +2085,10 @@ export type Database = {
         Args: { "": unknown }
         Returns: unknown
       }
+      immutable_unaccent: {
+        Args: { "": string }
+        Returns: string
+      }
       insert_thumbnail_with_image: {
         Args: { p_file_name: string; p_storage_path: string; p_user_id: string }
         Returns: {
@@ -2092,6 +2110,14 @@ export type Database = {
       show_trgm: {
         Args: { "": string }
         Returns: string[]
+      }
+      unaccent: {
+        Args: { "": string }
+        Returns: string
+      }
+      unaccent_init: {
+        Args: { "": unknown }
+        Returns: unknown
       }
     }
     Enums: {
