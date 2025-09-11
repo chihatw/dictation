@@ -774,16 +774,19 @@ export type Database = {
           created_at: string
           id: string
           label: string
+          norm_label: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           label: string
+          norm_label?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           label?: string
+          norm_label?: string | null
         }
         Relationships: []
       }
@@ -1876,6 +1879,46 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_submission_latest_view: {
+        Row: {
+          answer: string | null
+          article_id: string | null
+          content: string | null
+          created_at: string | null
+          display: string | null
+          elapsed_ms_since_first_play: number | null
+          elapsed_ms_since_item_view: number | null
+          id: string | null
+          listened_full_count: number | null
+          sentence_id: string | null
+          seq: number | null
+          title: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_sentences_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_sentences_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles_recent10"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_submission_logs_sentence_id_fkey"
+            columns: ["sentence_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_sentences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dictation_teacher_tags_view: {
         Row: {
           norm_label: string | null
@@ -2051,9 +2094,42 @@ export type Database = {
       }
     }
     Functions: {
+      create_feedback_and_log: {
+        Args: {
+          p_answer: string
+          p_elapsed_ms_since_first_play: number
+          p_elapsed_ms_since_item_view: number
+          p_feedback_md: string
+          p_listened_full_count: number
+          p_plays_count: number
+          p_sentence_id: string
+          p_used_play_all: boolean
+          p_user_id: string
+        }
+        Returns: {
+          logged: boolean
+          saved: boolean
+        }[]
+      }
+      create_submission_log: {
+        Args: {
+          p_answer: string
+          p_elapsed_ms_since_first_play: number
+          p_elapsed_ms_since_item_view: number
+          p_listened_full_count: number
+          p_plays_count: number
+          p_sentence_id: string
+          p_used_play_all: boolean
+        }
+        Returns: boolean
+      }
       delete_thumbnail_and_image: {
         Args: { p_image_id: string }
         Returns: undefined
+      }
+      get_or_create_dictation_tag: {
+        Args: { p_label: string }
+        Returns: string
       }
       get_release_article_tags: {
         Args: { p_uid: string }
