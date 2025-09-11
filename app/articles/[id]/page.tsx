@@ -114,10 +114,21 @@ export default function ArticlePage() {
     }));
   };
 
-  const handleSubmitOne = (sentenceId: string) => {
+  const handleSubmitOne = (
+    sentenceId: string,
+    metrics: {
+      playsCount: number;
+      listenedFullCount: number;
+      usedPlayAll: boolean;
+      elapsedMsSinceItemView: number;
+      elapsedMsSinceFirstPlay: number;
+    }
+  ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
     if (!s) return;
-    submitOne(s);
+    // 管理者なら記事の所有者UIDを代理指定
+    const targetUserId = isAdmin ? article?.uid : undefined;
+    submitOne(s, metrics, targetUserId);
   };
 
   if (loading) {

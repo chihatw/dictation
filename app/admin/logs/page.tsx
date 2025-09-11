@@ -3,109 +3,83 @@
 import { supabase } from '@/lib/supabase/browser';
 import { useEffect, useState } from 'react';
 
-type Log = {
+type Row = {
   id: string;
-  created_at: string;
-  answer: string | null;
-  plays_count: number;
+  user_id: string;
+  sentence_id: string;
   listened_full_count: number;
-  used_play_all: boolean;
   elapsed_ms_since_item_view: number;
   elapsed_ms_since_first_play: number;
-  users: { display: string } | null;
-  dictation_sentences: {
-    seq: number;
-    content: string;
-    dictation_articles: { title: string } | null;
-  } | null;
+  answer: string | null;
+  created_at: string;
+  display: string; // users.display
+  content: string; // dictation_sentences.content
+  seq: number; // dictation_sentences.seq
+  article_id: string; // dictation_sentences.article_id
+  title: string; // dictation_articles.title
 };
 
 export default function LogsPage() {
-  const [logs, setLogs] = useState<Log[]>([]);
+  const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // フィルタ入力
-  const [userFilter, setUserFilter] = useState('');
-  const [titleFilter, setTitleFilter] = useState('');
-
-  const fetchLogs = async () => {
-    let query = supabase
-      .from('dictation_submission_logs')
+  const fetchRows = async () => {
+    const { data, error } = await supabase
+      .from('dictation_submission_latest_view')
       .select(
         `
         id,
-        created_at,
-        answer,
-        plays_count,
+        user_id,
+        sentence_id,
         listened_full_count,
-        used_play_all,
         elapsed_ms_since_item_view,
         elapsed_ms_since_first_play,
-        users(display),
-        dictation_sentences(
-          seq,
-          content,
-          dictation_articles(title)
-        )
-      `
+        answer,
+        created_at,
+        display,
+        content,
+        seq,
+        article_id,
+        title
+        `
       )
       .order('created_at', { ascending: false })
       .limit(50);
 
-    // フィルタ条件
-    if (userFilter) {
-      query = query.ilike('users.display', `%${userFilter}%`);
-    }
-    if (titleFilter) {
-      query = query.ilike(
-        'dictation_sentences.dictation_articles.title',
-        `%${titleFilter}%`
-      );
-    }
-
-    const { data, error } = await query;
     if (error) {
       console.error(error);
     } else {
-      setLogs(data as Log[]);
+      setRows((data ?? []) as Row[]);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchRows();
   }, []);
 
-  const formatSec = (ms: number) => Math.floor(ms / 1000);
+  const formatMinSec = (ms: number) => {
+    const totalSec = Math.max(0, Math.floor(ms / 1000));
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}分${s.toString().padStart(2, '0')}秒`;
+  };
+
+  const formatJST = (iso: string) =>
+    new Date(iso).toLocaleString('ja-JP', {
+      timeZone: 'Asia/Tokyo',
+      hour12: false,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
 
   return (
     <div className='p-6'>
-      <h1 className='text-xl font-bold mb-4'>ログ一覧</h1>
-
-      {/* フィルタ入力フォーム */}
-      <div className='mb-4 flex gap-4'>
-        <input
-          type='text'
-          placeholder='ユーザー名で検索'
-          value={userFilter}
-          onChange={(e) => setUserFilter(e.target.value)}
-          className='border px-2 py-1 rounded'
-        />
-        <input
-          type='text'
-          placeholder='問題タイトルで検索'
-          value={titleFilter}
-          onChange={(e) => setTitleFilter(e.target.value)}
-          className='border px-2 py-1 rounded'
-        />
-        <button
-          onClick={fetchLogs}
-          className='px-3 py-1 bg-gray-800 text-white rounded'
-        >
-          フィルタ適用
-        </button>
-      </div>
+      <h1 className='text-xl font-bold mb-4'>ログ一覧（最新文ごと）</h1>
 
       {loading ? (
         <p>読み込み中...</p>
@@ -120,42 +94,34 @@ export default function LogsPage() {
                 <th className='border p-2'>文本文</th>
                 <th className='border p-2'>回答</th>
                 <th className='border p-2'>再生回数</th>
-                <th className='border p-2'>最後まで再生</th>
-                <th className='border p-2'>経過時間（表示→送信）</th>
                 <th className='border p-2'>経過時間（初回再生→送信）</th>
+                <th className='border p-2'>経過時間（表示→送信）</th>
                 <th className='border p-2'>作成日時</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map((log) => (
-                <tr key={log.id}>
-                  <td className='border p-2'>{log.users?.display ?? '-'}</td>
-                  <td className='border p-2'>
-                    {log.dictation_sentences?.dictation_articles?.title ?? '-'}
-                  </td>
-                  <td className='border p-2'>
-                    {log.dictation_sentences?.seq ?? '-'}
-                  </td>
+              {rows.map((r) => (
+                <tr key={r.id}>
+                  <td className='border p-2'>{r.display}</td>
+                  <td className='border p-2'>{r.title}</td>
+                  <td className='border p-2 text-center'>{r.seq}</td>
                   <td
                     className='border p-2 max-w-xs truncate'
-                    title={log.dictation_sentences?.content ?? '-'}
+                    title={r.content}
                   >
-                    {log.dictation_sentences?.content ?? '-'}
+                    {r.content}
                   </td>
-                  <td className='border p-2'>{log.answer}</td>
-                  <td className='border p-2 text-center'>{log.plays_count}</td>
+                  <td className='border p-2'>{r.answer ?? ''}</td>
                   <td className='border p-2 text-center'>
-                    {log.listened_full_count}
+                    {r.listened_full_count}
                   </td>
                   <td className='border p-2'>
-                    {formatSec(log.elapsed_ms_since_item_view)} 秒
+                    {formatMinSec(r.elapsed_ms_since_first_play)}
                   </td>
                   <td className='border p-2'>
-                    {formatSec(log.elapsed_ms_since_first_play)} 秒
+                    {formatMinSec(r.elapsed_ms_since_item_view)}
                   </td>
-                  <td className='border p-2'>
-                    {new Date(log.created_at).toLocaleString()}
-                  </td>
+                  <td className='border p-2'>{formatJST(r.created_at)}</td>
                 </tr>
               ))}
             </tbody>

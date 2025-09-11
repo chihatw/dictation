@@ -11,7 +11,16 @@ type Props = {
   feedbacks: Record<string, string>;
   loadingMap: Record<string, boolean>;
   onChangeAnswer: (id: string, val: string) => void;
-  onSubmitOne: (sentenceId: string) => void;
+  onSubmitOne: (
+    sentenceId: string,
+    metrics: {
+      playsCount: number;
+      listenedFullCount: number;
+      usedPlayAll: boolean;
+      elapsedMsSinceItemView: number;
+      elapsedMsSinceFirstPlay: number;
+    }
+  ) => void;
   voiceName: string;
   speakingRate: number;
   isAdmin: boolean;

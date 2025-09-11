@@ -12,8 +12,9 @@ export type Tag = {
   id: string;
   created_at: string;
   user_id: string;
-  label: string;
   teacher_feedback_id: string;
+  tag_master_id: string | null;
+  label: string;
 };
 
 export type FeedbackWithTags = {
@@ -24,56 +25,85 @@ export type FeedbackWithTags = {
   tags: Tag[];
 };
 
+// DBから返る生データ型
+type RawTag = {
+  id: string;
+  created_at: string;
+  user_id: string;
+  teacher_feedback_id: string;
+  tag_master_id: string | null;
+  tag: { label: string } | null;
+};
+
+type RawFeedbackWithTags = {
+  id: string;
+  created_at: string;
+  sentence_id: string;
+  note_md: string;
+  tags: RawTag[] | null;
+};
+
 /** クライアントから渡る入力の検証スキーマ */
 const schema = z.object({
   sentenceId: z.string().uuid(),
   sentenceScript: z.string().min(1),
   userAnswer: z.string().min(1),
+  metrics: z.object({
+    playsCount: z.number().int().nonnegative(),
+    listenedFullCount: z.number().int().nonnegative(),
+    usedPlayAll: z.boolean(),
+    elapsedMsSinceItemView: z.number().int().nonnegative(),
+    elapsedMsSinceFirstPlay: z.number().int().nonnegative(),
+  }),
+  targetUserId: z.string().uuid().optional(), // 代理対象（管理画面など）
 });
 
-/**
- * 学習者向けのAIフィードバックを生成し、dictation_submissions に保存する
- * - 入力を検証
- * - 未認証ならエラー
- * - AIにMarkdownでの短いFBを生成させ、upsertで保存（user_id + sentence_id の複合一意）
- */
-export async function createFeedbackAction(
-  input: unknown
-): Promise<CreateFeedbackResult> {
+export type CreateFeedbackAndLogArgs = z.infer<typeof schema>;
+
+export async function createFeedbackAndLogAction(input: unknown) {
   const parsed = schema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: '入力が不正です。' };
-  const { sentenceId, sentenceScript, userAnswer } = parsed.data;
+  if (!parsed.success) return { ok: false as const, error: '入力が不正です。' };
+
+  const { sentenceId, sentenceScript, userAnswer, metrics, targetUserId } =
+    parsed.data;
 
   const supabase = await createClientAction();
   const { data } = await supabase.auth.getUser();
-  const userId = data.user?.id;
-  if (!userId) return { ok: false, error: '未認証です。' };
+  if (!data.user?.id && !targetUserId)
+    return { ok: false as const, error: '未認証です。' };
 
-  // プロンプト方針：簡潔・繁体字・Markdown・5行以内
-  const userPrompt =
-    '你是一位日語老師。台灣的中學生正嘗試聽寫（日文音聲）。' +
-    '請以簡潔溫柔的繁體中文回覆，不加問候語，也不重複學生答案或完整音聲原文。' +
-    '正誤指摘僅限「聽對的詞語確認」與「聽錯的詞語訂正」，不要指出漏聽的詞語。' +
-    '若表記不同但發音相同，也算正確。' +
-    '回答中若出現日文漢字，務必加上假名。' +
-    '使用 Markdown 與 emoji，最多 5 行。' +
-    `音聲原文：${sentenceScript}\n學生答案：${userAnswer}\n`;
+  // フィードバック生成（失敗時はフォールバック文言）
+  let feedbackMarkdown = '';
+  try {
+    const prompt =
+      '你是一位日語老師。台灣的中學生正嘗試聽寫（日文音聲）。' +
+      '請以簡潔溫柔的繁體中文回覆，不加問候語，也不重複學生答案或完整音聲原文。' +
+      '正誤指摘僅限「聽對的詞語確認」與「聽錯的詞語訂正」，不要指出漏聽的詞語。' +
+      '若表記不同但發音相同，也算正確。' +
+      '回答中若出現日文漢字，務必加上假名。' +
+      '使用 Markdown 與 emoji，最多 5 行。' +
+      `音聲原文：${sentenceScript}\n學生答案：${userAnswer}\n`;
+    const ai = await chat([{ role: 'user', content: prompt }]);
+    feedbackMarkdown = ai.content ?? '';
+  } catch {
+    feedbackMarkdown = '（系統忙碌，稍後自動補上老師回饋）';
+  }
 
-  const feedback = await chat([{ role: 'user', content: userPrompt }]);
-  const feedbackMarkdown = feedback.content ?? '';
+  // DB内Txで 保存 + ログ
+  const { error } = await supabase.rpc('create_feedback_and_log', {
+    p_user_id: targetUserId ?? data.user!.id, // null なら auth.uid() が使われる
+    p_sentence_id: sentenceId,
+    p_answer: userAnswer,
+    p_feedback_md: feedbackMarkdown,
+    p_plays_count: metrics.playsCount,
+    p_listened_full_count: metrics.listenedFullCount,
+    p_used_play_all: metrics.usedPlayAll,
+    p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
+    p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
+  });
 
-  const { error } = await supabase.from('dictation_submissions').upsert(
-    {
-      user_id: userId,
-      sentence_id: sentenceId,
-      answer: userAnswer,
-      feedback_md: feedbackMarkdown,
-    },
-    { onConflict: 'user_id,sentence_id' }
-  );
-
-  if (error) return { ok: false, error: '保存に失敗しました。' };
-  return { ok: true, feedbackMarkdown };
+  if (error) return { ok: false as const, error: '保存に失敗しました。' };
+  return { ok: true as const, feedbackMarkdown };
 }
 
 /**
@@ -91,12 +121,16 @@ export async function addFeedbackWithTags(
     .select(
       `
       id, created_at, sentence_id, note_md,
-      tags:dictation_teacher_feedback_tags (id, created_at, user_id, label, teacher_feedback_id)
+      tags:dictation_teacher_feedback_tags (
+        id, created_at, user_id, teacher_feedback_id, tag_master_id,
+        tag:dictation_tag_master ( label )
+      )
     `
     )
     .single();
   if (error) throw new Error(error.message);
-  return data as FeedbackWithTags;
+
+  return flatten(data as unknown as RawFeedbackWithTags);
 }
 
 /**
@@ -130,22 +164,24 @@ export async function listFeedbackWithTagsBulkBySentence(
       `
       id, created_at, sentence_id, note_md,
       tags:dictation_teacher_feedback_tags (
-        id, created_at, user_id, label, teacher_feedback_id
+        id, created_at, user_id, teacher_feedback_id, tag_master_id,
+        tag:dictation_tag_master ( label )
       )
     `
     )
     .in('sentence_id', sentenceIds)
-    .order('created_at', { ascending: true }) // フィードバック：旧→新
+    .order('created_at', { ascending: true })
     .order('created_at', {
-      referencedTable: 'dictation_teacher_feedback_tags',
+      referencedTable: 'dictation_teacher_feedback_tags', // OK
       ascending: true,
-    }); // タグ：旧→新
+    });
 
   if (error) throw new Error(error.message);
 
   const map: Record<string, FeedbackWithTags[]> = {};
-  for (const row of (data ?? []) as FeedbackWithTags[]) {
-    (map[row.sentence_id] ||= []).push(row);
+  for (const row of (data ?? []) as RawFeedbackWithTags[]) {
+    const f = flatten(row);
+    (map[f.sentence_id] ||= []).push(f);
   }
   return map;
 }
@@ -161,21 +197,45 @@ export async function addFeedbackTag(
   ownerUserId: string
 ) {
   const supabase = await createClientAction();
-
   const trimmed = label.trim();
   if (!trimmed) throw new Error('empty label');
 
+  // 1) マスタIDを取得 or 作成
+  const { data: tagIdData, error: ge } = await supabase.rpc(
+    'get_or_create_dictation_tag',
+    { p_label: trimmed }
+  );
+  if (ge) throw new Error(ge.message);
+  const tagMasterId = tagIdData as string;
+
+  // 2) 紐付けを作成（重複は無視）
   const { data, error } = await supabase
     .from('dictation_teacher_feedback_tags')
     .insert({
       teacher_feedback_id: teacherFeedbackId,
       user_id: ownerUserId,
+      tag_master_id: tagMasterId,
+      // 旧label列を当面併記するなら↓を残す。移行完了後は削除可。
       label: trimmed,
     })
-    .select('id, created_at, teacher_feedback_id, user_id, label')
+    .select(
+      `
+      id, created_at, teacher_feedback_id, user_id, tag_master_id,
+      tag:dictation_tag_master(label)
+    `
+    )
     .single();
   if (error) throw new Error(error.message);
-  return data;
+
+  // 平坦化して返す
+  return {
+    id: data.id,
+    created_at: data.created_at,
+    teacher_feedback_id: data.teacher_feedback_id,
+    user_id: data.user_id,
+    tag_master_id: data.tag_master_id,
+    label: data.tag?.label ?? '',
+  } as Tag;
 }
 
 /**
@@ -189,4 +249,21 @@ export async function deleteFeedbackTag(tagId: string) {
     .delete()
     .eq('id', tagId);
   if (error) throw new Error(error.message);
+}
+
+function flatten(row: RawFeedbackWithTags): FeedbackWithTags {
+  return {
+    id: row.id,
+    created_at: row.created_at,
+    sentence_id: row.sentence_id,
+    note_md: row.note_md,
+    tags: (row.tags ?? []).map((t) => ({
+      id: t.id,
+      created_at: t.created_at,
+      user_id: t.user_id,
+      teacher_feedback_id: t.teacher_feedback_id,
+      tag_master_id: t.tag_master_id,
+      label: t.tag?.label ?? '', // ← マスタのlabelを平坦化
+    })),
+  };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { createFeedbackAction } from '@/app/articles/[id]/action';
+import { createFeedbackAndLogAction } from '@/app/articles/[id]/action';
 import { fetchArticleWithSentences } from '@/lib/dictation/queries';
 import type { Article, Sentence } from '@/types/dictation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -65,30 +65,39 @@ export function useArticle(articleId: string | undefined) {
   );
 
   const submitOne = useCallback(
-    async (s: Sentence) => {
+    async (
+      s: Sentence,
+      metrics: {
+        playsCount: number;
+        listenedFullCount: number;
+        usedPlayAll: boolean;
+        elapsedMsSinceItemView: number;
+        elapsedMsSinceFirstPlay: number;
+      },
+      targetUserId?: string
+    ) => {
       const val = (answers[s.id] ?? '').trim();
       if (!val) return;
-
       if (!window.confirm('送出後不可再編輯')) return;
 
-      // 楽観的 UI
       setSubmitted((old) => ({ ...old, [s.id]: true }));
       setLoadingMap((old) => ({ ...old, [s.id]: true }));
 
-      const res = await createFeedbackAction({
+      const res = await createFeedbackAndLogAction({
         sentenceId: s.id,
         sentenceScript: s.content,
         userAnswer: val,
+        metrics,
+        targetUserId,
       });
 
       if (!res?.ok) {
-        // 失敗時はロック解除（厳格に1回のみならここ解除しない運用もOK）
-        setSubmitted((old) => ({ ...old, [s.id]: false }));
-        alert('送信に失敗しました。ネットワーク等を確認してください。');
+        setSubmitted((o) => ({ ...o, [s.id]: false }));
+        alert(res.error ?? '保存に失敗しました。');
       } else {
-        setFeedbacks((old) => ({ ...old, [s.id]: res.feedbackMarkdown ?? '' }));
+        setFeedbacks((o) => ({ ...o, [s.id]: res.feedbackMarkdown ?? '' }));
       }
-      setLoadingMap((old) => ({ ...old, [s.id]: false }));
+      setLoadingMap((o) => ({ ...o, [s.id]: false }));
     },
     [answers]
   );

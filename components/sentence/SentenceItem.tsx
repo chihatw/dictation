@@ -1,6 +1,5 @@
 'use client';
 
-import { createLogAction } from '@/app/articles/[id]/createLogAction';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { Sentence } from '@/types/dictation';
 import { memo, useMemo, useRef, useState } from 'react';
@@ -20,7 +19,16 @@ export type SentenceItemProps = {
   voiceName: string;
   speakingRate: number;
   onChange: (val: string) => void;
-  onSubmit: (sentenceId: string) => void;
+  onSubmit: (
+    sentenceId: string,
+    metrics: {
+      playsCount: number;
+      listenedFullCount: number;
+      usedPlayAll: boolean;
+      elapsedMsSinceItemView: number;
+      elapsedMsSinceFirstPlay: number;
+    }
+  ) => void; // 型を差し替え
   submitting?: boolean;
   isAdmin?: boolean;
   items: FeedbackWithTags[];
@@ -66,21 +74,13 @@ function SentenceItemBase({
     : undefined;
 
   const handleSubmit = async () => {
-    try {
-      await createLogAction({
-        sentenceId: sentence.id,
-        answer: value,
-        playsCount,
-        listenedFullCount: playsCount,
-        usedPlayAll: false,
-        elapsedMsSinceItemView: Date.now() - itemViewAt.current,
-        elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
-      });
-    } catch {
-      // ここで黙殺 or console.error(e)
-    } finally {
-      onSubmit(sentence.id);
-    }
+    onSubmit(sentence.id, {
+      playsCount,
+      listenedFullCount: playsCount,
+      usedPlayAll: false,
+      elapsedMsSinceItemView: Date.now() - itemViewAt.current,
+      elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
+    });
   };
 
   return (
