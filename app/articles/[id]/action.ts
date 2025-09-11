@@ -4,10 +4,6 @@ import { chat } from '@/lib/chat';
 import { createClientAction } from '@/lib/supabase/server-action';
 import { z } from 'zod';
 
-type CreateFeedbackResult =
-  | { ok: false; error: string }
-  | { ok: true; feedbackMarkdown: string };
-
 export type Tag = {
   id: string;
   created_at: string;
