@@ -51,6 +51,7 @@ const schema = z.object({
     elapsedMsSinceItemView: z.number().int().nonnegative(),
     elapsedMsSinceFirstPlay: z.number().int().nonnegative(),
   }),
+  selfAssessedComprehension: z.number().int().min(1).max(4), // 1=低, 4=高+運用可
   targetUserId: z.string().uuid().optional(), // 代理対象（管理画面など）
 });
 
@@ -60,8 +61,14 @@ export async function createFeedbackAndLogAction(input: unknown) {
   const parsed = schema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: '入力が不正です。' };
 
-  const { sentenceId, sentenceScript, userAnswer, metrics, targetUserId } =
-    parsed.data;
+  const {
+    sentenceId,
+    sentenceScript,
+    userAnswer,
+    metrics,
+    selfAssessedComprehension,
+    targetUserId,
+  } = parsed.data;
 
   const supabase = await createClientAction();
   const { data } = await supabase.auth.getUser();
@@ -96,6 +103,7 @@ export async function createFeedbackAndLogAction(input: unknown) {
     p_used_play_all: metrics.usedPlayAll,
     p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
     p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
+    p_self_comp: selfAssessedComprehension,
   });
 
   if (error) return { ok: false as const, error: '保存に失敗しました。' };

@@ -9,6 +9,7 @@ import { AdminFeedbackBlock } from '../articles/AdminFeedbackBlock';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
 import { HeaderRow } from './parts/HeaderRow';
+import { SelfAssessmentSelectorCompact } from './parts/SelfAssessmentSelector';
 import { SubmitButton } from './parts/SubmitButton';
 
 export type SentenceItemProps = {
@@ -27,7 +28,8 @@ export type SentenceItemProps = {
       usedPlayAll: boolean;
       elapsedMsSinceItemView: number;
       elapsedMsSinceFirstPlay: number;
-    }
+    },
+    selfAssessedComprehension: number
   ) => void; // 型を差し替え
   submitting?: boolean;
   isAdmin?: boolean;
@@ -57,6 +59,7 @@ function SentenceItemBase({
 }: SentenceItemProps) {
   const [playsCount, setPlaysCount] = useState(0);
   const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
+  const [selfAssessedComprehension, setSelfAssessedComprehension] = useState(0);
   const itemViewAt = useRef(Date.now());
 
   const handlePlay = () => {
@@ -65,8 +68,12 @@ function SentenceItemBase({
   };
 
   const canSubmit = useMemo(
-    () => !isSubmitted && !!value.trim() && !submitting,
-    [isSubmitted, value, submitting]
+    () =>
+      !isSubmitted &&
+      !!value.trim() &&
+      !submitting &&
+      [1, 2, 3, 4].includes(selfAssessedComprehension),
+    [isSubmitted, value, submitting, selfAssessedComprehension]
   );
 
   const audioUrl = sentence.audio_path
@@ -74,13 +81,17 @@ function SentenceItemBase({
     : undefined;
 
   const handleSubmit = async () => {
-    onSubmit(sentence.id, {
-      playsCount,
-      listenedFullCount: playsCount,
-      usedPlayAll: false,
-      elapsedMsSinceItemView: Date.now() - itemViewAt.current,
-      elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
-    });
+    onSubmit(
+      sentence.id,
+      {
+        playsCount,
+        listenedFullCount: playsCount,
+        usedPlayAll: false,
+        elapsedMsSinceItemView: Date.now() - itemViewAt.current,
+        elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
+      },
+      selfAssessedComprehension
+    );
   };
 
   return (
@@ -110,6 +121,17 @@ function SentenceItemBase({
           />
         )}
       </div>
+
+      {/* 自己評価の選択肢を追加 */}
+      {!isSubmitted && (
+        <div className='mt-3'>
+          <SelfAssessmentSelectorCompact
+            value={selfAssessedComprehension}
+            onChange={setSelfAssessedComprehension}
+            describedById={`sentence-${sentence.id}-comp-hint`}
+          />
+        </div>
+      )}
 
       <div className='mt-3 flex justify-end'>
         <SubmitButton

@@ -74,6 +74,7 @@ export function useArticle(articleId: string | undefined) {
         elapsedMsSinceItemView: number;
         elapsedMsSinceFirstPlay: number;
       },
+      selfAssessedComprehension: number,
       targetUserId?: string
     ) => {
       const val = (answers[s.id] ?? '').trim();
@@ -88,6 +89,7 @@ export function useArticle(articleId: string | undefined) {
         sentenceScript: s.content,
         userAnswer: val,
         metrics,
+        selfAssessedComprehension,
         targetUserId,
       });
 

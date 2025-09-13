@@ -696,6 +696,7 @@ export type Database = {
           id: string
           listened_full_count: number
           plays_count: number
+          self_assessed_comprehension: number
           sentence_id: string
           used_play_all: boolean
           user_id: string
@@ -708,6 +709,7 @@ export type Database = {
           id?: string
           listened_full_count?: number
           plays_count?: number
+          self_assessed_comprehension: number
           sentence_id: string
           used_play_all?: boolean
           user_id: string
@@ -720,6 +722,7 @@ export type Database = {
           id?: string
           listened_full_count?: number
           plays_count?: number
+          self_assessed_comprehension?: number
           sentence_id?: string
           used_play_all?: boolean
           user_id?: string
@@ -823,7 +826,6 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          label: string
           tag_master_id: string | null
           teacher_feedback_id: string
           user_id: string
@@ -831,7 +833,6 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          label: string
           tag_master_id?: string | null
           teacher_feedback_id: string
           user_id: string
@@ -839,7 +840,6 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          label?: string
           tag_master_id?: string | null
           teacher_feedback_id?: string
           user_id?: string
@@ -1919,13 +1919,6 @@ export type Database = {
           },
         ]
       }
-      dictation_teacher_tags_view: {
-        Row: {
-          norm_label: string | null
-          sample_label: string | null
-        }
-        Relationships: []
-      }
       page_states_view: {
         Row: {
           display: string | null
@@ -2102,6 +2095,7 @@ export type Database = {
           p_feedback_md: string
           p_listened_full_count: number
           p_plays_count: number
+          p_self_comp: number
           p_sentence_id: string
           p_used_play_all: boolean
           p_user_id: string
@@ -2110,18 +2104,6 @@ export type Database = {
           logged: boolean
           saved: boolean
         }[]
-      }
-      create_submission_log: {
-        Args: {
-          p_answer: string
-          p_elapsed_ms_since_first_play: number
-          p_elapsed_ms_since_item_view: number
-          p_listened_full_count: number
-          p_plays_count: number
-          p_sentence_id: string
-          p_used_play_all: boolean
-        }
-        Returns: boolean
       }
       delete_thumbnail_and_image: {
         Args: { p_image_id: string }

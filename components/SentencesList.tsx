@@ -19,7 +19,8 @@ type Props = {
       usedPlayAll: boolean;
       elapsedMsSinceItemView: number;
       elapsedMsSinceFirstPlay: number;
-    }
+    },
+    selfAssessedComprehension: number
   ) => void;
   voiceName: string;
   speakingRate: number;

@@ -122,13 +122,14 @@ export default function ArticlePage() {
       usedPlayAll: boolean;
       elapsedMsSinceItemView: number;
       elapsedMsSinceFirstPlay: number;
-    }
+    },
+    selfAssessedComprehension: number
   ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
     if (!s) return;
     // 管理者なら記事の所有者UIDを代理指定
     const targetUserId = isAdmin ? article?.uid : undefined;
-    submitOne(s, metrics, targetUserId);
+    submitOne(s, metrics, selfAssessedComprehension, targetUserId);
   };
 
   if (loading) {
