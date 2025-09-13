@@ -146,6 +146,7 @@ function SentenceItemBase({
         feedback={feedback ?? ''}
         transcript={sentence.content}
         ariaLiveId={`sentence-${sentence.id}-feedback`}
+        selfAssessedComprehension={sentence.self_assessed_comprehension}
       />
       <AdminFeedbackBlock
         items={items}

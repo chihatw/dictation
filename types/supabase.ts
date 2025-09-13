@@ -1890,6 +1890,7 @@ export type Database = {
           elapsed_ms_since_item_view: number | null
           id: string | null
           listened_full_count: number | null
+          self_assessed_comprehension: number | null
           sentence_id: string | null
           seq: number | null
           title: string | null

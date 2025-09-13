@@ -12,6 +12,7 @@ export type Sentence = {
   created_at: string;
   audio_path?: string | null;
   submission?: Submission[] | null;
+  self_assessed_comprehension: number;
 };
 
 export type Article = {
