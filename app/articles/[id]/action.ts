@@ -219,8 +219,6 @@ export async function addFeedbackTag(
       teacher_feedback_id: teacherFeedbackId,
       user_id: ownerUserId,
       tag_master_id: tagMasterId,
-      // 旧label列を当面併記するなら↓を残す。移行完了後は削除可。
-      label: trimmed,
     })
     .select(
       `
