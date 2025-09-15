@@ -3,23 +3,16 @@
 import { toPublicUrl } from '@/lib/tts/publicUrl';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { TTSPlayButton } from './audio/TTSPlayButton';
 import { UrlPlayButton } from './audio/UrlPlayButton';
 
 type Props = {
   title: string;
-  text: string;
-  voiceName: string;
-  speakingRate: number;
   audioPathFull?: string | null;
   isAdmin?: boolean;
 };
 
 export default function ArticleHeader({
   title,
-  text,
-  voiceName,
-  speakingRate,
   audioPathFull,
   isAdmin = false,
 }: Props) {
@@ -42,23 +35,9 @@ export default function ArticleHeader({
             管理
           </Link>
         )}
-        {audioUrl ? (
+        {audioUrl && (
           <UrlPlayButton
             audioUrl={audioUrl}
-            variant='solid'
-            size='md'
-            labels={{
-              idle: '全部播放',
-              loading: '朗讀準備中...',
-              stop: '停止',
-              aria: '全体を再生/停止',
-            }}
-          />
-        ) : (
-          <TTSPlayButton
-            text={text}
-            voiceName={voiceName}
-            speakingRate={speakingRate}
             variant='solid'
             size='md'
             labels={{

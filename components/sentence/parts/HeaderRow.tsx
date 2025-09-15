@@ -1,13 +1,11 @@
 'use client';
 
-import { TTSPlayButton } from '@/components/audio/TTSPlayButton';
 import { UrlPlayButton } from '@/components/audio/UrlPlayButton';
 import { memo } from 'react';
 
 export type HeaderRowProps = {
   id: string;
   seq: number;
-  tts: { text: string; voiceName: string; speakingRate: number };
   audioUrl?: string;
   disabled?: boolean;
   onPlay?: () => void;
@@ -16,7 +14,6 @@ export type HeaderRowProps = {
 function HeaderRowBase({
   id,
   seq,
-  tts,
   audioUrl,
   disabled,
   onPlay,
@@ -27,22 +24,11 @@ function HeaderRowBase({
         文 #{seq}
       </h3>
       <div className='flex items-center gap-2'>
-        {audioUrl ? (
+        {audioUrl && (
           <UrlPlayButton
             audioUrl={audioUrl}
             variant='solid'
             size='md'
-            labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
-            className={disabled ? 'pointer-events-none opacity-50' : undefined}
-            onPlayStart={onPlay}
-          />
-        ) : (
-          <TTSPlayButton
-            text={tts.text}
-            voiceName={tts.voiceName}
-            speakingRate={tts.speakingRate}
-            variant='outline'
-            size='sm'
             labels={{ idle: '播放', loading: '載入中', stop: '停止' }}
             className={disabled ? 'pointer-events-none opacity-50' : undefined}
             onPlayStart={onPlay}

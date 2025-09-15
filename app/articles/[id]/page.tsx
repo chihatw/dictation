@@ -17,8 +17,6 @@ import {
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
 
-  const [voiceName, setVoiceName] = useState('ja-JP-Chirp3-HD-Aoede');
-  const [speakingRate, setSpeakingRate] = useState(1.0);
   const [isAdmin, setIsAdmin] = useState(false);
 
   // sentenceId -> feedbacks(with tags)
@@ -38,7 +36,6 @@ export default function ArticlePage() {
     article,
     loading,
     errMsg,
-    fullText,
     allSubmitted,
     answers,
     setAnswers,
@@ -47,13 +44,6 @@ export default function ArticlePage() {
     loadingMap,
     submitOne,
   } = useArticle(id);
-
-  useEffect(() => {
-    if (!article) return;
-    if (article.tts_voice_name) setVoiceName(article.tts_voice_name);
-    if (typeof article.speaking_rate === 'number')
-      setSpeakingRate(article.speaking_rate);
-  }, [article]); // 記事切替時のみ
 
   // フィードバック+タグを一括取得
   useEffect(() => {
@@ -156,9 +146,6 @@ export default function ArticlePage() {
     <div className='min-h-screen'>
       <ArticleHeader
         title={article.title}
-        text={fullText}
-        voiceName={voiceName}
-        speakingRate={speakingRate}
         audioPathFull={article.audio_path_full ?? null}
         isAdmin={isAdmin}
       />
@@ -174,8 +161,6 @@ export default function ArticlePage() {
             setAnswers((p) => ({ ...p, [sid]: val }))
           }
           onSubmitOne={handleSubmitOne}
-          voiceName={voiceName}
-          speakingRate={speakingRate}
           isAdmin={isAdmin}
           /** 重要：文ごとのマップを渡す（子で sid をキーに取り出す） */
           feedbackMap={fbMap}

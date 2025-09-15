@@ -22,8 +22,6 @@ type Props = {
     },
     selfAssessedComprehension: number
   ) => void;
-  voiceName: string;
-  speakingRate: number;
   isAdmin: boolean;
   feedbackMap: Record<string, FeedbackWithTags[]>;
   onCreatedFeedback?: (created: FeedbackWithTags, sentenceId: string) => void;
@@ -40,8 +38,6 @@ export default function SentencesList({
   loadingMap,
   onChangeAnswer,
   onSubmitOne,
-  voiceName,
-  speakingRate,
   isAdmin,
   feedbackMap,
   onCreatedFeedback,
@@ -58,8 +54,6 @@ export default function SentencesList({
           value={answers[s.id] ?? ''}
           isSubmitted={submitted[s.id] ?? false}
           feedback={feedbacks[s.id]}
-          voiceName={voiceName}
-          speakingRate={speakingRate}
           onChange={(val) => onChangeAnswer(s.id, val)}
           onSubmit={onSubmitOne}
           submitting={loadingMap[s.id] ?? false}

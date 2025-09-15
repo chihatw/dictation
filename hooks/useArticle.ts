@@ -54,11 +54,6 @@ export function useArticle(articleId: string | undefined) {
     };
   }, [articleId]);
 
-  const fullText = useMemo(
-    () => article?.sentences.map((s) => s.content).join('') ?? '',
-    [article]
-  );
-
   const allSubmitted = useMemo(
     () => article?.sentences.every((s) => submitted[s.id]) ?? false,
     [submitted, article?.sentences]
@@ -110,7 +105,6 @@ export function useArticle(articleId: string | undefined) {
     loading,
     errMsg,
     // 派生
-    fullText,
     allSubmitted,
     // 入力状態
     answers,

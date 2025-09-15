@@ -17,8 +17,6 @@ export type SentenceItemProps = {
   value: string;
   isSubmitted: boolean;
   feedback?: string | null;
-  voiceName: string;
-  speakingRate: number;
   onChange: (val: string) => void;
   onSubmit: (
     sentenceId: string,
@@ -45,8 +43,6 @@ function SentenceItemBase({
   value,
   isSubmitted,
   feedback,
-  voiceName,
-  speakingRate,
   onChange,
   onSubmit,
   submitting,
@@ -103,7 +99,6 @@ function SentenceItemBase({
         id={`sentence-${sentence.id}-title`}
         seq={sentence.seq}
         audioUrl={audioUrl}
-        tts={{ text: sentence.content, voiceName, speakingRate }}
         disabled={!!submitting}
         onPlay={handlePlay}
       />
