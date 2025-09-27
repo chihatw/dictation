@@ -10,6 +10,9 @@ export async function fetchArticleWithSentences(
       `
       id, uid, title, created_at,
       tts_voice_name, speaking_rate, audio_path_full,
+      journal:dictation_journals!left (
+        id, user_id, body, created_at
+      ),
       sentences:dictation_sentences (
         id, seq, content, created_at, audio_path,
         submission:dictation_submissions!left ( id, answer, feedback_md, created_at ),
@@ -37,6 +40,7 @@ export async function fetchArticleWithSentences(
     uid: data.uid,
     title: data.title,
     created_at: data.created_at,
+    journal: data.journal?.[0]?.body ?? null,
     sentences: (data.sentences ?? []).map((s) => {
       const sac = s?.log?.[0]?.self_assessed_comprehension ?? 4; // 旧データ=4
       return {

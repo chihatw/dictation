@@ -575,6 +575,45 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_journals: {
+        Row: {
+          article_id: string
+          body: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          body: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_journals_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_journals_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles_recent10"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dictation_release_items: {
         Row: {
           article_id: string
@@ -2102,6 +2141,8 @@ export type Database = {
           p_user_id: string
         }
         Returns: {
+          article_id: string
+          completed: boolean
           logged: boolean
           saved: boolean
         }[]
@@ -2109,6 +2150,18 @@ export type Database = {
       delete_thumbnail_and_image: {
         Args: { p_image_id: string }
         Returns: undefined
+      }
+      get_article_answers_for_modal: {
+        Args: { p_article_id: string; p_user_id?: string }
+        Returns: {
+          answer: string
+          content: string
+          seq: number
+        }[]
+      }
+      get_journal_body: {
+        Args: { p_article_id: string; p_user_id?: string }
+        Returns: string
       }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
@@ -2156,6 +2209,10 @@ export type Database = {
       }
       publish_release: {
         Args: { p_release_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      save_dictation_journal: {
+        Args: { p_article_id: string; p_body: string; p_user_id?: string }
         Returns: undefined
       }
       set_limit: {

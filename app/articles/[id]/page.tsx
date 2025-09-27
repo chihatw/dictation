@@ -3,6 +3,7 @@
 import ArticleHeader from '@/components/ArticleHeader';
 import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
+import { useJournalModal } from '@/hooks/useJournalModal';
 import { supabase } from '@/lib/supabase/browser';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -44,6 +45,8 @@ export default function ArticlePage() {
     loadingMap,
     submitOne,
   } = useArticle(id);
+
+  const { openJournalModal, JournalModalElement } = useJournalModal();
 
   // フィードバック+タグを一括取得
   useEffect(() => {
@@ -104,7 +107,7 @@ export default function ArticlePage() {
     }));
   };
 
-  const handleSubmitOne = (
+  const handleSubmitOne = async (
     sentenceId: string,
     metrics: {
       playsCount: number;
@@ -119,7 +122,16 @@ export default function ArticlePage() {
     if (!s) return;
     // 管理者なら記事の所有者UIDを代理指定
     const targetUserId = isAdmin ? article?.uid : undefined;
-    submitOne(s, metrics, selfAssessedComprehension, targetUserId);
+    const result = await submitOne(
+      s,
+      metrics,
+      selfAssessedComprehension,
+      targetUserId
+    );
+
+    if (result?.completed && result.articleId) {
+      openJournalModal({ articleId: result.articleId, userId: targetUserId });
+    }
   };
 
   if (loading) {
@@ -174,6 +186,7 @@ export default function ArticlePage() {
           {allSubmitted ? '所有句子都已送出。辛苦了！' : '尚有未送出的回答'}
         </div>
       </main>
+      {JournalModalElement}
     </div>
   );
 }

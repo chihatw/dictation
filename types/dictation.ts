@@ -20,6 +20,7 @@ export type Article = {
   uid: string;
   title: string;
   created_at: string;
+  journal: string | null;
   tts_voice_name: string;
   speaking_rate: number;
   sentences: Sentence[];

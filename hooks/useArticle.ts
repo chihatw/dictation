@@ -88,13 +88,17 @@ export function useArticle(articleId: string | undefined) {
         targetUserId,
       });
 
-      if (!res?.ok) {
-        setSubmitted((o) => ({ ...o, [s.id]: false }));
-        alert(res.error ?? '保存に失敗しました。');
-      } else {
-        setFeedbacks((o) => ({ ...o, [s.id]: res.feedbackMarkdown ?? '' }));
+      try {
+        if (!res?.ok) {
+          setSubmitted((o) => ({ ...o, [s.id]: false }));
+          alert(res.error ?? '保存に失敗しました。');
+        } else {
+          setFeedbacks((o) => ({ ...o, [s.id]: res.feedbackMarkdown ?? '' }));
+          return { completed: res.completed, articleId: res.articleId };
+        }
+      } finally {
+        setLoadingMap((o) => ({ ...o, [s.id]: false }));
       }
-      setLoadingMap((o) => ({ ...o, [s.id]: false }));
     },
     [answers]
   );

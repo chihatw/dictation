@@ -39,6 +39,13 @@ type RawFeedbackWithTags = {
   tags: RawTag[] | null;
 };
 
+type CreateRes = {
+  saved: boolean;
+  logged: boolean;
+  completed: boolean;
+  article_id: string;
+};
+
 /** クライアントから渡る入力の検証スキーマ */
 const schema = z.object({
   sentenceId: z.string().uuid(),
@@ -71,8 +78,8 @@ export async function createFeedbackAndLogAction(input: unknown) {
   } = parsed.data;
 
   const supabase = await createClientAction();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user?.id && !targetUserId)
+  const { data: _data } = await supabase.auth.getUser();
+  if (!_data.user?.id && !targetUserId)
     return { ok: false as const, error: '未認証です。' };
 
   // フィードバック生成（失敗時はフォールバック文言）
@@ -93,21 +100,28 @@ export async function createFeedbackAndLogAction(input: unknown) {
   }
 
   // DB内Txで 保存 + ログ
-  const { error } = await supabase.rpc('create_feedback_and_log', {
-    p_user_id: targetUserId ?? data.user!.id, // null なら auth.uid() が使われる
-    p_sentence_id: sentenceId,
-    p_answer: userAnswer,
-    p_feedback_md: feedbackMarkdown,
-    p_plays_count: metrics.playsCount,
-    p_listened_full_count: metrics.listenedFullCount,
-    p_used_play_all: metrics.usedPlayAll,
-    p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
-    p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
-    p_self_comp: selfAssessedComprehension,
-  });
+  const { data, error } = await supabase
+    .rpc('create_feedback_and_log', {
+      p_user_id: targetUserId ?? _data.user!.id, // null なら auth.uid() が使われる
+      p_sentence_id: sentenceId,
+      p_answer: userAnswer,
+      p_feedback_md: feedbackMarkdown,
+      p_plays_count: metrics.playsCount,
+      p_listened_full_count: metrics.listenedFullCount,
+      p_used_play_all: metrics.usedPlayAll,
+      p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
+      p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
+      p_self_comp: selfAssessedComprehension,
+    })
+    .single<CreateRes>();
 
   if (error) return { ok: false as const, error: '保存に失敗しました。' };
-  return { ok: true as const, feedbackMarkdown };
+  return {
+    ok: true as const,
+    feedbackMarkdown,
+    completed: data.completed,
+    articleId: data.article_id,
+  };
 }
 
 /**
