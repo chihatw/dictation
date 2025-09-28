@@ -163,6 +163,29 @@ export default function ArticlePage() {
       />
 
       <main className='mx-auto max-w-4xl px-4 py-6'>
+        {article.journal && (
+          <div className='rounded-xl border bg-white p-4 shadow-sm mb-4 '>
+            <div className='text-sm flex gap-x-2 items-center pb-2'>
+              <div className='font-bold'>學習日誌:</div>
+              <div className='text-gray-500'>
+                {(() => {
+                  const date = new Date(article.journal.created_at);
+                  const y = date.getFullYear();
+                  const m = date.getMonth() + 1;
+                  const d = date.getDate();
+                  return [y, m, d].join('/');
+                })()}
+              </div>
+            </div>
+            <div className='text-sm'>
+              <div className='rounded-lg bg-slate-50 p-2 border border-slate-200 text-slate-700'>
+                {article.journal.body.split('\n').map((line, index) => {
+                  return <div key={index}>{line}</div>;
+                })}
+              </div>
+            </div>
+          </div>
+        )}
         <SentencesList
           article={article}
           answers={answers}

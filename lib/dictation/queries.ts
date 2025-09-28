@@ -35,12 +35,16 @@ export async function fetchArticleWithSentences(
   }
   if (!data) return null;
 
+  const journal = data.journal?.[0] ?? null;
+
   return {
     id: data.id,
     uid: data.uid,
     title: data.title,
     created_at: data.created_at,
-    journal: data.journal?.[0]?.body ?? null,
+    journal: journal
+      ? { body: journal.body, created_at: journal.created_at }
+      : null,
     sentences: (data.sentences ?? []).map((s) => {
       const sac = s?.log?.[0]?.self_assessed_comprehension ?? 4; // 旧データ=4
       return {

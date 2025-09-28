@@ -1,6 +1,7 @@
 // ユーザー毎に表示を変更するので、動的レンダリングを強制
 export const dynamic = 'force-dynamic';
 
+import Journal from '@/components/journal/Journal';
 import { Tags } from '@/components/tag/Tags';
 import { createClient } from '@/lib/supabase/server';
 import { ChevronRight } from 'lucide-react';
@@ -36,7 +37,14 @@ export default async function Home() {
                     <div className='flex-1 truncate font-medium'>{t.title}</div>
                     <ChevronRight className='h-4 w-4 shrink-0' />
                   </div>
+
                   {t.tags.length > 0 && <Tags items={t.tags} />}
+                  {t.journal_body && (
+                    <Journal
+                      body={t.journal_body}
+                      created_at={t.journal_created_at}
+                    />
+                  )}
                 </Link>
               </li>
             ))}

@@ -2172,6 +2172,8 @@ export type Database = {
         Returns: {
           created_at: string
           id: string
+          journal_body: string
+          journal_created_at: string
           pos: number
           tags: string[]
           title: string
