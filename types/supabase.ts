@@ -731,7 +731,6 @@ export type Database = {
           plays_count: number
           self_assessed_comprehension: number
           sentence_id: string
-          used_play_all: boolean
           user_id: string
         }
         Insert: {
@@ -744,7 +743,6 @@ export type Database = {
           plays_count?: number
           self_assessed_comprehension: number
           sentence_id: string
-          used_play_all?: boolean
           user_id: string
         }
         Update: {
@@ -757,7 +755,6 @@ export type Database = {
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id?: string
-          used_play_all?: boolean
           user_id?: string
         }
         Relationships: [
@@ -2148,10 +2145,6 @@ export type Database = {
           content: string
           seq: number
         }[]
-      }
-      get_journal_body: {
-        Args: { p_article_id: string; p_user_id?: string }
-        Returns: string
       }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
