@@ -727,7 +727,6 @@ export type Database = {
           elapsed_ms_since_first_play: number
           elapsed_ms_since_item_view: number
           id: string
-          listened_full_count: number
           plays_count: number
           self_assessed_comprehension: number
           sentence_id: string
@@ -739,7 +738,6 @@ export type Database = {
           elapsed_ms_since_first_play: number
           elapsed_ms_since_item_view: number
           id?: string
-          listened_full_count?: number
           plays_count?: number
           self_assessed_comprehension: number
           sentence_id: string
@@ -751,7 +749,6 @@ export type Database = {
           elapsed_ms_since_first_play?: number
           elapsed_ms_since_item_view?: number
           id?: string
-          listened_full_count?: number
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id?: string
@@ -1916,7 +1913,7 @@ export type Database = {
           elapsed_ms_since_first_play: number | null
           elapsed_ms_since_item_view: number | null
           id: string | null
-          listened_full_count: number | null
+          plays_count: number | null
           self_assessed_comprehension: number | null
           sentence_id: string | null
           seq: number | null

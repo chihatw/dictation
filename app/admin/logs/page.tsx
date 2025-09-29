@@ -7,7 +7,7 @@ type Row = {
   id: string;
   user_id: string;
   sentence_id: string;
-  listened_full_count: number;
+  plays_count: number;
   elapsed_ms_since_item_view: number;
   elapsed_ms_since_first_play: number;
   self_assessed_comprehension: number;
@@ -32,7 +32,7 @@ export default function LogsPage() {
         id,
         user_id,
         sentence_id,
-        listened_full_count,
+        plays_count,
         elapsed_ms_since_item_view,
         elapsed_ms_since_first_play,
         self_assessed_comprehension,
@@ -148,7 +148,7 @@ export default function LogsPage() {
                   </td>
 
                   <td className='border p-1 text-center whitespace-nowrap'>
-                    {r.listened_full_count}
+                    {r.plays_count}
                   </td>
                   <td className='border p-1 whitespace-nowrap'>
                     {formatMinSec(r.elapsed_ms_since_first_play)}
