@@ -5,6 +5,13 @@ export type Submission = {
   created_at: string;
 };
 
+export type Metrics = {
+  playsCount: number;
+  listenedFullCount: number;
+  elapsedMsSinceItemView: number;
+  elapsedMsSinceFirstPlay: number;
+};
+
 export type Sentence = {
   id: string;
   seq: number;

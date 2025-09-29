@@ -24,5 +24,5 @@ export async function synthesizeToStorage(input: TtsKey) {
     .upload(path, audioBuffer, { upsert: false, contentType: 'audio/mpeg' });
 
   // 既存あり（競合）は成功扱い
-  return { path, hash };
+  return { path };
 }

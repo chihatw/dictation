@@ -5,6 +5,7 @@ import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
 import { useJournalModal } from '@/hooks/useJournalModal';
 import { supabase } from '@/lib/supabase/browser';
+import { Metrics } from '@/types/dictation';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -109,13 +110,7 @@ export default function ArticlePage() {
 
   const handleSubmitOne = async (
     sentenceId: string,
-    metrics: {
-      playsCount: number;
-      listenedFullCount: number;
-      usedPlayAll: boolean;
-      elapsedMsSinceItemView: number;
-      elapsedMsSinceFirstPlay: number;
-    },
+    metrics: Metrics,
     selfAssessedComprehension: number
   ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);

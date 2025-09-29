@@ -67,13 +67,13 @@ export async function createArticleAction(input: unknown) {
     await Promise.all(
       inserted.map((s) =>
         limit(async () => {
-          const { path, hash } = await synthesizeToStorage({
+          const { path } = await synthesizeToStorage({
             ...baseKey,
             text: s.content,
           });
           await supabase
             .from('dictation_sentences')
-            .update({ audio_path: path, tts_hash: hash })
+            .update({ audio_path: path })
             .eq('id', s.id);
         })
       )
@@ -91,13 +91,13 @@ export async function createArticleAction(input: unknown) {
   // 3B) 記事全体の一括音声（任意だが今回「作る」）
   try {
     const joined = sentences.join('。') + '。'; // 間を少し置きたいなら SSML に変更してもOK
-    const { path, hash } = await synthesizeToStorage({
+    const { path } = await synthesizeToStorage({
       ...baseKey,
       text: joined,
     });
     await supabase
       .from('dictation_articles')
-      .update({ audio_path_full: path, tts_full_hash: hash })
+      .update({ audio_path_full: path })
       .eq('id', articleId);
   } catch {
     // ここは致命ではないので握りつぶし（ログだけ）

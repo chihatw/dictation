@@ -1,7 +1,7 @@
 'use client';
 
 import { FeedbackWithTags } from '@/app/articles/[id]/action';
-import type { Article } from '@/types/dictation';
+import type { Article, Metrics } from '@/types/dictation';
 import SentenceItem from './sentence/SentenceItem';
 
 type Props = {
@@ -13,13 +13,7 @@ type Props = {
   onChangeAnswer: (id: string, val: string) => void;
   onSubmitOne: (
     sentenceId: string,
-    metrics: {
-      playsCount: number;
-      listenedFullCount: number;
-      usedPlayAll: boolean;
-      elapsedMsSinceItemView: number;
-      elapsedMsSinceFirstPlay: number;
-    },
+    metrics: Metrics,
     selfAssessedComprehension: number
   ) => void;
   isAdmin: boolean;

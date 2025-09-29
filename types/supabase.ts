@@ -549,7 +549,6 @@ export type Database = {
           id: string
           speaking_rate: number
           title: string
-          tts_full_hash: string | null
           tts_voice_name: string
           uid: string
         }
@@ -559,7 +558,6 @@ export type Database = {
           id?: string
           speaking_rate?: number
           title?: string
-          tts_full_hash?: string | null
           tts_voice_name?: string
           uid: string
         }
@@ -569,7 +567,6 @@ export type Database = {
           id?: string
           speaking_rate?: number
           title?: string
-          tts_full_hash?: string | null
           tts_voice_name?: string
           uid?: string
         }
@@ -689,7 +686,6 @@ export type Database = {
           created_at: string
           id: string
           seq: number
-          tts_hash: string | null
         }
         Insert: {
           article_id: string
@@ -698,7 +694,6 @@ export type Database = {
           created_at?: string
           id?: string
           seq: number
-          tts_hash?: string | null
         }
         Update: {
           article_id?: string
@@ -707,7 +702,6 @@ export type Database = {
           created_at?: string
           id?: string
           seq?: number
-          tts_hash?: string | null
         }
         Relationships: [
           {
@@ -783,7 +777,6 @@ export type Database = {
           feedback_md: string | null
           id: string
           sentence_id: string
-          user_id: string
         }
         Insert: {
           answer: string
@@ -791,7 +784,6 @@ export type Database = {
           feedback_md?: string | null
           id?: string
           sentence_id: string
-          user_id: string
         }
         Update: {
           answer?: string
@@ -799,7 +791,6 @@ export type Database = {
           feedback_md?: string | null
           id?: string
           sentence_id?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -2137,7 +2128,6 @@ export type Database = {
           p_plays_count: number
           p_self_comp: number
           p_sentence_id: string
-          p_used_play_all: boolean
           p_user_id: string
         }
         Returns: {

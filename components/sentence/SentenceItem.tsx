@@ -1,7 +1,7 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { Sentence } from '@/types/dictation';
+import { Metrics, Sentence } from '@/types/dictation';
 import { memo, useMemo, useRef, useState } from 'react';
 
 import { FeedbackWithTags } from '@/app/articles/[id]/action';
@@ -20,13 +20,7 @@ export type SentenceItemProps = {
   onChange: (val: string) => void;
   onSubmit: (
     sentenceId: string,
-    metrics: {
-      playsCount: number;
-      listenedFullCount: number;
-      usedPlayAll: boolean;
-      elapsedMsSinceItemView: number;
-      elapsedMsSinceFirstPlay: number;
-    },
+    metrics: Metrics,
     selfAssessedComprehension: number
   ) => void; // 型を差し替え
   submitting?: boolean;
@@ -82,7 +76,6 @@ function SentenceItemBase({
       {
         playsCount,
         listenedFullCount: playsCount,
-        usedPlayAll: false,
         elapsedMsSinceItemView: Date.now() - itemViewAt.current,
         elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
       },

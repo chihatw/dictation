@@ -2,7 +2,7 @@
 
 import { createFeedbackAndLogAction } from '@/app/articles/[id]/action';
 import { fetchArticleWithSentences } from '@/lib/dictation/queries';
-import type { Article, Sentence } from '@/types/dictation';
+import type { Article, Metrics, Sentence } from '@/types/dictation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function useArticle(articleId: string | undefined) {
@@ -62,13 +62,7 @@ export function useArticle(articleId: string | undefined) {
   const submitOne = useCallback(
     async (
       s: Sentence,
-      metrics: {
-        playsCount: number;
-        listenedFullCount: number;
-        usedPlayAll: boolean;
-        elapsedMsSinceItemView: number;
-        elapsedMsSinceFirstPlay: number;
-      },
+      metrics: Metrics,
       selfAssessedComprehension: number,
       targetUserId?: string
     ) => {

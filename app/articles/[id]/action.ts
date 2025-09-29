@@ -54,7 +54,6 @@ const schema = z.object({
   metrics: z.object({
     playsCount: z.number().int().nonnegative(),
     listenedFullCount: z.number().int().nonnegative(),
-    usedPlayAll: z.boolean(),
     elapsedMsSinceItemView: z.number().int().nonnegative(),
     elapsedMsSinceFirstPlay: z.number().int().nonnegative(),
   }),
@@ -108,7 +107,6 @@ export async function createFeedbackAndLogAction(input: unknown) {
       p_feedback_md: feedbackMarkdown,
       p_plays_count: metrics.playsCount,
       p_listened_full_count: metrics.listenedFullCount,
-      p_used_play_all: metrics.usedPlayAll,
       p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
       p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
       p_self_comp: selfAssessedComprehension,
