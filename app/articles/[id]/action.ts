@@ -106,7 +106,6 @@ export async function createFeedbackAndLogAction(input: unknown) {
       p_answer: userAnswer,
       p_feedback_md: feedbackMarkdown,
       p_plays_count: metrics.playsCount,
-      p_listened_full_count: metrics.listenedFullCount,
       p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
       p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
       p_self_comp: selfAssessedComprehension,

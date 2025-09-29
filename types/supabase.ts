@@ -2118,7 +2118,6 @@ export type Database = {
           p_elapsed_ms_since_first_play: number
           p_elapsed_ms_since_item_view: number
           p_feedback_md: string
-          p_listened_full_count: number
           p_plays_count: number
           p_self_comp: number
           p_sentence_id: string
