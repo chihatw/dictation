@@ -23,7 +23,7 @@ export async function createArticleAction(input: unknown) {
     .from('dictation_articles')
     .insert({
       uid,
-      title: title.trim(),
+      subtitle: title.trim(),
       tts_voice_name: ttsVoiceName,
       speaking_rate: clampRateForDB(speakingRate),
     })

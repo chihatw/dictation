@@ -21,7 +21,7 @@ export default async function Page(props: Params) {
   // 登録済み記事（pos昇順）
   const { data: rawItems, error: itemsErr } = await supabaseAdmin
     .from('dictation_release_items')
-    .select('id, article_id, pos, dictation_articles(id, title, created_at)')
+    .select('id, article_id, pos, dictation_articles(id, subtitle, created_at)')
     .eq('release_id', releaseId)
     .order('pos', { ascending: true });
   if (itemsErr) throw itemsErr;
@@ -30,7 +30,7 @@ export default async function Page(props: Params) {
   // 追加候補：同一uidの最新10件だけ取得（除外はUI側で実施）
   const { data: rawCandidates, error: candErr } = await supabaseAdmin
     .from('dictation_articles')
-    .select('id, title, created_at')
+    .select('id, subtitle, created_at')
     .eq('uid', release.uid)
     .order('created_at', { ascending: false })
     .limit(10);
@@ -126,7 +126,9 @@ export default async function Page(props: Params) {
                 <tr key={it.id} className='border-t'>
                   <td className='p-2'>{it.pos}</td>
                   <td className='p-2 font-mono'>{it.article_id}</td>
-                  <td className='p-2'>{it.dictation_articles?.title ?? ''}</td>
+                  <td className='p-2'>
+                    {it.dictation_articles?.subtitle ?? ''}
+                  </td>
                   <td className='p-2'>
                     {it.dictation_articles?.created_at
                       ? new Date(
@@ -176,7 +178,7 @@ export default async function Page(props: Params) {
               {candidates?.map((a) => (
                 <tr key={a.id} className='border-t'>
                   <td className='p-2 font-mono'>{a.id}</td>
-                  <td className='p-2'>{a.title}</td>
+                  <td className='p-2'>{a.subtitle}</td>
                   <td className='p-2'>
                     {a.created_at
                       ? new Date(a.created_at).toLocaleString('ja-JP', {

@@ -28,8 +28,6 @@ export type Article = {
   title: string;
   created_at: string;
   journal: { body: string; created_at: string } | null;
-  tts_voice_name: string;
-  speaking_rate: number;
   sentences: Sentence[];
   audio_path_full?: string | null;
 };

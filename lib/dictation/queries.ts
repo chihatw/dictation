@@ -8,8 +8,7 @@ export async function fetchArticleWithSentences(
     .from('dictation_articles')
     .select(
       `
-      id, uid, title, created_at,
-      tts_voice_name, speaking_rate, audio_path_full,
+      id, uid, subtitle, created_at, audio_path_full,
       journal:dictation_journals!left (
         id, body, created_at
       ),
@@ -40,7 +39,7 @@ export async function fetchArticleWithSentences(
   return {
     id: data.id,
     uid: data.uid,
-    title: data.title,
+    title: data.subtitle,
     created_at: data.created_at,
     journal: journal
       ? { body: journal.body, created_at: journal.created_at }
@@ -52,8 +51,6 @@ export async function fetchArticleWithSentences(
         self_assessed_comprehension: sac,
       };
     }),
-    tts_voice_name: data.tts_voice_name,
-    speaking_rate: data.speaking_rate,
     audio_path_full: data.audio_path_full ?? null,
   };
 }

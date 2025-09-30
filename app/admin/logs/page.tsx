@@ -17,7 +17,7 @@ type Row = {
   content: string; // dictation_sentences.content
   seq: number; // dictation_sentences.seq
   article_id: string; // dictation_sentences.article_id
-  title: string; // dictation_articles.title
+  title: string; // dictation_articles.subtitle
 };
 
 export default function LogsPage() {
