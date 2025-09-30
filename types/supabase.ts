@@ -578,34 +578,31 @@ export type Database = {
           body: string
           created_at: string
           id: string
-          user_id: string
         }
         Insert: {
           article_id: string
           body: string
           created_at?: string
           id?: string
-          user_id: string
         }
         Update: {
           article_id?: string
           body?: string
           created_at?: string
           id?: string
-          user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "dictation_journals_article_id_fkey"
             columns: ["article_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "dictation_articles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "dictation_journals_article_id_fkey"
             columns: ["article_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "dictation_articles_recent10"
             referencedColumns: ["id"]
           },
@@ -2189,7 +2186,7 @@ export type Database = {
         Returns: undefined
       }
       save_dictation_journal: {
-        Args: { p_article_id: string; p_body: string; p_user_id?: string }
+        Args: { p_article_id: string; p_body: string }
         Returns: undefined
       }
       set_limit: {

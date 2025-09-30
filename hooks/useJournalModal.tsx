@@ -1,7 +1,14 @@
 'use client';
 
+import { saveDictationJournalAction } from '@/app/actions/saveDictationJournal';
 import { supabase } from '@/lib/supabase/browser';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
 
 type OpenArgs = { articleId: string; userId?: string };
 
@@ -57,6 +64,8 @@ export function useJournalModal() {
   const [body, setBody] = useState('');
   const [placeholder, setPlaceholder] = useState('');
 
+  const [isPending, startTransition] = useTransition();
+
   const openJournalModal = useCallback(({ articleId, userId }: OpenArgs) => {
     setArticleId(articleId);
     setUserId(userId);
@@ -102,22 +111,22 @@ export function useJournalModal() {
     };
   }, [open, articleId, userId]);
 
-  const save = useCallback(async () => {
+  const save = useCallback(() => {
     if (!articleId || !body.trim()) return;
+    startTransition(async () => {
+      try {
+        await saveDictationJournalAction(articleId, body);
+        close(); // revalidate後に閉じる
+      } catch {
+        alert('保存に失敗しました。');
+      }
+    });
+  }, [articleId, body, close]);
 
-    const saveArgs = userId
-      ? { p_article_id: articleId, p_body: body, p_user_id: userId }
-      : { p_article_id: articleId, p_body: body };
-
-    const { error } = await supabase.rpc('save_dictation_journal', saveArgs);
-    if (error) {
-      alert('保存に失敗しました。');
-      return;
-    }
-    close();
-  }, [articleId, body, userId, close]);
-
-  const canSave = useMemo(() => !!body.trim() && !loading, [body, loading]);
+  const canSave = useMemo(
+    () => !!body.trim() && !loading && !isPending,
+    [body, loading]
+  );
 
   const JournalModalElement = useMemo(() => {
     if (!open) return null;

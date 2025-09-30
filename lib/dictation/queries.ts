@@ -11,7 +11,7 @@ export async function fetchArticleWithSentences(
       id, uid, title, created_at,
       tts_voice_name, speaking_rate, audio_path_full,
       journal:dictation_journals!left (
-        id, user_id, body, created_at
+        id, body, created_at
       ),
       sentences:dictation_sentences (
         id, seq, content, created_at, audio_path,
@@ -35,7 +35,7 @@ export async function fetchArticleWithSentences(
   }
   if (!data) return null;
 
-  const journal = data.journal?.[0] ?? null;
+  const journal = data.journal ?? null;
 
   return {
     id: data.id,
