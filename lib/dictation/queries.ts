@@ -8,16 +8,19 @@ export async function fetchArticleWithSentences(
     .from('dictation_articles')
     .select(
       `
-      id, uid, subtitle, created_at, audio_path_full,
-      journal:dictation_journals!left (
-        id, body, created_at
-      ),
-      sentences:dictation_sentences (
-        id, seq, content, created_at, audio_path,
-        submission:dictation_submissions!left ( id, answer, feedback_md, created_at ),
-        log:dictation_submission_logs!left ( self_assessed_comprehension, created_at )
-      )
-    `
+    id, subtitle, created_at, audio_path_full,
+    collection:dictation_article_collections!dictation_articles_collection_fkey (
+      user_id
+    ),
+    journal:dictation_journals!left (
+      id, body, created_at
+    ),
+    sentences:dictation_sentences (
+      id, seq, content, created_at, audio_path,
+      submission:dictation_submissions!left ( id, answer, feedback_md, created_at ),
+      log:dictation_submission_logs!left ( self_assessed_comprehension, created_at )
+    )
+  `
     )
     .eq('id', articleId)
     .order('seq', { referencedTable: 'dictation_sentences', ascending: true })
@@ -38,7 +41,7 @@ export async function fetchArticleWithSentences(
 
   return {
     id: data.id,
-    uid: data.uid,
+    uid: data.collection?.user_id,
     title: data.subtitle,
     created_at: data.created_at,
     journal: journal

@@ -566,26 +566,37 @@ export type Database = {
       dictation_articles: {
         Row: {
           audio_path_full: string | null
+          collection_id: string
           created_at: string
           id: string
+          seq: number
           subtitle: string
-          uid: string
         }
         Insert: {
           audio_path_full?: string | null
+          collection_id: string
           created_at?: string
           id?: string
+          seq: number
           subtitle?: string
-          uid: string
         }
         Update: {
           audio_path_full?: string | null
+          collection_id?: string
           created_at?: string
           id?: string
+          seq?: number
           subtitle?: string
-          uid?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_articles_collection_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_article_collections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dictation_journals: {
         Row: {

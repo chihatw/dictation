@@ -24,8 +24,8 @@ export async function createArticleAction(input: unknown) {
     .insert({
       uid,
       subtitle: title.trim(),
-      tts_voice_name: ttsVoiceName,
-      speaking_rate: clampRateForDB(speakingRate),
+      collection_id: 'dummy', // debug insert dictation_articles の修正
+      seq: 1,
     })
     .select('id')
     .single();
