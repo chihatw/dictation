@@ -79,7 +79,6 @@ export function useArticle(articleId: string | undefined) {
         userAnswer: val,
         metrics,
         selfAssessedComprehension,
-        targetUserId,
       });
 
       try {

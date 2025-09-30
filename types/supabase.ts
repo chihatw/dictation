@@ -2132,6 +2132,16 @@ export type Database = {
           seq: number
         }[]
       }
+      get_feedbacks_with_tags: {
+        Args: { p_sentence_ids: string[] }
+        Returns: {
+          created_at: string
+          id: string
+          note_md: string
+          sentence_id: string
+          tags: Json
+        }[]
+      }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
         Returns: string

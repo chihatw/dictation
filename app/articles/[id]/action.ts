@@ -20,28 +20,16 @@ export type FeedbackWithTags = {
   tags: Tag[];
 };
 
-// DBから返る生データ型
-type RawTag = {
-  id: string;
-  created_at: string;
-  teacher_feedback_id: string;
-  tag_master_id: string | null;
-  tag: { label: string } | null;
-};
-
-type RawFeedbackWithTags = {
-  id: string;
-  created_at: string;
-  sentence_id: string;
-  note_md: string;
-  tags: RawTag[] | null;
-};
-
 type CreateRes = {
   saved: boolean;
   logged: boolean;
   completed: boolean;
   article_id: string;
+};
+
+// RPC戻り値型（DB → TS）
+type RpcFeedbackRow = Omit<FeedbackWithTags, 'tags'> & {
+  tags: unknown; // JSONB はまず unknown で受ける
 };
 
 /** クライアントから渡る入力の検証スキーマ */
@@ -56,7 +44,6 @@ const schema = z.object({
     elapsedMsSinceFirstPlay: z.number().int().nonnegative(),
   }),
   selfAssessedComprehension: z.number().int().min(1).max(4), // 1=低, 4=高+運用可
-  targetUserId: z.string().uuid().optional(), // 代理対象（管理画面など）
 });
 
 export type CreateFeedbackAndLogArgs = z.infer<typeof schema>;
@@ -71,13 +58,11 @@ export async function createFeedbackAndLogAction(input: unknown) {
     userAnswer,
     metrics,
     selfAssessedComprehension,
-    targetUserId,
   } = parsed.data;
 
   const supabase = await createClientAction();
   const { data: _data } = await supabase.auth.getUser();
-  if (!_data.user?.id && !targetUserId)
-    return { ok: false as const, error: '未認証です。' };
+  if (!_data.user?.id) return { ok: false as const, error: '未認証です。' };
 
   // フィードバック生成（失敗時はフォールバック文言）
   let feedbackMarkdown = '';
@@ -130,19 +115,17 @@ export async function addFeedbackWithTags(
   const { data, error } = await supabase
     .from('dictation_teacher_feedback')
     .insert({ sentence_id: sentenceId, note_md: noteMd })
-    .select(
-      `
-      id, created_at, sentence_id, note_md,
-      tags:dictation_teacher_feedback_tags (
-        id, created_at, teacher_feedback_id, tag_master_id,
-        tag:dictation_tag_master ( label )
-      )
-    `
-    )
+    .select(`id, created_at, sentence_id, note_md`)
     .single();
   if (error) throw new Error(error.message);
 
-  return flatten(data as unknown as RawFeedbackWithTags);
+  return {
+    id: data.id,
+    created_at: data.created_at,
+    sentence_id: data.sentence_id,
+    note_md: data.note_md,
+    tags: [],
+  };
 }
 
 /**
@@ -161,7 +144,6 @@ export async function deleteFeedback(id: string) {
 /**
  * 文ID配列に紐づく教員用フィードバック＋タグを一括取得
  * - 初期表示でのN+1回避
- * - フィードバックは新しい順、タグは作成順
  * - 返値は sentence_id をキーにしたマップ
  */
 export async function listFeedbackWithTagsBulkBySentence(
@@ -170,29 +152,24 @@ export async function listFeedbackWithTagsBulkBySentence(
   if (!sentenceIds?.length) return {};
   const supabase = await createClientAction();
 
-  const { data, error } = await supabase
-    .from('dictation_teacher_feedback')
-    .select(
-      `
-      id, created_at, sentence_id, note_md,
-      tags:dictation_teacher_feedback_tags (
-        id, created_at, teacher_feedback_id, tag_master_id,
-        tag:dictation_tag_master ( label )
-      )
-    `
-    )
-    .in('sentence_id', sentenceIds)
-    .order('created_at', { ascending: true })
-    .order('created_at', {
-      referencedTable: 'dictation_teacher_feedback_tags', // OK
-      ascending: true,
-    });
+  const { data, error } = await supabase.rpc('get_feedbacks_with_tags', {
+    p_sentence_ids: sentenceIds,
+  });
 
   if (error) throw new Error(error.message);
 
+  // JSONB → 型へ
+  const rows = (data ?? []) as RpcFeedbackRow[];
+
   const map: Record<string, FeedbackWithTags[]> = {};
-  for (const row of (data ?? []) as RawFeedbackWithTags[]) {
-    const f = flatten(row);
+  for (const r of rows) {
+    // パース処理（安全に Tag[] へ変換）
+    const tags: Tag[] = Array.isArray(r.tags) ? (r.tags as Tag[]) : [];
+
+    const f: FeedbackWithTags = {
+      ...r,
+      tags,
+    };
     (map[f.sentence_id] ||= []).push(f);
   }
   return map;
@@ -252,20 +229,4 @@ export async function deleteFeedbackTag(tagId: string) {
     .delete()
     .eq('id', tagId);
   if (error) throw new Error(error.message);
-}
-
-function flatten(row: RawFeedbackWithTags): FeedbackWithTags {
-  return {
-    id: row.id,
-    created_at: row.created_at,
-    sentence_id: row.sentence_id,
-    note_md: row.note_md,
-    tags: (row.tags ?? []).map((t) => ({
-      id: t.id,
-      created_at: t.created_at,
-      teacher_feedback_id: t.teacher_feedback_id,
-      tag_master_id: t.tag_master_id,
-      label: t.tag?.label ?? '', // ← マスタのlabelを平坦化
-    })),
-  };
 }
