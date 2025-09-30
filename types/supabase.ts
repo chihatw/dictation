@@ -730,7 +730,6 @@ export type Database = {
           plays_count: number
           self_assessed_comprehension: number
           sentence_id: string
-          user_id: string
         }
         Insert: {
           answer?: string | null
@@ -741,7 +740,6 @@ export type Database = {
           plays_count?: number
           self_assessed_comprehension: number
           sentence_id: string
-          user_id: string
         }
         Update: {
           answer?: string | null
@@ -752,7 +750,6 @@ export type Database = {
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -2121,7 +2118,6 @@ export type Database = {
           p_plays_count: number
           p_self_comp: number
           p_sentence_id: string
-          p_user_id: string
         }
         Returns: {
           article_id: string

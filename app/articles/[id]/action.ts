@@ -101,7 +101,6 @@ export async function createFeedbackAndLogAction(input: unknown) {
   // DB内Txで 保存 + ログ
   const { data, error } = await supabase
     .rpc('create_feedback_and_log', {
-      p_user_id: targetUserId ?? _data.user!.id, // null なら auth.uid() が使われる
       p_sentence_id: sentenceId,
       p_answer: userAnswer,
       p_feedback_md: feedbackMarkdown,
