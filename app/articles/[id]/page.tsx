@@ -99,7 +99,7 @@ export default function ArticlePage() {
     fbId: string
   ) => {
     if (!article) return;
-    const created = await addFeedbackTag(fbId, label.trim(), article.uid);
+    const created = await addFeedbackTag(fbId, label.trim());
     setFbMap((m) => ({
       ...m,
       [sentenceId]: (m[sentenceId] ?? []).map((f) =>

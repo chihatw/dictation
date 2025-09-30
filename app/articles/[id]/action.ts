@@ -7,7 +7,6 @@ import { z } from 'zod';
 export type Tag = {
   id: string;
   created_at: string;
-  user_id: string;
   teacher_feedback_id: string;
   tag_master_id: string | null;
   label: string;
@@ -25,7 +24,6 @@ export type FeedbackWithTags = {
 type RawTag = {
   id: string;
   created_at: string;
-  user_id: string;
   teacher_feedback_id: string;
   tag_master_id: string | null;
   tag: { label: string } | null;
@@ -136,7 +134,7 @@ export async function addFeedbackWithTags(
       `
       id, created_at, sentence_id, note_md,
       tags:dictation_teacher_feedback_tags (
-        id, created_at, user_id, teacher_feedback_id, tag_master_id,
+        id, created_at, teacher_feedback_id, tag_master_id,
         tag:dictation_tag_master ( label )
       )
     `
@@ -178,7 +176,7 @@ export async function listFeedbackWithTagsBulkBySentence(
       `
       id, created_at, sentence_id, note_md,
       tags:dictation_teacher_feedback_tags (
-        id, created_at, user_id, teacher_feedback_id, tag_master_id,
+        id, created_at, teacher_feedback_id, tag_master_id,
         tag:dictation_tag_master ( label )
       )
     `
@@ -202,14 +200,9 @@ export async function listFeedbackWithTagsBulkBySentence(
 
 /**
  * タグを1件追加
- * - 実行ユーザーIDを埋める（誰が付けたか追跡可能）
  * - 返値は作成済みタグ1件
  */
-export async function addFeedbackTag(
-  teacherFeedbackId: string,
-  label: string,
-  ownerUserId: string
-) {
+export async function addFeedbackTag(teacherFeedbackId: string, label: string) {
   const supabase = await createClientAction();
   const trimmed = label.trim();
   if (!trimmed) throw new Error('empty label');
@@ -227,12 +220,11 @@ export async function addFeedbackTag(
     .from('dictation_teacher_feedback_tags')
     .insert({
       teacher_feedback_id: teacherFeedbackId,
-      user_id: ownerUserId,
       tag_master_id: tagMasterId,
     })
     .select(
       `
-      id, created_at, teacher_feedback_id, user_id, tag_master_id,
+      id, created_at, teacher_feedback_id, tag_master_id,
       tag:dictation_tag_master(label)
     `
     )
@@ -244,7 +236,6 @@ export async function addFeedbackTag(
     id: data.id,
     created_at: data.created_at,
     teacher_feedback_id: data.teacher_feedback_id,
-    user_id: data.user_id,
     tag_master_id: data.tag_master_id,
     label: data.tag?.label ?? '',
   } as Tag;
@@ -272,7 +263,6 @@ function flatten(row: RawFeedbackWithTags): FeedbackWithTags {
     tags: (row.tags ?? []).map((t) => ({
       id: t.id,
       created_at: t.created_at,
-      user_id: t.user_id,
       teacher_feedback_id: t.teacher_feedback_id,
       tag_master_id: t.tag_master_id,
       label: t.tag?.label ?? '', // ← マスタのlabelを平坦化

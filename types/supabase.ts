@@ -846,21 +846,18 @@ export type Database = {
           id: string
           tag_master_id: string | null
           teacher_feedback_id: string
-          user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           tag_master_id?: string | null
           teacher_feedback_id: string
-          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           tag_master_id?: string | null
           teacher_feedback_id?: string
-          user_id?: string
         }
         Relationships: [
           {
