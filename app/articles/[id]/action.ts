@@ -1,35 +1,16 @@
 'use server';
+// app/articles/[id]/action.ts
 
 import { chat } from '@/lib/chat';
 import { createClientAction } from '@/lib/supabase/server-action';
+import { FeedbackWithTags, Tag } from '@/types/dictation';
 import { z } from 'zod';
-
-export type Tag = {
-  id: string;
-  created_at: string;
-  teacher_feedback_id: string;
-  tag_master_id: string | null;
-  label: string;
-};
-
-export type FeedbackWithTags = {
-  id: string;
-  created_at: string;
-  sentence_id: string;
-  note_md: string;
-  tags: Tag[];
-};
 
 type CreateRes = {
   saved: boolean;
   logged: boolean;
   completed: boolean;
   article_id: string;
-};
-
-// RPC戻り値型（DB → TS）
-type RpcFeedbackRow = Omit<FeedbackWithTags, 'tags'> & {
-  tags: unknown; // JSONB はまず unknown で受ける
 };
 
 /** クライアントから渡る入力の検証スキーマ */
@@ -139,40 +120,6 @@ export async function deleteFeedback(id: string) {
     .delete()
     .eq('id', id);
   if (error) throw new Error(error.message);
-}
-
-/**
- * 文ID配列に紐づく教員用フィードバック＋タグを一括取得
- * - 初期表示でのN+1回避
- * - 返値は sentence_id をキーにしたマップ
- */
-export async function listFeedbackWithTagsBulkBySentence(
-  sentenceIds: string[]
-): Promise<Record<string, FeedbackWithTags[]>> {
-  if (!sentenceIds?.length) return {};
-  const supabase = await createClientAction();
-
-  const { data, error } = await supabase.rpc('get_feedbacks_with_tags', {
-    p_sentence_ids: sentenceIds,
-  });
-
-  if (error) throw new Error(error.message);
-
-  // JSONB → 型へ
-  const rows = (data ?? []) as RpcFeedbackRow[];
-
-  const map: Record<string, FeedbackWithTags[]> = {};
-  for (const r of rows) {
-    // パース処理（安全に Tag[] へ変換）
-    const tags: Tag[] = Array.isArray(r.tags) ? (r.tags as Tag[]) : [];
-
-    const f: FeedbackWithTags = {
-      ...r,
-      tags,
-    };
-    (map[f.sentence_id] ||= []).push(f);
-  }
-  return map;
 }
 
 /**

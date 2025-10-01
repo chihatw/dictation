@@ -1,4 +1,4 @@
-import { FeedbackWithTags } from '@/app/articles/[id]/action';
+import { FeedbackWithTags } from '@/types/dictation';
 import { TeacherFeedbackForm } from './TeacherFeedbackForm';
 import { TeacherFeedbackList } from './TeacherFeedbackList';
 

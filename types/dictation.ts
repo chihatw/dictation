@@ -1,3 +1,5 @@
+// types/dictation.ts
+
 export type Submission = {
   id: string;
   answer: string;
@@ -20,6 +22,7 @@ export type Sentence = {
   created_at: string;
   audio_path?: string | null;
   submission?: Submission | null;
+  teacher_feedback: FeedbackWithTags[] | null;
 };
 
 export type Article = {
@@ -30,4 +33,20 @@ export type Article = {
   journal: { body: string; created_at: string } | null;
   sentences: Sentence[];
   audio_path_full?: string | null;
+};
+
+export type Tag = {
+  id: string;
+  created_at: string;
+  teacher_feedback_id: string;
+  tag_master_id: string | null;
+  label: string;
+};
+
+export type FeedbackWithTags = {
+  id: string;
+  created_at: string;
+  sentence_id: string;
+  note_md: string;
+  tags: Tag[];
 };

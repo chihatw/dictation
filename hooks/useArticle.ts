@@ -63,8 +63,7 @@ export function useArticle(articleId: string | undefined) {
     async (
       s: Sentence,
       metrics: Metrics,
-      selfAssessedComprehension: number,
-      targetUserId?: string
+      selfAssessedComprehension: number
     ) => {
       const val = (answers[s.id] ?? '').trim();
       if (!val) return;

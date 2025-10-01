@@ -1,7 +1,7 @@
 'use client';
 
-import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
+import { FeedbackWithTags } from '@/types/dictation';
 import { Tags } from '../tag/Tags';
 import TagAdder from './TagAdder';
 

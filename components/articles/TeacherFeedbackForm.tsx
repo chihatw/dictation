@@ -1,10 +1,8 @@
 'use client';
 
-import {
-  addFeedbackWithTags,
-  FeedbackWithTags,
-} from '@/app/articles/[id]/action';
+import { addFeedbackWithTags } from '@/app/articles/[id]/action';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
+import { FeedbackWithTags } from '@/types/dictation';
 import { useState, useTransition } from 'react';
 
 export function TeacherFeedbackForm({

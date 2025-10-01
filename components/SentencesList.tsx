@@ -1,7 +1,6 @@
 'use client';
 
-import { FeedbackWithTags } from '@/app/articles/[id]/action';
-import type { Article, Metrics } from '@/types/dictation';
+import type { Article, FeedbackWithTags, Metrics } from '@/types/dictation';
 import SentenceItem from './sentence/SentenceItem';
 
 type Props = {
@@ -18,10 +17,9 @@ type Props = {
   ) => void;
   isAdmin: boolean;
   feedbackMap: Record<string, FeedbackWithTags[]>;
-  onCreatedFeedback?: (created: FeedbackWithTags, sentenceId: string) => void;
-  onDeleteFeedback?: (fbId: string, sentenceId: string) => Promise<void>;
-  onDeleteTag?: (tagId: string, sentenceId: string) => Promise<void>;
-  onAddTag?: (label: string, sentenceId: string, fbId: string) => void;
+  onDeleteFeedback?: (fbId: string) => Promise<void>;
+  onDeleteTag?: (tagId: string) => Promise<void>;
+  onAddTag?: (label: string, fbId: string) => void;
 };
 
 export default function SentencesList({
@@ -34,31 +32,32 @@ export default function SentencesList({
   onSubmitOne,
   isAdmin,
   feedbackMap,
-  onCreatedFeedback,
   onDeleteFeedback,
   onDeleteTag,
   onAddTag,
 }: Props) {
   return (
     <div className='space-y-5'>
-      {article.sentences.map((s) => (
-        <SentenceItem
-          key={s.id}
-          sentence={s}
-          value={answers[s.id] ?? ''}
-          isSubmitted={submitted[s.id] ?? false}
-          feedback={feedbacks[s.id]}
-          onChange={(val) => onChangeAnswer(s.id, val)}
-          onSubmit={onSubmitOne}
-          submitting={loadingMap[s.id] ?? false}
-          isAdmin={isAdmin}
-          items={feedbackMap[s.id] ?? []}
-          onCreated={(created) => onCreatedFeedback?.(created, s.id)}
-          onDelete={(fbId) => onDeleteFeedback?.(fbId, s.id)}
-          onDeleteTag={(tagId) => onDeleteTag?.(tagId, s.id)}
-          onAddTag={(label, fbId) => onAddTag?.(label, s.id, fbId)}
-        />
-      ))}
+      {article.sentences.map((s) => {
+        const itemsFor = feedbackMap[s.id] ?? s.teacher_feedback ?? [];
+        return (
+          <SentenceItem
+            key={s.id}
+            sentence={s}
+            value={answers[s.id] ?? ''}
+            isSubmitted={submitted[s.id] ?? false}
+            feedback={feedbacks[s.id]}
+            onChange={(val) => onChangeAnswer(s.id, val)}
+            onSubmit={onSubmitOne}
+            submitting={loadingMap[s.id] ?? false}
+            isAdmin={isAdmin}
+            items={itemsFor}
+            onDelete={(fbId) => onDeleteFeedback?.(fbId)}
+            onDeleteTag={(tagId) => onDeleteTag?.(tagId)}
+            onAddTag={(label, fbId) => onAddTag?.(label, fbId)}
+          />
+        );
+      })}
     </div>
   );
 }

@@ -1,5 +1,50 @@
 import { supabase } from '@/lib/supabase/browser';
-import type { Article } from '@/types/dictation';
+import type {
+  Article,
+  FeedbackWithTags,
+  Sentence,
+  Tag,
+} from '@/types/dictation';
+
+type RpcFeedbackTag = {
+  id: string;
+  created_at: string;
+  teacher_feedback_id: string;
+  tag_master_id: string | null;
+  label: string;
+};
+
+type RpcFeedbackWithTags = {
+  id: string;
+  created_at: string;
+  sentence_id: string;
+  note_md: string;
+  tags: RpcFeedbackTag[];
+};
+
+type RpcArticle = {
+  id: string;
+  uid: string;
+  title: string;
+  created_at: string;
+  audio_path_full: string | null;
+  journal: { body: string; created_at: string } | null;
+  sentences: Array<{
+    id: string;
+    seq: number;
+    content: string;
+    created_at: string;
+    audio_path: string | null;
+    submission: {
+      id: string;
+      answer: string;
+      feedback_md: string | null;
+      created_at: string;
+      self_assessed_comprehension: number;
+    } | null;
+    teacher_feedback: RpcFeedbackWithTags[] | null;
+  }>;
+};
 
 export async function fetchArticleWithSentences(
   articleId: string
@@ -8,36 +53,9 @@ export async function fetchArticleWithSentences(
     p_article_id: articleId,
   });
 
-  if (error) {
-    console.error('[get_article_page]', error);
-    return null;
-  }
+  if (error || !data) return null;
 
-  if (!data) return null;
-
-  // RPC は Article 形状の JSON を返す想定。最低限の整形のみ。
-  const a = data as {
-    id: string;
-    uid: string;
-    title: string;
-    created_at: string;
-    audio_path_full: string | null;
-    journal: { body: string; created_at: string } | null;
-    sentences: Array<{
-      id: string;
-      seq: number;
-      content: string;
-      created_at: string;
-      audio_path: string | null;
-      submission: {
-        id: string;
-        answer: string; // not null
-        feedback_md: string | null; // null 許容
-        created_at: string;
-        self_assessed_comprehension: number;
-      } | null;
-    }>;
-  };
+  const a = data as RpcArticle;
 
   const article: Article = {
     id: a.id,
@@ -46,14 +64,27 @@ export async function fetchArticleWithSentences(
     created_at: a.created_at,
     journal: a.journal,
     audio_path_full: a.audio_path_full,
-    sentences: a.sentences.map((s) => ({
-      id: s.id,
-      seq: s.seq,
-      content: s.content,
-      created_at: s.created_at,
-      audio_path: s.audio_path,
-      submission: s.submission, // 既に単一 or null
-    })),
+    sentences: a.sentences.map(
+      (s): Sentence => ({
+        id: s.id,
+        seq: s.seq,
+        content: s.content,
+        created_at: s.created_at,
+        audio_path: s.audio_path,
+        submission: s.submission,
+        teacher_feedback: s.teacher_feedback
+          ? (s.teacher_feedback.map(
+              (f): FeedbackWithTags => ({
+                id: f.id,
+                created_at: f.created_at,
+                sentence_id: f.sentence_id,
+                note_md: f.note_md,
+                tags: (Array.isArray(f.tags) ? f.tags : []) as Tag[],
+              })
+            ) as FeedbackWithTags[])
+          : null,
+      })
+    ),
   };
 
   return article;

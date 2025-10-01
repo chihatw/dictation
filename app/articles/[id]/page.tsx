@@ -1,31 +1,20 @@
 'use client';
+// app/articles/[id]/page.tsx
 
 import ArticleHeader from '@/components/ArticleHeader';
 import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
 import { useJournalModal } from '@/hooks/useJournalModal';
 import { supabase } from '@/lib/supabase/browser';
-import { Metrics } from '@/types/dictation';
+import { FeedbackWithTags, Metrics } from '@/types/dictation';
 import { useParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import {
-  addFeedbackTag,
-  deleteFeedback,
-  deleteFeedbackTag,
-  FeedbackWithTags,
-  listFeedbackWithTagsBulkBySentence,
-} from './action';
+import { useEffect, useMemo, useState } from 'react';
+import { addFeedbackTag, deleteFeedback, deleteFeedbackTag } from './action';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
 
   const [isAdmin, setIsAdmin] = useState(false);
-
-  // sentenceId -> feedbacks(with tags)
-  const [fbMap, setFbMap] = useState<Record<string, FeedbackWithTags[]>>({});
-
-  // StrictMode の二重実行を避けつつ、記事IDごとに一回だけ取得
-  const lastFetchedArticleId = useRef<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -49,64 +38,27 @@ export default function ArticlePage() {
 
   const { openJournalModal, JournalModalElement } = useJournalModal();
 
-  // todo フィードバックとタグも Article と一緒に取得する？
-  // フィードバック+タグを一括取得
-  useEffect(() => {
-    if (!article) return;
-    if (lastFetchedArticleId.current === article.id) return;
-    lastFetchedArticleId.current = article.id;
-
-    const ids = article.sentences.map((s) => s.id);
-    (async () => {
-      const m = await listFeedbackWithTagsBulkBySentence(ids);
-      setFbMap(m);
-    })();
+  // Article から都度生成。別取得は不要。
+  const fbMap = useMemo<Record<string, FeedbackWithTags[]>>(() => {
+    if (!article) return {};
+    const m: Record<string, FeedbackWithTags[]> = {};
+    for (const s of article.sentences) {
+      m[s.id] = s.teacher_feedback ?? [];
+    }
+    return m;
   }, [article]);
 
-  // 追加の反映（楽観更新）
-  const handleCreatedFeedback = (
-    created: FeedbackWithTags,
-    sentenceId: string
-  ) => {
-    setFbMap((m) => ({
-      ...m,
-      [sentenceId]: [...(m[sentenceId] ?? []), created], // 下に追加
-    }));
-  };
-
-  // 送信・削除の反映（楽観更新）
-  const handleDeleteFeedback = async (fbId: string, sentenceId: string) => {
+  const handleDeleteFeedback = async (fbId: string) => {
     await deleteFeedback(fbId);
-    setFbMap((m) => ({
-      ...m,
-      [sentenceId]: (m[sentenceId] ?? []).filter((x) => x.id !== fbId),
-    }));
   };
 
-  const handleDeleteTag = async (tagId: string, sentenceId: string) => {
+  const handleDeleteTag = async (tagId: string) => {
     await deleteFeedbackTag(tagId);
-    setFbMap((m) => ({
-      ...m,
-      [sentenceId]: (m[sentenceId] ?? []).map((f) => ({
-        ...f,
-        tags: f.tags.filter((t) => t.id !== tagId),
-      })),
-    }));
   };
 
-  const handleAddTag = async (
-    label: string,
-    sentenceId: string,
-    fbId: string
-  ) => {
+  const handleAddTag = async (label: string, fbId: string) => {
     if (!article) return;
-    const created = await addFeedbackTag(fbId, label.trim());
-    setFbMap((m) => ({
-      ...m,
-      [sentenceId]: (m[sentenceId] ?? []).map((f) =>
-        f.id === fbId ? { ...f, tags: [...(f.tags ?? []), created] } : f
-      ),
-    }));
+    await addFeedbackTag(fbId, label.trim());
   };
 
   const handleSubmitOne = async (
@@ -116,16 +68,11 @@ export default function ArticlePage() {
   ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
     if (!s) return;
-    // 管理者なら記事の所有者UIDを代理指定
     const targetUserId = isAdmin ? article?.uid : undefined;
-    const result = await submitOne(
-      s,
-      metrics,
-      selfAssessedComprehension,
-      targetUserId
-    );
+    const result = await submitOne(s, metrics, selfAssessedComprehension);
 
     if (result?.completed && result.articleId) {
+      // todo 管理者はモーダルを開けるないので userId は不要のはず
       openJournalModal({ articleId: result.articleId, userId: targetUserId });
     }
   };
@@ -165,7 +112,7 @@ export default function ArticlePage() {
               <div className='font-bold'>學習日誌:</div>
               <div className='text-gray-500'>
                 {(() => {
-                  const date = new Date(article.journal.created_at);
+                  const date = new Date(article.journal!.created_at);
                   const y = date.getFullYear();
                   const m = date.getMonth() + 1;
                   const d = date.getDate();
@@ -182,6 +129,7 @@ export default function ArticlePage() {
             </div>
           </div>
         )}
+
         <SentencesList
           article={article}
           answers={answers}
@@ -193,9 +141,8 @@ export default function ArticlePage() {
           }
           onSubmitOne={handleSubmitOne}
           isAdmin={isAdmin}
-          /** 重要：文ごとのマップを渡す（子で sid をキーに取り出す） */
+          /** 重要：Article 由来のマップを渡す（追加取得なし） */
           feedbackMap={fbMap}
-          onCreatedFeedback={handleCreatedFeedback}
           onDeleteFeedback={handleDeleteFeedback}
           onDeleteTag={handleDeleteTag}
           onAddTag={handleAddTag}

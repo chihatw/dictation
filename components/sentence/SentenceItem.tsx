@@ -1,10 +1,9 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { Metrics, Sentence } from '@/types/dictation';
-import { memo, useMemo, useRef, useState } from 'react';
+import { FeedbackWithTags, Metrics, Sentence, Tag } from '@/types/dictation';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
-import { FeedbackWithTags } from '@/app/articles/[id]/action';
 import { AdminFeedbackBlock } from '../articles/AdminFeedbackBlock';
 import { AnswerField } from './parts/AnswerField';
 import { FeedbackPanel } from './parts/FeedbackPanel';
@@ -26,7 +25,6 @@ export type SentenceItemProps = {
   submitting?: boolean;
   isAdmin?: boolean;
   items: FeedbackWithTags[];
-  onCreated?: (created: FeedbackWithTags) => void;
   onDelete?: (feedbackId: string) => void;
   onDeleteTag?: (tagId: string) => void;
   onAddTag?: (label: string, feedbackId: string) => void;
@@ -42,15 +40,19 @@ function SentenceItemBase({
   submitting,
   isAdmin = false,
   items,
-  onCreated,
   onDelete,
   onDeleteTag,
   onAddTag,
 }: SentenceItemProps) {
+  const [localItems, setLocalItems] = useState<FeedbackWithTags[]>(items);
   const [playsCount, setPlaysCount] = useState(0);
   const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
   const [selfAssessedComprehension, setSelfAssessedComprehension] = useState(0);
   const itemViewAt = useRef(Date.now());
+
+  useEffect(() => {
+    setLocalItems(items);
+  }, [sentence.id, items]);
 
   const displaySac = isSubmitted
     ? selfAssessedComprehension ??
@@ -87,6 +89,41 @@ function SentenceItemBase({
       },
       selfAssessedComprehension
     );
+  };
+
+  const handleCreatedLocal = (created: FeedbackWithTags) => {
+    setLocalItems((prev) => [...prev, created]);
+  };
+
+  const handleDeleteLocal = async (feedbackId: string) => {
+    // 先に楽観反映
+    setLocalItems((prev) => prev.filter((f) => f.id !== feedbackId));
+    await onDelete?.(feedbackId);
+  };
+
+  const handleDeleteTagLocal = async (tagId: string) => {
+    setLocalItems((prev) =>
+      prev.map((f) => ({ ...f, tags: f.tags.filter((t) => t.id !== tagId) }))
+    );
+    await onDeleteTag?.(tagId);
+  };
+
+  const handleAddTagLocal = async (label: string, feedbackId: string) => {
+    // 楽観追加（暫定ID）
+    const temp: Tag = {
+      id: `temp-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      teacher_feedback_id: feedbackId,
+      tag_master_id: null,
+      label: label.trim(),
+    };
+    setLocalItems((prev) =>
+      prev.map((f) =>
+        f.id === feedbackId ? { ...f, tags: [...f.tags, temp] } : f
+      )
+    );
+    // サーバ更新（親が no-op でも UI は保たれる）
+    await onAddTag?.(label, feedbackId);
   };
 
   return (
@@ -143,13 +180,13 @@ function SentenceItemBase({
         selfAssessedComprehension={displaySac}
       />
       <AdminFeedbackBlock
-        items={items}
+        items={localItems}
         sentenceId={sentence.id}
         isAdmin={isAdmin}
-        onCreated={onCreated}
-        onDelete={onDelete}
-        onDeleteTag={onDeleteTag}
-        onAddTag={onAddTag}
+        onCreated={handleCreatedLocal}
+        onDelete={handleDeleteLocal}
+        onDeleteTag={handleDeleteTagLocal}
+        onAddTag={handleAddTagLocal}
       />
     </section>
   );
