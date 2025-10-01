@@ -743,67 +743,38 @@ export type Database = {
           },
         ]
       }
-      dictation_submission_logs: {
+      dictation_submissions: {
         Row: {
-          answer: string | null
+          answer: string
           created_at: string
           elapsed_ms_since_first_play: number
           elapsed_ms_since_item_view: number
+          feedback_md: string | null
           id: string
           plays_count: number
           self_assessed_comprehension: number
           sentence_id: string
         }
         Insert: {
-          answer?: string | null
-          created_at?: string
-          elapsed_ms_since_first_play: number
-          elapsed_ms_since_item_view: number
-          id?: string
-          plays_count?: number
-          self_assessed_comprehension: number
-          sentence_id: string
-        }
-        Update: {
-          answer?: string | null
+          answer: string
           created_at?: string
           elapsed_ms_since_first_play?: number
           elapsed_ms_since_item_view?: number
+          feedback_md?: string | null
           id?: string
           plays_count?: number
           self_assessed_comprehension?: number
-          sentence_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_submission_logs_sentence_id_fkey"
-            columns: ["sentence_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_sentences"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      dictation_submissions: {
-        Row: {
-          answer: string
-          created_at: string
-          feedback_md: string | null
-          id: string
-          sentence_id: string
-        }
-        Insert: {
-          answer: string
-          created_at?: string
-          feedback_md?: string | null
-          id?: string
           sentence_id: string
         }
         Update: {
           answer?: string
           created_at?: string
+          elapsed_ms_since_first_play?: number
+          elapsed_ms_since_item_view?: number
           feedback_md?: string | null
           id?: string
+          plays_count?: number
+          self_assessed_comprehension?: number
           sentence_id?: string
         }
         Relationships: [
@@ -1953,7 +1924,7 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dictation_submission_logs_sentence_id_fkey"
+            foreignKeyName: "dictation_submissions_sentence_id_fkey"
             columns: ["sentence_id"]
             isOneToOne: false
             referencedRelation: "dictation_sentences"

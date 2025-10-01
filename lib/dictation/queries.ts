@@ -8,27 +8,21 @@ export async function fetchArticleWithSentences(
     .from('dictation_articles')
     .select(
       `
-    id, subtitle, created_at, audio_path_full,
-    collection:dictation_article_collections!dictation_articles_collection_fkey (
-      user_id
-    ),
-    journal:dictation_journals!left (
-      id, body, created_at
-    ),
-    sentences:dictation_sentences (
-      id, seq, content, created_at, audio_path,
-      submission:dictation_submissions!left ( id, answer, feedback_md, created_at ),
-      log:dictation_submission_logs!left ( self_assessed_comprehension, created_at )
+  id, subtitle, created_at, audio_path_full,
+  collection:dictation_article_collections!dictation_articles_collection_fkey ( user_id ),
+  journal:dictation_journals!left ( id, body, created_at ),
+  sentences:dictation_sentences (
+    id, seq, content, created_at, audio_path,
+    submission:dictation_submissions!left (
+      id, answer, feedback_md, created_at,
+      plays_count, elapsed_ms_since_item_view,
+      elapsed_ms_since_first_play, self_assessed_comprehension
     )
-  `
+  )
+`
     )
     .eq('id', articleId)
     .order('seq', { referencedTable: 'dictation_sentences', ascending: true })
-    .order('created_at', {
-      referencedTable: 'dictation_sentences.dictation_submission_logs',
-      ascending: false,
-    })
-    .limit(1, { foreignTable: 'dictation_sentences.dictation_submission_logs' })
     .maybeSingle();
 
   if (error) {
@@ -48,10 +42,10 @@ export async function fetchArticleWithSentences(
       ? { body: journal.body, created_at: journal.created_at }
       : null,
     sentences: (data.sentences ?? []).map((s) => {
-      const sac = s?.log?.[0]?.self_assessed_comprehension ?? 4; // 旧データ=4
+      const sub = s.submission?.[0] ?? null;
       return {
         ...s,
-        self_assessed_comprehension: sac,
+        self_assessed_comprehension: sub?.self_assessed_comprehension,
       };
     }),
     audio_path_full: data.audio_path_full ?? null,

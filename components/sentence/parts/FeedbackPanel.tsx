@@ -11,6 +11,7 @@ export type FeedbackPanelProps = {
   selfAssessedComprehension: number;
 };
 
+// debug 入力直後は self AssessedComprehension が null になっている
 function FeedbackPanelBase({
   show,
   feedback,

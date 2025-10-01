@@ -49,6 +49,7 @@ export default function ArticlePage() {
 
   const { openJournalModal, JournalModalElement } = useJournalModal();
 
+  // todo フィードバックとタグも Article と一緒に取得する？
   // フィードバック+タグを一括取得
   useEffect(() => {
     if (!article) return;
