@@ -2129,6 +2129,10 @@ export type Database = {
           seq: number
         }[]
       }
+      get_article_page: {
+        Args: { p_article_id: string }
+        Returns: Json
+      }
       get_feedbacks_with_tags: {
         Args: { p_sentence_ids: string[] }
         Returns: {

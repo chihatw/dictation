@@ -39,7 +39,7 @@ export function useArticle(articleId: string | undefined) {
       const nextFeedbacks: Record<string, string> = {};
 
       for (const s of data.sentences ?? []) {
-        const one = (s.submission ?? [])[0];
+        const one = s.submission ?? null;
         nextAnswers[s.id] = one?.answer ?? '';
         nextSubmitted[s.id] = !!one;
         nextFeedbacks[s.id] = one?.feedback_md ?? '';

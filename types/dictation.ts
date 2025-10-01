@@ -1,7 +1,8 @@
 export type Submission = {
   id: string;
-  answer: string | null;
+  answer: string;
   feedback_md: string | null;
+  self_assessed_comprehension: number;
   created_at: string;
 };
 
@@ -18,8 +19,7 @@ export type Sentence = {
   content: string;
   created_at: string;
   audio_path?: string | null;
-  submission?: Submission[] | null;
-  self_assessed_comprehension: number;
+  submission?: Submission | null;
 };
 
 export type Article = {

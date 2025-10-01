@@ -53,8 +53,10 @@ function SentenceItemBase({
   const itemViewAt = useRef(Date.now());
 
   const displaySac = isSubmitted
-    ? selfAssessedComprehension || sentence.self_assessed_comprehension || 0
-    : selfAssessedComprehension;
+    ? selfAssessedComprehension ??
+      sentence.submission?.self_assessed_comprehension ??
+      0
+    : selfAssessedComprehension ?? 0;
 
   const handlePlay = () => {
     setPlaysCount((c) => c + 1);
