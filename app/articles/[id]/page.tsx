@@ -68,12 +68,10 @@ export default function ArticlePage() {
   ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
     if (!s) return;
-    const targetUserId = isAdmin ? article?.uid : undefined;
     const result = await submitOne(s, metrics, selfAssessedComprehension);
 
     if (result?.completed && result.articleId) {
-      // todo 管理者はモーダルを開けるないので userId は不要のはず
-      openJournalModal({ articleId: result.articleId, userId: targetUserId });
+      openJournalModal(result.articleId);
     }
   };
 

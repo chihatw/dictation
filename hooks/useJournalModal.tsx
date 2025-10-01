@@ -10,8 +10,6 @@ import {
   useTransition,
 } from 'react';
 
-type OpenArgs = { articleId: string; userId?: string };
-
 type AnswerRow = { seq: number; content: string; answer: string };
 
 const PLACEHOLDERS = [
@@ -57,7 +55,6 @@ function getRandomPlaceholders(n: number) {
 export function useJournalModal() {
   const [open, setOpen] = useState(false);
   const [articleId, setArticleId] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | undefined>(undefined);
 
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState<AnswerRow[]>([]);
@@ -66,16 +63,14 @@ export function useJournalModal() {
 
   const [isPending, startTransition] = useTransition();
 
-  const openJournalModal = useCallback(({ articleId, userId }: OpenArgs) => {
+  const openJournalModal = useCallback((articleId: string) => {
     setArticleId(articleId);
-    setUserId(userId);
     setOpen(true);
   }, []);
 
   const close = useCallback(() => {
     setOpen(false);
     setArticleId(null);
-    setUserId(undefined);
     setRows([]);
     setBody('');
     setPlaceholder('');
@@ -89,13 +84,9 @@ export function useJournalModal() {
     (async () => {
       setLoading(true);
       try {
-        const ansArgs = userId
-          ? { p_article_id: articleId, p_user_id: userId }
-          : { p_article_id: articleId };
-
         const { data: answers } = await supabase.rpc(
           'get_article_answers_for_modal',
-          ansArgs
+          { p_article_id: articleId }
         );
 
         if (!cancelled) {
@@ -109,7 +100,7 @@ export function useJournalModal() {
     return () => {
       cancelled = true;
     };
-  }, [open, articleId, userId]);
+  }, [open, articleId]);
 
   const save = useCallback(() => {
     if (!articleId || !body.trim()) return;

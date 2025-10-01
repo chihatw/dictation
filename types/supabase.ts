@@ -2122,7 +2122,7 @@ export type Database = {
         Returns: undefined
       }
       get_article_answers_for_modal: {
-        Args: { p_article_id: string; p_user_id?: string }
+        Args: { p_article_id: string }
         Returns: {
           answer: string
           content: string
