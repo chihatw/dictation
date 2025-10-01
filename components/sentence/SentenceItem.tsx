@@ -52,6 +52,10 @@ function SentenceItemBase({
   const [selfAssessedComprehension, setSelfAssessedComprehension] = useState(0);
   const itemViewAt = useRef(Date.now());
 
+  const displaySac = isSubmitted
+    ? selfAssessedComprehension || sentence.self_assessed_comprehension || 0
+    : selfAssessedComprehension;
+
   const handlePlay = () => {
     setPlaysCount((c) => c + 1);
     if (!firstPlayAt) setFirstPlayAt(Date.now());
@@ -134,7 +138,7 @@ function SentenceItemBase({
         feedback={feedback ?? ''}
         transcript={sentence.content}
         ariaLiveId={`sentence-${sentence.id}-feedback`}
-        selfAssessedComprehension={sentence.self_assessed_comprehension}
+        selfAssessedComprehension={displaySac}
       />
       <AdminFeedbackBlock
         items={items}
