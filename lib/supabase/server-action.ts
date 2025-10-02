@@ -1,4 +1,4 @@
-// lib/supabase/server.ts
+// lib/supabase/server-action.ts
 import { Database } from '@/types/supabase';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
