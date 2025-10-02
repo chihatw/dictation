@@ -1,4 +1,4 @@
-import { createClientAction } from '@/lib/supabase/server-action';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { deleteCollection } from './actions';
 
@@ -11,7 +11,7 @@ type Collection = {
 };
 
 export default async function CollectionsPage() {
-  const supabase = await createClientAction();
+  const supabase = await createClient();
 
   // collections
   const { data: cols, error: ce } = await supabase

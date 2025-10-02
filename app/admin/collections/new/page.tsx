@@ -1,9 +1,9 @@
-import { createClientAction } from '@/lib/supabase/server-action';
+import { createClient } from '@/lib/supabase/server';
 import CollectionForm from '../_CollectionForm';
 import { createCollection } from '../actions';
 
 export default async function NewCollectionPage() {
-  const supabase = await createClientAction();
+  const supabase = await createClient();
   const { data: users, error } = await supabase
     .from('users')
     .select('uid, display')

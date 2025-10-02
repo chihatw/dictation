@@ -1,87 +1,205 @@
-// 動的レンダリングを強制
-export const dynamic = 'force-dynamic';
-
+// app/admin/articles/page.tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { createClient } from '@/lib/supabase/server';
-import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-type Row = {
-  id: string;
-  uid: string;
-  title: string;
-  created_at: string;
+type PageProps = {
+  params: Promise<Record<string, string>>;
+  searchParams: Promise<Record<string, string | string[]>>;
 };
 
-const AdminArticlesPage = async () => {
+type User = { uid: string; display: string };
+type Collection = { id: string; title: string };
+type Article = {
+  id: string;
+  subtitle: string;
+  created_at: string;
+  seq: number;
+};
+
+export default async function Page(props: PageProps) {
+  const {
+    /* unused */
+  } = await props.params;
+  const sp = await props.searchParams;
+  const userId = typeof sp.user_id === 'string' ? sp.user_id : '';
+  const colId = typeof sp.collection_id === 'string' ? sp.collection_id : '';
+
   const supabase = await createClient();
 
-  // ビューから取得。表示順は uid→created_at の昇順
-  const { data, error } = await supabase
-    .from('dictation_articles_recent10')
-    .select('id, uid, title, created_at')
-    .order('uid', { ascending: true })
-    .order('created_at', { ascending: true });
+  // users
+  const { data: usersRaw } = await supabase
+    .from('users')
+    .select('uid, display')
+    .order('display', { ascending: true });
+  const users: User[] = Array.isArray(usersRaw) ? usersRaw : [];
 
-  if (error) {
-    console.error(error);
-    return <div className='p-6'>読み込みでエラーが発生しました。</div>;
-  }
+  // collections
+  const { data: collectionsRaw } = userId
+    ? await supabase
+        .from('dictation_article_collections')
+        .select('id, title')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+    : { data: null };
+  const collections: Collection[] = Array.isArray(collectionsRaw)
+    ? collectionsRaw
+    : [];
 
-  const rows = (data ?? []) as Row[];
+  // colId の整合性
+  const validColId = collections.some((c) => c.id === colId) ? colId : '';
 
-  // uid ごとにグループ化
-  const groups = rows.reduce<Record<string, Row[]>>((acc, r) => {
-    (acc[r.uid] ||= []).push(r);
-    return acc;
-  }, {});
-
-  const uids = Object.keys(groups);
+  // articles
+  const { data: articlesRaw } = validColId
+    ? await supabase
+        .from('dictation_articles')
+        .select('id, subtitle, created_at, seq')
+        .eq('collection_id', validColId)
+        .order('seq', { ascending: true })
+    : { data: null };
+  const articles: Article[] = Array.isArray(articlesRaw) ? articlesRaw : [];
 
   return (
-    <div className='min-h-screen'>
-      <main className='p-6 space-y-6 max-w-3xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
-        <h1 className='text-xl font-semibold'>各ユーザーの直近10件</h1>
+    <div className='space-y-6'>
+      <h1 className='text-xl font-semibold'>一覧</h1>
 
-        {uids.length === 0 ? (
-          <div className='rounded border p-4 text-sm text-gray-600'>
-            データがありません。
+      <div className='flex flex-wrap gap-6'>
+        {/* ユーザー選択 専用フォーム */}
+        <form
+          action='/admin/articles'
+          method='get'
+          className='flex items-end gap-3'
+        >
+          <div className='flex flex-col gap-2'>
+            <Select name='user_id' defaultValue={userId || ''}>
+              <SelectTrigger className='w-[360px]'>
+                <SelectValue placeholder='ユーザーを選択' />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((u) => (
+                  <SelectItem key={u.uid} value={u.uid}>
+                    {u.display}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        ) : (
-          <div className='space-y-8'>
-            {uids.map((uid) => (
-              <section key={uid} className='space-y-2'>
-                <h2 className='text-sm font-semibold text-gray-700'>
-                  UID: <span className='font-mono'>{uid}</span>
-                </h2>
-                <ul className='space-y-2'>
-                  {groups[uid].map((a) => (
-                    <li
-                      key={a.id}
-                      className='rounded border p-3 hover:bg-gray-50'
-                    >
-                      <Link href={`/articles/${a.id}`} className='block'>
-                        <div className='flex items-center gap-3'>
-                          <div className='flex-1 min-w-0'>
-                            <div className='truncate font-medium'>
-                              {a.title}
-                            </div>
-                            <div className='text-xs text-gray-500'>
-                              {new Date(a.created_at).toLocaleString()}
-                            </div>
-                          </div>
-                          <ChevronRight className='h-4 w-4 shrink-0' />
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
+
+          <button
+            type='submit'
+            className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
+          >
+            適用
+          </button>
+          <Link
+            href='/admin/articles'
+            className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
+          >
+            クリア
+          </Link>
+        </form>
+
+        {/* コレクション選択 専用フォーム */}
+        <form
+          action='/admin/articles'
+          method='get'
+          className='flex items-end gap-3'
+        >
+          {/* user_id を維持するため hidden */}
+          <input type='hidden' name='user_id' value={userId} />
+          <div className='flex flex-col gap-2'>
+            <Select
+              name='collection_id'
+              defaultValue={validColId || ''}
+              disabled={!userId}
+            >
+              <SelectTrigger className='w-[360px]'>
+                <SelectValue placeholder='コレクションを選択' />
+              </SelectTrigger>
+              <SelectContent>
+                {collections.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <button
+            type='submit'
+            disabled={!userId}
+            className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white disabled:opacity-50'
+          >
+            適用
+          </button>
+          <Link
+            href={
+              userId
+                ? `/admin/articles?user_id=${encodeURIComponent(userId)}`
+                : '/admin/articles'
+            }
+            className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
+          >
+            クリア
+          </Link>
+        </form>
+
+        {/* 新規作成は別ボタン */}
+        <div className='ml-auto flex items-end'>
+          <Link
+            href='/admin/articles/new'
+            className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
+          >
+            新規作成
+          </Link>
+        </div>
+      </div>
+
+      <div className='overflow-x-auto'>
+        <table className='w-full text-sm'>
+          <thead>
+            <tr className='text-left'>
+              <th className='px-2 py-1'>seq</th>
+              <th className='px-2 py-1'>subtitle</th>
+              <th className='px-2 py-1'>created_at</th>
+              <th className='px-2 py-1'>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(articles ?? []).map((a) => (
+              <tr key={a.id} className='border-t'>
+                <td className='px-2 py-1'>{a.seq}</td>
+                <td className='px-2 py-1'>{a.subtitle}</td>
+                <td className='px-2 py-1'>
+                  {new Date(a.created_at).toLocaleString('ja-JP')}
+                </td>
+                <td className='px-2 py-1'>
+                  <Link
+                    href={`/admin/articles/${a.id}/edit`}
+                    className='rounded-md border px-2 py-1'
+                  >
+                    編集
+                  </Link>
+                </td>
+              </tr>
             ))}
-          </div>
-        )}
-      </main>
+            {(articles?.length ?? 0) === 0 && (
+              <tr>
+                <td className='px-2 py-6 text-gray-500' colSpan={4}>
+                  該当データなし
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-};
-
-export default AdminArticlesPage;
+}

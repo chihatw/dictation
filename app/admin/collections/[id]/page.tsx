@@ -1,4 +1,4 @@
-import { createClientAction } from '@/lib/supabase/server-action';
+import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import CollectionForm from '../_CollectionForm';
 import { updateCollection } from '../actions';
@@ -9,7 +9,7 @@ export default async function EditCollectionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClientAction();
+  const supabase = await createClient();
 
   const [{ data: users, error: ue }, { data: col, error: ce }] =
     await Promise.all([

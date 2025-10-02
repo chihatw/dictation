@@ -2183,6 +2183,13 @@ export type Database = {
         Args: { "": string }
         Returns: string
       }
+      insert_article_with_next_seq: {
+        Args: { p_collection_id: string; p_subtitle: string }
+        Returns: {
+          id: string
+          seq: number
+        }[]
+      }
       insert_thumbnail_with_image: {
         Args: { p_file_name: string; p_storage_path: string; p_user_id: string }
         Returns: {
