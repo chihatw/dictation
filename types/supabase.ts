@@ -2133,6 +2133,18 @@ export type Database = {
         Args: { p_article_id: string }
         Returns: Json
       }
+      get_collection_article_tags: {
+        Args: { p_collection_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          journal_body: string
+          journal_created_at: string
+          seq: number
+          tags: string[]
+          title: string
+        }[]
+      }
       get_feedbacks_with_tags: {
         Args: { p_sentence_ids: string[] }
         Returns: {
