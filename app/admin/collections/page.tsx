@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { Link2 } from 'lucide-react';
 import Link from 'next/link';
 import { deleteCollection } from './actions';
 
@@ -48,12 +49,21 @@ export default async function CollectionsPage() {
             className='flex flex-wrap items-center justify-between gap-3 px-3 py-2'
           >
             <div>
-              <div className='font-medium'>{col.title}</div>
+              <div className='font-medium flex items-center gap-1'>
+                <Link
+                  href={`/admin/articles?collection_id=${col.id}`}
+                  className='hover:underline hover:cursor-pointer flex items-center gap-1'
+                >
+                  {col.title}
+                  <Link2 className='h-4 w-4 text-gray-400' />
+                </Link>
+              </div>
               <div className='text-xs text-gray-500'>
                 {nameByUid.get(col.user_id) ?? col.user_id} ・{' '}
                 {new Date(col.created_at).toLocaleString()}
               </div>
             </div>
+
             <div className='flex items-center gap-2'>
               <Link
                 href={`/admin/collections/${col.id}`}
@@ -61,7 +71,6 @@ export default async function CollectionsPage() {
               >
                 編集
               </Link>
-
               <form action={deleteCollection}>
                 <input type='hidden' name='id' value={col.id} />
                 <button

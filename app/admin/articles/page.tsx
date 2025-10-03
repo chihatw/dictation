@@ -1,11 +1,4 @@
 // app/admin/articles/page.tsx
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
@@ -14,7 +7,6 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[]>>;
 };
 
-type User = { uid: string; display: string };
 type Collection = { id: string; title: string };
 type Article = {
   id: string;
@@ -24,137 +16,88 @@ type Article = {
 };
 
 export default async function Page(props: PageProps) {
-  const {
-    /* unused */
-  } = await props.params;
+  await props.params; // 未使用でも await
   const sp = await props.searchParams;
-  const userId = typeof sp.user_id === 'string' ? sp.user_id : '';
   const colId = typeof sp.collection_id === 'string' ? sp.collection_id : '';
 
   const supabase = await createClient();
 
-  // users
-  const { data: usersRaw } = await supabase
-    .from('users')
-    .select('uid, display')
-    .order('display', { ascending: true });
-  const users: User[] = Array.isArray(usersRaw) ? usersRaw : [];
+  if (!colId) {
+    return (
+      <div className='space-y-6'>
+        <h1 className='text-xl font-semibold'>記事一覧</h1>
+        <p className='text-sm text-muted-foreground'>
+          collection_id
+          が指定されていません。コレクション一覧から選択してください。
+        </p>
+        <Link
+          href='/admin/collections'
+          className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
+        >
+          コレクション一覧へ
+        </Link>
+      </div>
+    );
+  }
 
-  // collections
-  const { data: collectionsRaw } = userId
-    ? await supabase
-        .from('dictation_article_collections')
-        .select('id, title')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-    : { data: null };
-  const collections: Collection[] = Array.isArray(collectionsRaw)
-    ? collectionsRaw
-    : [];
+  // collection
+  const { data: col, error: colErr } = await supabase
+    .from('dictation_article_collections')
+    .select('id, title')
+    .eq('id', colId)
+    .maybeSingle<Collection>();
 
-  // colId の整合性
-  const validColId = collections.some((c) => c.id === colId) ? colId : '';
+  if (colErr) throw new Error(colErr.message);
+
+  if (!col) {
+    return (
+      <div className='space-y-6'>
+        <h1 className='text-xl font-semibold'>記事一覧</h1>
+        <p className='text-sm text-red-600'>
+          指定のコレクションが見つかりません。
+        </p>
+        <Link
+          href='/admin/collections'
+          className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
+        >
+          コレクション一覧へ
+        </Link>
+      </div>
+    );
+  }
 
   // articles
-  const { data: articlesRaw } = validColId
-    ? await supabase
-        .from('dictation_articles')
-        .select('id, subtitle, created_at, seq')
-        .eq('collection_id', validColId)
-        .order('seq', { ascending: true })
-    : { data: null };
+  const { data: articlesRaw, error: artErr } = await supabase
+    .from('dictation_articles')
+    .select('id, subtitle, created_at, seq')
+    .eq('collection_id', col.id)
+    .order('seq', { ascending: true });
+
+  if (artErr) throw new Error(artErr.message);
   const articles: Article[] = Array.isArray(articlesRaw) ? articlesRaw : [];
 
   return (
     <div className='space-y-6'>
-      <h1 className='text-xl font-semibold'>一覧</h1>
-
-      <div className='flex flex-wrap gap-6'>
-        {/* ユーザー選択 専用フォーム */}
-        <form
-          action='/admin/articles'
-          method='get'
-          className='flex items-end gap-3'
-        >
-          <div className='flex flex-col gap-2'>
-            <Select name='user_id' defaultValue={userId || ''}>
-              <SelectTrigger className='w-[360px]'>
-                <SelectValue placeholder='ユーザーを選択' />
-              </SelectTrigger>
-              <SelectContent>
-                {users.map((u) => (
-                  <SelectItem key={u.uid} value={u.uid}>
-                    {u.display}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <button
-            type='submit'
-            className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
-          >
-            適用
-          </button>
+      <div className='flex items-start gap-3'>
+        <div>
+          <h1 className='text-xl font-semibold'>記事一覧</h1>
+          <p className='text-sm text-muted-foreground'>
+            コレクション: <span className='font-medium'>{col.title}</span>
+          </p>
+        </div>
+        <div className='ml-auto flex items-center gap-2'>
+          {/* 追加: 戻るボタン */}
           <Link
-            href='/admin/articles'
+            href='/admin/collections'
             className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
           >
-            クリア
+            コレクション一覧に戻る
           </Link>
-        </form>
 
-        {/* コレクション選択 専用フォーム */}
-        <form
-          action='/admin/articles'
-          method='get'
-          className='flex items-end gap-3'
-        >
-          {/* user_id を維持するため hidden */}
-          <input type='hidden' name='user_id' value={userId} />
-          <div className='flex flex-col gap-2'>
-            <Select
-              name='collection_id'
-              defaultValue={validColId || ''}
-              disabled={!userId}
-            >
-              <SelectTrigger className='w-[360px]'>
-                <SelectValue placeholder='コレクションを選択' />
-              </SelectTrigger>
-              <SelectContent>
-                {collections.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <button
-            type='submit'
-            disabled={!userId}
-            className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white disabled:opacity-50'
-          >
-            適用
-          </button>
           <Link
-            href={
-              userId
-                ? `/admin/articles?user_id=${encodeURIComponent(userId)}`
-                : '/admin/articles'
-            }
-            className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
-          >
-            クリア
-          </Link>
-        </form>
-
-        {/* 新規作成は別ボタン */}
-        <div className='ml-auto flex items-end'>
-          <Link
-            href='/admin/articles/new'
+            href={`/admin/articles/new?collection_id=${encodeURIComponent(
+              col.id
+            )}`}
             className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
           >
             新規作成
@@ -176,11 +119,18 @@ export default async function Page(props: PageProps) {
             {(articles ?? []).map((a) => (
               <tr key={a.id} className='border-t'>
                 <td className='px-2 py-1'>{a.seq}</td>
-                <td className='px-2 py-1'>{a.subtitle}</td>
+                <td className='px-2 py-1'>
+                  <Link
+                    href={`/articles/${a.id}`}
+                    className='underline hover:no-underline cursor-pointer'
+                  >
+                    {a.subtitle}
+                  </Link>
+                </td>
                 <td className='px-2 py-1'>
                   {new Date(a.created_at).toLocaleString('ja-JP')}
                 </td>
-                <td className='px-2 py-1'>
+                <td className='px-2 py-1 space-x-2'>
                   <Link
                     href={`/admin/articles/${a.id}/edit`}
                     className='rounded-md border px-2 py-1'

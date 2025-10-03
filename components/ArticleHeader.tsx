@@ -29,7 +29,7 @@ export default function ArticleHeader({
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>{title}</h1>
         {isAdmin && (
           <Link
-            href={'/admin/articles'}
+            href={'/admin/collections'}
             className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             管理
