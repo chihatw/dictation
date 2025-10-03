@@ -1,32 +1,38 @@
 // app/admin/articles/_components/EditSubtitleForm.tsx
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { updateSubtitle } from '../actions';
 
 export function EditSubtitleForm({
   id,
   defaultSubtitle,
+  collectionId,
 }: {
   id: string;
   defaultSubtitle: string;
+  collectionId: string;
 }) {
+  const router = useRouter();
   const [subtitle, setSubtitle] = useState(defaultSubtitle);
   const [pending, setPending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [ok, setOk] = useState<string | null>(null);
 
   return (
     <form
       action={async (fd) => {
         setPending(true);
         setErr(null);
-        setOk(null);
         fd.set('id', id);
         const res = await updateSubtitle(fd);
-        if (!res.ok) setErr(res.error ?? '更新に失敗しました');
-        else setOk('更新しました');
         setPending(false);
+
+        if (!res.ok) {
+          setErr(res.error ?? '更新に失敗しました');
+          return;
+        }
+        router.push(`/admin/articles?collection_id=${collectionId}`);
       }}
       className='space-y-4'
     >
@@ -48,7 +54,6 @@ export function EditSubtitleForm({
         {pending ? '更新中…' : '更新する'}
       </button>
       {err && <p className='text-sm text-red-600'>エラー: {err}</p>}
-      {ok && <p className='text-sm text-green-700'>{ok}</p>}
     </form>
   );
 }

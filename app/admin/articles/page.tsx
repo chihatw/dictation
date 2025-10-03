@@ -80,10 +80,7 @@ export default async function Page(props: PageProps) {
     <div className='space-y-6'>
       <div className='flex items-start gap-3'>
         <div>
-          <h1 className='text-xl font-semibold'>記事一覧</h1>
-          <p className='text-sm text-muted-foreground'>
-            コレクション: <span className='font-medium'>{col.title}</span>
-          </p>
+          <h1 className='text-xl font-semibold'>{`${col.title}`}</h1>
         </div>
         <div className='ml-auto flex items-center gap-2'>
           {/* 追加: 戻るボタン */}
@@ -135,7 +132,7 @@ export default async function Page(props: PageProps) {
                     href={`/admin/articles/${a.id}/edit`}
                     className='rounded-md border px-2 py-1'
                   >
-                    編集
+                    subtitle編集
                   </Link>
                 </td>
               </tr>
