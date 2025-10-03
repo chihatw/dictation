@@ -3,7 +3,7 @@
 
 import { chat } from '@/lib/chat';
 import { createClientAction } from '@/lib/supabase/server-action';
-import { FeedbackWithTags, Tag } from '@/types/dictation';
+import { FeedbackWithTags } from '@/types/dictation';
 import { z } from 'zod';
 
 type CreateRes = {
@@ -107,73 +107,4 @@ export async function addFeedbackWithTags(
     note_md: data.note_md,
     tags: [],
   };
-}
-
-/**
- * 教員用フィードバックを1件削除
- * - 関連タグはDBの外部キー（ON DELETE CASCADE）で自動削除
- */
-export async function deleteFeedback(id: string) {
-  const supabase = await createClientAction();
-  const { error } = await supabase
-    .from('dictation_teacher_feedback')
-    .delete()
-    .eq('id', id);
-  if (error) throw new Error(error.message);
-}
-
-/**
- * タグを1件追加
- * - 返値は作成済みタグ1件
- */
-export async function addFeedbackTag(teacherFeedbackId: string, label: string) {
-  const supabase = await createClientAction();
-  const trimmed = label.trim();
-  if (!trimmed) throw new Error('empty label');
-
-  // 1) マスタIDを取得 or 作成
-  const { data: tagIdData, error: ge } = await supabase.rpc(
-    'get_or_create_dictation_tag',
-    { p_label: trimmed }
-  );
-  if (ge) throw new Error(ge.message);
-  const tagMasterId = tagIdData as string;
-
-  // 2) 紐付けを作成（重複は無視）
-  const { data, error } = await supabase
-    .from('dictation_teacher_feedback_tags')
-    .insert({
-      teacher_feedback_id: teacherFeedbackId,
-      tag_master_id: tagMasterId,
-    })
-    .select(
-      `
-      id, created_at, teacher_feedback_id, tag_master_id,
-      tag:dictation_tag_master(label)
-    `
-    )
-    .single();
-  if (error) throw new Error(error.message);
-
-  // 平坦化して返す
-  return {
-    id: data.id,
-    created_at: data.created_at,
-    teacher_feedback_id: data.teacher_feedback_id,
-    tag_master_id: data.tag_master_id,
-    label: data.tag?.label ?? '',
-  } as Tag;
-}
-
-/**
- * タグを1件削除
- * - RLSで管理者のみ許可することを想定
- */
-export async function deleteFeedbackTag(tagId: string) {
-  const supabase = await createClientAction();
-  const { error } = await supabase
-    .from('dictation_teacher_feedback_tags')
-    .delete()
-    .eq('id', tagId);
-  if (error) throw new Error(error.message);
 }

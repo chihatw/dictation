@@ -9,7 +9,6 @@ import { supabase } from '@/lib/supabase/browser';
 import { FeedbackWithTags, Metrics } from '@/types/dictation';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { addFeedbackTag, deleteFeedback, deleteFeedbackTag } from './action';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
@@ -47,19 +46,6 @@ export default function ArticlePage() {
     }
     return m;
   }, [article]);
-
-  const handleDeleteFeedback = async (fbId: string) => {
-    await deleteFeedback(fbId);
-  };
-
-  const handleDeleteTag = async (tagId: string) => {
-    await deleteFeedbackTag(tagId);
-  };
-
-  const handleAddTag = async (label: string, fbId: string) => {
-    if (!article) return;
-    await addFeedbackTag(fbId, label.trim());
-  };
 
   const handleSubmitOne = async (
     sentenceId: string,
@@ -139,11 +125,7 @@ export default function ArticlePage() {
           }
           onSubmitOne={handleSubmitOne}
           isAdmin={isAdmin}
-          /** 重要：Article 由来のマップを渡す（追加取得なし） */
           feedbackMap={fbMap}
-          onDeleteFeedback={handleDeleteFeedback}
-          onDeleteTag={handleDeleteTag}
-          onAddTag={handleAddTag}
         />
 
         <div className='mt-8 text-center text-sm text-gray-600'>

@@ -2159,6 +2159,10 @@ export type Database = {
           title: string
         }[]
       }
+      get_sentence_admin: {
+        Args: { p_sentence_id: string }
+        Returns: Json
+      }
       gtrgm_compress: {
         Args: { "": unknown }
         Returns: unknown
