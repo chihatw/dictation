@@ -627,27 +627,66 @@ export type Database = {
           },
         ]
       }
+      dictation_release_items: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          pos: number
+          release_id: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          pos: number
+          release_id: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          pos?: number
+          release_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_release_items_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_release_items_release_id_fkey"
+            columns: ["release_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_releases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dictation_releases: {
         Row: {
           created_at: string
           due_at: string | null
           id: string
           published_at: string | null
-          uid: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           due_at?: string | null
           id?: string
           published_at?: string | null
-          uid: string
+          user_id: string
         }
         Update: {
           created_at?: string
           due_at?: string | null
           id?: string
           published_at?: string | null
-          uid?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -12,7 +12,7 @@ export default async function Page(props: Params) {
   // リリース本体（uid取得用）
   const { data: release, error: relErr } = await supabaseAdmin
     .from('dictation_releases')
-    .select('id, uid, created_at, published_at, due_at')
+    .select('id, user_id, created_at, published_at, due_at')
     .eq('id', releaseId)
     .single();
   if (relErr) throw relErr;
@@ -31,7 +31,7 @@ export default async function Page(props: Params) {
   const { data: rawCandidates, error: candErr } = await supabaseAdmin
     .from('dictation_articles')
     .select('id, subtitle, created_at')
-    .eq('uid', release.uid)
+    .eq('uid', release.user_id)
     .order('created_at', { ascending: false })
     .limit(10);
   if (candErr) throw candErr;
@@ -75,7 +75,7 @@ export default async function Page(props: Params) {
         </div>
         <div className='border rounded p-4'>
           <div className='text-sm text-gray-500'>UID</div>
-          <div className='font-mono'>{release.uid}</div>
+          <div className='font-mono'>{release.user_id}</div>
         </div>
         <div className='border rounded p-4'>
           <div className='text-sm text-gray-500'>作成</div>

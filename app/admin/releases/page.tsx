@@ -13,7 +13,7 @@ export default async function Page() {
   // リリース一覧（created_at降順10件）
   const { data: releases, error: relErr } = await supabaseAdmin
     .from('dictation_releases')
-    .select('id, created_at, uid, published_at, due_at')
+    .select('id, created_at, user_id, published_at, due_at')
     .order('created_at', { ascending: false })
     .limit(10);
   if (relErr) throw relErr;
@@ -107,7 +107,9 @@ export default async function Page() {
                       {r.id.slice(0, 8)}
                     </Link>
                   </td>
-                  <td className='p-2'>{emailById.get(r.uid) ?? r.uid}</td>
+                  <td className='p-2'>
+                    {emailById.get(r.user_id) ?? r.user_id}
+                  </td>
                   <td className='p-2'>
                     {new Date(r.created_at).toLocaleString('ja-JP', {
                       timeZone: 'Asia/Tokyo',

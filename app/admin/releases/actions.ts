@@ -18,7 +18,7 @@ export async function createRelease(input: {
 
   const { error } = await supabaseAdmin
     .from('dictation_releases')
-    .insert([{ uid: input.uid, due_at, published_at: null }]);
+    .insert([{ user_id: input.uid, due_at, published_at: null }]);
 
   if (error) throw error;
   await revalidateAdminReleases();
