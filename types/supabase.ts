@@ -627,68 +627,54 @@ export type Database = {
           },
         ]
       }
-      dictation_release_items: {
-        Row: {
-          article_id: string
-          created_at: string
-          id: string
-          pos: number
-          release_id: string
-        }
-        Insert: {
-          article_id: string
-          created_at?: string
-          id?: string
-          pos: number
-          release_id: string
-        }
-        Update: {
-          article_id?: string
-          created_at?: string
-          id?: string
-          pos?: number
-          release_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_release_items_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_release_items_release_id_fkey"
-            columns: ["release_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_releases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dictation_releases: {
         Row: {
+          collection_id: string
           created_at: string
-          due_at: string | null
+          due_at: string
           id: string
           published_at: string | null
           user_id: string
         }
         Insert: {
+          collection_id: string
           created_at?: string
-          due_at?: string | null
+          due_at: string
           id?: string
           published_at?: string | null
           user_id: string
         }
         Update: {
+          collection_id?: string
           created_at?: string
-          due_at?: string | null
+          due_at?: string
           id?: string
           published_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_releases_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_article_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_releases_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "article_pitch_quizzes_view"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "dictation_releases_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
+          },
+        ]
       }
       dictation_sentences: {
         Row: {
@@ -2053,6 +2039,19 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
+      get_admin_releases_by_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          collection_id: string
+          collection_title: string
+          created_at: string
+          due_at: string
+          id: string
+          published_at: string
+          user_display: string
+          user_id: string
+        }[]
+      }
       get_article_answers_for_modal: {
         Args: { p_article_id: string }
         Returns: {
@@ -2167,10 +2166,6 @@ export type Database = {
         Returns: {
           image_id: string
         }[]
-      }
-      publish_release: {
-        Args: { p_release_id: string; p_user_id: string }
-        Returns: undefined
       }
       save_dictation_journal: {
         Args: { p_article_id: string; p_body: string }
