@@ -1,64 +1,86 @@
-// ユーザー毎に表示を変更するので、動的レンダリングを強制
+// 動的レンダリング
 export const dynamic = 'force-dynamic';
 
-import Journal from '@/components/journal/Journal';
-import { Tags } from '@/components/tag/Tags';
+import TodayPanel from '@/components/home/TodayPanel';
+import { fetchTaichungWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import { createClient } from '@/lib/supabase/server';
-import { ChevronRight } from 'lucide-react';
+import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
+import { remainDaysHours } from '@/utils/home/remainDaysHours';
+
 import Link from 'next/link';
 
 export default async function Home() {
   const supabase = await createClient();
-
-  // 認証済み前提（middlewareで非ログインを排除）
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) throw new Error('unauthorized');
 
-  const { data } = await supabase.rpc('get_release_article_tags', {
-    p_uid: user!.id,
-  });
+  const [{ data, error }, wx] = await Promise.all([
+    supabase.rpc('get_home_next_task', { p_uid: user.id }),
+    fetchTaichungWeather(),
+  ]);
+  if (error) throw new Error(error.message);
+
+  const row = Array.isArray(data) ? data[0] : data;
+  const dueAt = row?.due_at as string | null | undefined;
+  const nextArticleId = row?.next_article_id as string | null | undefined;
+  const dueStr = formatDueTW(dueAt);
+  const remain = remainDaysHours(dueAt);
+  const todayStr = formatTodayTW();
+  const pct = row?.total_count
+    ? Math.round((row.done_count / row.total_count) * 100)
+    : 0;
 
   return (
-    <div className='min-h-screen'>
-      <main className='p-6 space-y-4 max-w-2xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
-        <h1 className='text-xl font-semibold'>{data?.[0]?.title}</h1>
+    <div className='min-h-screen p-6'>
+      <main className='mx-auto max-w-2xl space-y-6'>
+        <TodayPanel todayStr={todayStr} wx={wx} />
 
-        {(!data || data.map.length) === 0 ? (
-          <div className='rounded border p-4 text-sm text-gray-600'>
-            まだ記事がありません。
+        <section className='rounded-xl border p-5 space-y-3 bg-white'>
+          <div className='text-sm text-gray-500'>下次上課</div>
+          <div className='text-xl'>{dueStr ?? '未設定'}</div>
+          <div className='text-sm text-gray-600'>
+            剩餘時間：
+            {remain ? (
+              <span>
+                {remain.days}天 {remain.hours}小時
+              </span>
+            ) : (
+              <span>—</span>
+            )}
           </div>
-        ) : (
-          <ul className='space-y-2'>
-            {data?.map((t) => (
-              <li key={t.id} className='rounded border p-3 '>
-                <Link href={`/articles/${t.id}`} className='block'>
-                  <div className='flex items-center hover:underline'>
-                    <div className='flex-1 truncate font-medium'>
-                      {t.subtitle}
-                    </div>
-                    <ChevronRight className='h-4 w-4 shrink-0' />
-                  </div>
-                </Link>
+        </section>
 
-                {t.tags.length > 0 && (
-                  <div className='mt-1 cursor-default'>
-                    <Tags items={t.tags} />
-                  </div>
-                )}
+        <section className='rounded-xl border p-5 bg-white space-y-3'>
+          <div className='text-sm text-gray-500'>下一個作業</div>
 
-                {t.journal_body && (
-                  <div className='mt-2 cursor-default'>
-                    <Journal
-                      body={t.journal_body}
-                      created_at={t.journal_created_at}
-                    />
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+          {/* 進捗メッセージ */}
+          <div className='text-sm text-gray-700'>
+            <div>
+              目前進度為 <span className='font-semibold text-xl'>{pct}</span>%
+            </div>
+            <div>語言學習重在習慣。 與其一天做很多，不如盡量每天都做一點。</div>
+          </div>
+
+          {nextArticleId ? (
+            <Link
+              href={`/articles/${nextArticleId}`}
+              className='inline-flex items-center rounded-xl px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
+            >
+              {`前往「${row.collection_title ?? ''} ${row.subtitle ?? ''}」第 ${
+                row.sentence_seq ?? ''
+              } 行`}
+            </Link>
+          ) : (
+            <button
+              disabled
+              className='inline-flex items-center rounded-xl px-4 py-2 bg-slate-900 text-white opacity-50 cursor-not-allowed'
+            >
+              無待辦作業
+            </button>
+          )}
+        </section>
       </main>
     </div>
   );

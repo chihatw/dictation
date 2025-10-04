@@ -2089,6 +2089,19 @@ export type Database = {
           tags: Json
         }[]
       }
+      get_home_next_task: {
+        Args: { p_uid: string }
+        Returns: {
+          collection_title: string
+          done_count: number
+          due_at: string
+          next_article_id: string
+          next_sentence_id: string
+          sentence_seq: number
+          subtitle: string
+          total_count: number
+        }[]
+      }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
         Returns: string
