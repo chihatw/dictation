@@ -42,13 +42,13 @@ export default async function ArticlesPage() {
                 </Link>
 
                 {t.tags.length > 0 && (
-                  <div className='mt-1 cursor-default'>
+                  <div className='mt-1 '>
                     <Tags items={t.tags} />
                   </div>
                 )}
 
                 {t.journal_body && (
-                  <div className='mt-2 cursor-default'>
+                  <div className='mt-2 '>
                     <Journal
                       body={t.journal_body}
                       created_at={t.journal_created_at}

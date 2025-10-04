@@ -2168,6 +2168,15 @@ export type Database = {
           image_id: string
         }[]
       }
+      list_journals_for_me: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          article_id: string
+          body: string
+          created_at: string
+          id: string
+        }[]
+      }
       save_dictation_journal: {
         Args: { p_article_id: string; p_body: string }
         Returns: undefined
