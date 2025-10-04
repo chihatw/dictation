@@ -13,52 +13,71 @@ type Row = {
   self_assessed_comprehension: number;
   answer: string | null;
   created_at: string;
-  display: string; // users.display
-  content: string; // dictation_sentences.content
-  seq: number; // dictation_sentences.seq
-  article_id: string; // dictation_sentences.article_id
-  title: string; // dictation_articles.subtitle
+  display: string;
+  content: string;
+  seq: number;
+  article_id: string;
+  title: string;
 };
+
+type UserOpt = { uid: string; display: string };
+
+const COLS = [
+  'w-32',
+  'w-10',
+  'w-64',
+  'w-64',
+  'w-12',
+  'w-20',
+  'w-20',
+  'w-16',
+  'w-36',
+];
 
 export default function LogsPage() {
   const [rows, setRows] = useState<Row[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<UserOpt[]>([]);
+  const [selectedUser, setSelectedUser] = useState<string>(''); // 未選択 = 空
 
-  const fetchRows = async () => {
-    const { data, error } = await supabase
-      .from('dictation_submission_latest_view')
-      .select(
-        `
-        id,
-        user_id,
-        sentence_id,
-        plays_count,
-        elapsed_ms_since_item_view,
-        elapsed_ms_since_first_play,
-        self_assessed_comprehension,
-        answer,
-        created_at,
-        display,
-        content,
-        seq,
-        article_id,
-        title
-        `
-      )
-      .order('created_at', { ascending: false })
-      .limit(50);
-
-    if (error) {
-      console.error(error);
-    } else {
-      setRows((data ?? []) as Row[]);
-    }
-    setLoading(false);
-  };
-
+  // ユーザー一覧取得（表示名用）
   useEffect(() => {
-    fetchRows();
+    (async () => {
+      const { data, error } = await supabase
+        .from('users')
+        .select('uid, display')
+        .order('created_at', { ascending: true });
+      if (error) {
+        console.error(error);
+        setUsers([]);
+      } else {
+        setUsers((data ?? []) as UserOpt[]);
+      }
+    })();
   }, []);
+
+  // 選択ユーザーのログ取得
+  useEffect(() => {
+    if (!selectedUser) {
+      setRows([]);
+      return;
+    }
+    (async () => {
+      setLoading(true);
+      const { data, error } = await supabase.rpc('get_submission_latest', {
+        p_limit: 40,
+        p_offset: 0,
+        p_user_id: selectedUser,
+      });
+      if (error) {
+        console.error(error);
+        setRows([]);
+      } else {
+        setRows((data ?? []) as Row[]);
+      }
+      setLoading(false);
+    })();
+  }, [selectedUser]);
 
   const formatMinSec = (ms: number) => {
     const totalSec = Math.max(0, Math.floor(ms / 1000));
@@ -79,7 +98,6 @@ export default function LogsPage() {
       second: '2-digit',
     });
 
-  // 表示用マップ
   const compMap: Record<number, string> = {
     1: '😕 聽不懂',
     2: '🙂 大致懂',
@@ -88,8 +106,37 @@ export default function LogsPage() {
   };
 
   return (
-    <div className='p-6'>
-      <h1 className='text-xl font-bold mb-4'>ログ一覧（最新文ごと）</h1>
+    <div className='p-6 space-y-4'>
+      <h1 className='text-xl font-bold'>ログ一覧</h1>
+
+      {/* User Select */}
+      <div className='flex items-center gap-3'>
+        <label htmlFor='user' className='text-sm font-medium'>
+          User
+        </label>
+        <select
+          id='user'
+          className='border rounded px-2 py-1 text-sm'
+          value={selectedUser}
+          onChange={(e) => setSelectedUser(e.target.value)}
+        >
+          <option value=''>— 選択してください —</option>
+          {users.map((u) => (
+            <option key={u.uid} value={u.uid}>
+              {u.display}
+            </option>
+          ))}
+        </select>
+        {selectedUser && (
+          <button
+            type='button'
+            className='text-xs underline'
+            onClick={() => setSelectedUser('')}
+          >
+            クリア
+          </button>
+        )}
+      </div>
 
       {loading ? (
         <p>読み込み中...</p>
@@ -97,22 +144,13 @@ export default function LogsPage() {
         <div className='overflow-x-auto'>
           <table className='table-fixed w-full text-xs leading-tight tabular-nums'>
             <colgroup>
-              <col className='w-24' /> {/* ユーザー名 */}
-              <col className='w-32' /> {/* 問題タイトル */}
-              <col className='w-10' /> {/* 行番号 */}
-              <col className='w-64' /> {/* 文本文 */}
-              <col className='w-64' /> {/* 回答 */}
-              <col className='w-12' /> {/* 再生回数 */}
-              <col className='w-20' /> {/* 経過A */}
-              <col className='w-20' /> {/* 経過B */}
-              <col className='w-16' /> {/* 自己評価 */}
-              <col className='w-36' /> {/* 作成日時 */}
+              {COLS.map((c, index) => (
+                <col key={index} className={c} />
+              ))}
             </colgroup>
-
             <thead>
               <tr className='bg-gray-50'>
                 {[
-                  'ユーザー名',
                   '問題タイトル',
                   '行',
                   '文本文',
@@ -132,39 +170,43 @@ export default function LogsPage() {
                 ))}
               </tr>
             </thead>
-
             <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className='align-top'>
-                  <td className='border p-1'>{r.display}</td>
-                  <td className='border p-1'>{r.title}</td>
-                  <td className='border p-1 text-center'>{r.seq}</td>
-
-                  <td className='border p-1 max-w-64 whitespace-normal break-words'>
-                    {r.content}
-                  </td>
-                  <td className='border p-1 max-w-64 whitespace-normal break-words'>
-                    {r.answer ?? ''}
-                  </td>
-
-                  <td className='border p-1 text-center whitespace-nowrap'>
-                    {r.plays_count}
-                  </td>
-                  <td className='border p-1 whitespace-nowrap'>
-                    {formatMinSec(r.elapsed_ms_since_first_play)}
-                  </td>
-                  <td className='border p-1 whitespace-nowrap'>
-                    {formatMinSec(r.elapsed_ms_since_item_view)}
-                  </td>
-                  <td className='border p-1 text-center whitespace-nowrap'>
-                    {compMap[r.self_assessed_comprehension] ??
-                      `等級 ${r.self_assessed_comprehension}`}
-                  </td>
-                  <td className='border p-1 whitespace-nowrap'>
-                    {formatJST(r.created_at)}
+              {rows.length === 0 ? (
+                <tr>
+                  <td className='p-3 text-center text-gray-500' colSpan={10}>
+                    ユーザー未選択、またはデータなし
                   </td>
                 </tr>
-              ))}
+              ) : (
+                rows.map((r) => (
+                  <tr key={r.id} className='align-top'>
+                    <td className='border p-1'>{r.title}</td>
+                    <td className='border p-1 text-center'>{r.seq}</td>
+                    <td className='border p-1 max-w-64 whitespace-normal break-words'>
+                      {r.content}
+                    </td>
+                    <td className='border p-1 max-w-64 whitespace-normal break-words'>
+                      {r.answer ?? ''}
+                    </td>
+                    <td className='border p-1 text-center whitespace-nowrap'>
+                      {r.plays_count}
+                    </td>
+                    <td className='border p-1 whitespace-nowrap'>
+                      {formatMinSec(r.elapsed_ms_since_first_play)}
+                    </td>
+                    <td className='border p-1 whitespace-nowrap'>
+                      {formatMinSec(r.elapsed_ms_since_item_view)}
+                    </td>
+                    <td className='border p-1 text-center whitespace-nowrap'>
+                      {compMap[r.self_assessed_comprehension] ??
+                        `等級 ${r.self_assessed_comprehension}`}
+                    </td>
+                    <td className='border p-1 whitespace-nowrap'>
+                      {formatJST(r.created_at)}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

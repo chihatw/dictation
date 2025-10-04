@@ -2,8 +2,17 @@
 export const dynamic = 'force-dynamic';
 
 import { createClient } from '@/lib/supabase/server';
-import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+
+// YYYY/M/D（Asia/Taipei）で整形。タイトルの開始xを固定するため日付欄は固定幅。
+function formatYMDTaipei(iso: string) {
+  return new Intl.DateTimeFormat('zh-TW', {
+    timeZone: 'Asia/Taipei',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  }).format(new Date(iso));
+}
 
 export default async function Page() {
   const supabase = await createClient();
@@ -31,9 +40,13 @@ export default async function Page() {
             {cols.map((c) => (
               <li key={c.id} className='rounded border p-3 hover:bg-gray-50'>
                 <Link href={`/collections/${c.id}`} className='block'>
-                  <div className='flex items-center'>
+                  <div className='flex items-center gap-3'>
+                    {/* 固定幅で日付。tabular-numsで桁幅を統一 */}
+                    <div className='w-18 shrink-0 text-sm text-gray-500 tabular-nums'>
+                      {formatYMDTaipei(c.created_at)}
+                    </div>
+                    {/* タイトルは常に同じxから開始 */}
                     <div className='flex-1 truncate font-medium'>{c.title}</div>
-                    <ChevronRight className='h-4 w-4 shrink-0' />
                   </div>
                 </Link>
               </li>

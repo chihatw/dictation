@@ -625,56 +625,6 @@ export type Database = {
             referencedRelation: "dictation_articles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "dictation_journals_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: true
-            referencedRelation: "dictation_articles_recent10"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      dictation_release_items: {
-        Row: {
-          article_id: string
-          id: string
-          pos: number
-          release_id: string
-        }
-        Insert: {
-          article_id: string
-          id?: string
-          pos: number
-          release_id: string
-        }
-        Update: {
-          article_id?: string
-          id?: string
-          pos?: number
-          release_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_release_items_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_release_items_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles_recent10"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_release_items_release_id_fkey"
-            columns: ["release_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_releases"
-            referencedColumns: ["id"]
-          },
         ]
       }
       dictation_releases: {
@@ -732,13 +682,6 @@ export type Database = {
             columns: ["article_id"]
             isOneToOne: false
             referencedRelation: "dictation_articles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_sentences_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles_recent10"
             referencedColumns: ["id"]
           },
         ]
@@ -1882,56 +1825,6 @@ export type Database = {
         }
         Relationships: []
       }
-      dictation_articles_recent10: {
-        Row: {
-          created_at: string | null
-          id: string | null
-          title: string | null
-          uid: string | null
-        }
-        Relationships: []
-      }
-      dictation_submission_latest_view: {
-        Row: {
-          answer: string | null
-          article_id: string | null
-          content: string | null
-          created_at: string | null
-          display: string | null
-          elapsed_ms_since_first_play: number | null
-          elapsed_ms_since_item_view: number | null
-          id: string | null
-          plays_count: number | null
-          self_assessed_comprehension: number | null
-          sentence_id: string | null
-          seq: number | null
-          title: string | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_sentences_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_sentences_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles_recent10"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_submissions_sentence_id_fkey"
-            columns: ["sentence_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_sentences"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       page_states_view: {
         Row: {
           display: string | null
@@ -2174,6 +2067,30 @@ export type Database = {
       get_sentence_admin: {
         Args: { p_sentence_id: string }
         Returns: Json
+      }
+      get_submission_latest: {
+        Args: {
+          p_article_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_user_id?: string
+        }
+        Returns: {
+          answer: string
+          article_id: string
+          content: string
+          created_at: string
+          display: string
+          elapsed_ms_since_first_play: number
+          elapsed_ms_since_item_view: number
+          id: string
+          plays_count: number
+          self_assessed_comprehension: number
+          sentence_id: string
+          seq: number
+          title: string
+          user_id: string
+        }[]
       }
       gtrgm_compress: {
         Args: { "": unknown }
