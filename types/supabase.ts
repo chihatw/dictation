@@ -604,18 +604,21 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          rating_score: number
         }
         Insert: {
           article_id: string
           body: string
           created_at?: string
           id?: string
+          rating_score?: number
         }
         Update: {
           article_id?: string
           body?: string
           created_at?: string
           id?: string
+          rating_score?: number
         }
         Relationships: [
           {
@@ -2168,6 +2171,10 @@ export type Database = {
           image_id: string
         }[]
       }
+      journal_vote: {
+        Args: { p_delta: number; p_id: string }
+        Returns: number
+      }
       list_journals_for_me: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -2175,6 +2182,7 @@ export type Database = {
           body: string
           created_at: string
           id: string
+          rating_score: number
         }[]
       }
       save_dictation_journal: {
