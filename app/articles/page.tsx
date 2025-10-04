@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function Home() {
+export default async function ArticlesPage() {
   const supabase = await createClient();
 
   // 認証済み前提（middlewareで非ログインを排除）

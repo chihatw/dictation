@@ -2098,6 +2098,7 @@ export type Database = {
           journal_body: string
           journal_created_at: string
           pos: number
+          subtitle: string
           tags: string[]
           title: string
         }[]
