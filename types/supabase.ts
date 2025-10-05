@@ -2075,8 +2075,8 @@ export type Database = {
           journal_body: string
           journal_created_at: string
           seq: number
+          subtitle: string
           tags: string[]
-          title: string
         }[]
       }
       get_feedbacks_with_tags: {
@@ -2092,6 +2092,7 @@ export type Database = {
       get_home_next_task: {
         Args: { p_uid: string }
         Returns: {
+          collection_id: string
           collection_title: string
           done_count: number
           due_at: string

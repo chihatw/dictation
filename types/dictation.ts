@@ -33,6 +33,7 @@ export type Article = {
   journal: { body: string; created_at: string } | null;
   sentences: Sentence[];
   audio_path_full?: string | null;
+  collection_id: string;
 };
 
 export type Tag = {

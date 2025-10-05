@@ -73,12 +73,17 @@ export default async function Home() {
               } 行`}
             </Link>
           ) : (
-            <button
-              disabled
-              className='inline-flex items-center rounded-xl px-4 py-2 bg-slate-900 text-white opacity-50 cursor-not-allowed'
-            >
-              無待辦作業
-            </button>
+            <div>
+              <div className='text-sm  text-gray-700 mb-4'>
+                所有作業都結束了，辛苦了！🎉
+              </div>
+              <Link
+                href={`/collections/${row.collection_id}`}
+                className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
+              >
+                {`查看「${row.collection_title ?? ''}」的成果`}
+              </Link>
+            </div>
           )}
         </section>
       </main>

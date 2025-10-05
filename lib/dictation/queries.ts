@@ -28,6 +28,7 @@ type RpcArticle = {
   title: string;
   created_at: string;
   audio_path_full: string | null;
+  collection_id: string;
   journal: { body: string; created_at: string } | null;
   sentences: Array<{
     id: string;
@@ -64,6 +65,7 @@ export async function fetchArticleWithSentences(
     created_at: a.created_at,
     journal: a.journal,
     audio_path_full: a.audio_path_full,
+    collection_id: a.collection_id,
     sentences: a.sentences.map(
       (s): Sentence => ({
         id: s.id,

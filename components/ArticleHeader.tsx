@@ -7,12 +7,14 @@ import { UrlPlayButton } from './audio/UrlPlayButton';
 
 type Props = {
   title: string;
+  collectionId: string;
   audioPathFull?: string | null;
   isAdmin?: boolean;
 };
 
 export default function ArticleHeader({
   title,
+  collectionId,
   audioPathFull,
   isAdmin = false,
 }: Props) {
@@ -20,13 +22,22 @@ export default function ArticleHeader({
   return (
     <header className='sticky top-0 z-10 border-b bg-white/90 backdrop-blur'>
       <div className='mx-auto flex max-w-4xl items-center gap-3 px-4 py-3'>
-        <Link
-          href='/'
-          className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
-        >
-          <ChevronLeft className='h-4 w-4' /> 返回首頁
-        </Link>
+        <div className='grid gap-2'>
+          <Link
+            href='/'
+            className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
+          >
+            <ChevronLeft className='h-4 w-4' /> 返回首頁
+          </Link>
+          <Link
+            href={`/collections/${collectionId}`}
+            className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
+          >
+            <ChevronLeft className='h-4 w-4' /> 返回主題頁
+          </Link>
+        </div>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>{title}</h1>
+
         {isAdmin && (
           <Link
             href={'/admin/collections'}

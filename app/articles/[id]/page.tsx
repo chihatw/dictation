@@ -87,6 +87,7 @@ export default function ArticlePage() {
         title={article.title}
         audioPathFull={article.audio_path_full ?? null}
         isAdmin={isAdmin}
+        collectionId={article.collection_id}
       />
 
       <main className='mx-auto max-w-4xl px-4 py-6'>
