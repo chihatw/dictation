@@ -2188,7 +2188,7 @@ export type Database = {
       }
       journal_vote: {
         Args: { p_delta: number; p_id: string }
-        Returns: number
+        Returns: undefined
       }
       list_journals_for_me: {
         Args: Record<PropertyKey, never>

@@ -2,7 +2,6 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { PostgrestError } from '@supabase/supabase-js';
 
 export async function voteAction(
   prev: { score: number; error: string | null },
@@ -23,9 +22,14 @@ export async function voteAction(
     p_delta: delta,
   });
   if (error) {
+    const code = (error as { code?: string; message?: string })?.code ?? '';
     const msg =
-      (error as PostgrestError)?.code === 'over_request_rate_limit'
+      code === 'over_request_rate_limit'
         ? 'rate_limited'
+        : ((error as { message?: string })?.message ?? '').includes(
+            'vote_not_available'
+          )
+        ? 'not_yet'
         : 'rpc_error';
     return { score: current, error: msg };
   }

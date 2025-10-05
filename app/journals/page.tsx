@@ -80,7 +80,11 @@ export default async function Page() {
                 ))}
               </div>
 
-              <Vote id={j.id} initialScore={j.rating_score} />
+              <Vote
+                id={j.id}
+                initialScore={j.rating_score}
+                createdAt={j.created_at}
+              />
             </li>
           ))}
         </ul>

@@ -2,20 +2,54 @@
 'use client';
 
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useActionState } from 'react';
+import { useActionState, useEffect, useMemo, useState } from 'react';
 import { voteAction } from './actions';
+
+function pad(n: number) {
+  return n < 10 ? `0${n}` : String(n);
+}
 
 export function Vote({
   id,
   initialScore,
+  createdAt, // 追加
 }: {
   id: string;
   initialScore: number;
+  createdAt: string;
 }) {
   const [state, formAction, isPending] = useActionState(voteAction, {
     score: initialScore,
     error: null as string | null,
   });
+
+  const unlockAt = useMemo(
+    () => new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
+    [createdAt]
+  );
+
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 30_000); // 30秒ごとに更新
+    return () => clearInterval(t);
+  }, []);
+
+  const msLeft = unlockAt.getTime() - now.getTime();
+  const canVote = msLeft <= 0;
+
+  // サーバー側ガードに引っかかった場合のフォールバック
+  const blocked = state.error === 'not_yet';
+
+  if (!canVote || blocked) {
+    const left = Math.max(msLeft, 0);
+    const hh = Math.floor(left / 3_600_000);
+    const mm = Math.floor((left % 3_600_000) / 60_000);
+    return (
+      <div className='mt-2 text-right text-xs text-slate-500'>
+        再過 {pad(hh)}:{pad(mm)} 才能評分
+      </div>
+    );
+  }
 
   return (
     <div className='mt-2 flex gap-x-2 items-center justify-end'>
@@ -54,12 +88,13 @@ export function Vote({
       </form>
 
       {state.error === 'rate_limited' && (
-        <div className='text-xs text-orange-600 ml-2'>
-          リクエストが多すぎます。少し待って再試行。
-        </div>
+        <div className='text-xs text-orange-600 ml-2'>請稍候再試。</div>
       )}
       {state.error === 'unauthorized' && (
-        <div className='text-xs text-red-600 ml-2'>再ログインが必要です。</div>
+        <div className='text-xs text-red-600 ml-2'>需要重新登入。</div>
+      )}
+      {state.error === 'rpc_error' && (
+        <div className='text-xs text-red-600 ml-2'>發生錯誤。</div>
       )}
     </div>
   );
