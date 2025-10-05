@@ -2,12 +2,13 @@
 export const dynamic = 'force-dynamic';
 
 import TodayPanel from '@/components/home/TodayPanel';
-import { fetchTaichungWeather } from '@/lib/openweathermap/fetchTaichungWeather';
+
 import { createClient } from '@/lib/supabase/server';
 import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
 import { remainDaysHours } from '@/utils/home/remainDaysHours';
 import { LinkIcon } from 'lucide-react';
 
+import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import Link from 'next/link';
 import { Vote } from './journals/Vote';
 
@@ -26,9 +27,9 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('unauthorized');
 
-  const [{ data, error }, wx] = await Promise.all([
+  const [{ data, error }, { yunlin, hyogo }] = await Promise.all([
     supabase.rpc('get_home_next_task', { p_uid: user.id }),
-    fetchTaichungWeather(),
+    fetchMultiWeather(),
   ]);
   if (error) throw new Error(error.message);
 
@@ -49,7 +50,7 @@ export default async function Home() {
   return (
     <div className='min-h-screen p-6'>
       <main className='mx-auto max-w-2xl space-y-6'>
-        <TodayPanel todayStr={todayStr} wx={wx} />
+        <TodayPanel todayStr={todayStr} yunlin={yunlin} hyogo={hyogo} />
 
         {/* 下次上課 */}
         <section className='rounded-xl border p-5 space-y-3 bg-white'>
@@ -81,7 +82,7 @@ export default async function Home() {
           {nextArticleId ? (
             <Link
               href={`/articles/${nextArticleId}`}
-              className='inline-flex items-center rounded-xl px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
+              className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
             >
               {`前往「${row.collection_title ?? ''} ${row.subtitle ?? ''}」第 ${
                 row.sentence_seq ?? ''
