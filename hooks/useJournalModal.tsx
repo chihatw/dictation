@@ -105,12 +105,7 @@ export function useJournalModal() {
   const save = useCallback(() => {
     if (!articleId || !body.trim()) return;
     startTransition(async () => {
-      try {
-        await saveDictationJournalAction(articleId, body);
-        close(); // revalidate後に閉じる
-      } catch {
-        alert('保存に失敗しました。');
-      }
+      await saveDictationJournalAction(articleId, body);
     });
   }, [articleId, body, close]);
 
@@ -130,7 +125,11 @@ export function useJournalModal() {
           <p className='mt-2 text-sm text-gray-700'>
             你剛才聽了根據自己作文改寫的日語句子，有沒有發現新的東西呢？
             <br />
-            三天之後，你可能就忘記了。請為未來的自己留下筆記。
+            三天之後，你可能就忘記了。
+            <span className='font-bold text-red-500'>
+              請為未來的自己留下筆記
+            </span>
+            。
           </p>
 
           {/* 回答一覧：ここだけをスクロール。sentenceが多くても下のテキストエリアは見える */}

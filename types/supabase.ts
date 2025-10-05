@@ -2096,6 +2096,7 @@ export type Database = {
           collection_title: string
           done_count: number
           due_at: string
+          journals: Json
           next_article_id: string
           next_sentence_id: string
           sentence_seq: number
