@@ -1,6 +1,8 @@
 'use client';
 
 import { supabase } from '@/lib/supabase/browser';
+import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 type Row = {
@@ -107,6 +109,13 @@ export default function LogsPage() {
 
   return (
     <div className='p-6 space-y-4'>
+      <Link
+        href='/admin'
+        className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-800 hover:bg-gray-50 mb-4'
+      >
+        <ChevronLeft className='h-4 w-4' />
+        <span>管理者ページ</span>
+      </Link>
       <h1 className='text-xl font-bold'>ログ一覧</h1>
 
       {/* User Select */}

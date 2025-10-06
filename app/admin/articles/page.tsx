@@ -3,8 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
 type PageProps = {
-  params: Promise<Record<string, string>>;
-  searchParams: Promise<Record<string, string | string[]>>;
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ collection_id?: string; user_id?: string }>;
 };
 
 type Collection = { id: string; title: string };
@@ -18,23 +18,22 @@ type Article = {
 export default async function Page(props: PageProps) {
   await props.params; // 未使用でも await
   const sp = await props.searchParams;
-  const colId = typeof sp.collection_id === 'string' ? sp.collection_id : '';
+  const { collection_id: colId, user_id: userId } = sp;
 
   const supabase = await createClient();
 
   if (!colId) {
     return (
       <div className='space-y-6'>
-        <h1 className='text-xl font-semibold'>記事一覧</h1>
+        <h1 className='text-xl font-semibold'>課題文章一覧</h1>
         <p className='text-sm text-muted-foreground'>
-          collection_id
-          が指定されていません。コレクション一覧から選択してください。
+          collection_id が指定されていません。課題一覧から選択してください。
         </p>
         <Link
           href='/admin/collections'
           className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
         >
-          コレクション一覧へ
+          課題一覧へ
         </Link>
       </div>
     );
@@ -52,15 +51,13 @@ export default async function Page(props: PageProps) {
   if (!col) {
     return (
       <div className='space-y-6'>
-        <h1 className='text-xl font-semibold'>記事一覧</h1>
-        <p className='text-sm text-red-600'>
-          指定のコレクションが見つかりません。
-        </p>
+        <h1 className='text-xl font-semibold'>課題文章一覧</h1>
+        <p className='text-sm text-red-600'>指定の課題が見つかりません。</p>
         <Link
           href='/admin/collections'
           className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
         >
-          コレクション一覧へ
+          課題一覧へ
         </Link>
       </div>
     );
@@ -85,10 +82,10 @@ export default async function Page(props: PageProps) {
         <div className='ml-auto flex items-center gap-2'>
           {/* 追加: 戻るボタン */}
           <Link
-            href='/admin/collections'
+            href={`/admin/collections?user_id=${userId}`}
             className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
           >
-            コレクション一覧に戻る
+            課題一覧に戻る
           </Link>
 
           <Link

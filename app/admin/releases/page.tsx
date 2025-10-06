@@ -1,11 +1,12 @@
 // ユーザー選択 → リリース一覧 + 公開ボタン
 export const dynamic = 'force-dynamic';
 
+import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { UserSelect } from '../_components/UserSelect';
 import { deleteRelease, publishRelease } from './actions';
 import { ConfirmSubmitButton } from './ConfirmSubmitButton';
 import { listReleasesByUser, listUsers } from './queries';
-import { UserSelect } from './UserSelect';
 
 export default async function Page(props: {
   searchParams: Promise<{ user_id?: string }>;
@@ -34,7 +35,15 @@ export default async function Page(props: {
   return (
     <div className='max-w-3xl mx-auto'>
       <div className='p-6 space-y-6'>
-        <h1 className='text-xl font-semibold'>Releases</h1>
+        <Link
+          href='/admin'
+          className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-800 hover:bg-gray-50 mb-4'
+        >
+          <ChevronLeft className='h-4 w-4' />
+          <span>管理者ページ</span>
+        </Link>
+
+        <h1 className='text-xl font-semibold'>公開一覧（publish操作・削除）</h1>
 
         <div className='flex gap-3 items-end'>
           <UserSelect users={users} selectedUserId={selectedUserId} />

@@ -5,7 +5,9 @@ export default function AdminLayout({
 }) {
   return (
     <div className='mx-auto max-w-3xl px-4 py-6'>
-      <h1 className='mb-6 text-2xl font-semibold'>Articles</h1>
+      <h1 className='mb-6 text-2xl font-semibold'>
+        課題文章一覧（サブタイトル編集・Link to /articles/[id] ）
+      </h1>
       {children}
     </div>
   );
