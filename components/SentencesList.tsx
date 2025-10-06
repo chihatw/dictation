@@ -31,7 +31,9 @@ export default function SentencesList({
     <div className='space-y-5'>
       {article.sentences.map((s) => {
         const tags: Tag[] = s.submission?.tags ?? []; // ← 常に配列
-        const feedback = s.submission?.teacher_feedback ?? null; // ← 文字列 or null
+        const feedback = s.submission?.feedback_md ?? null; // ← 文字列 or null
+        const teacherFeedback = s.submission?.teacher_feedback ?? null; // ← 文字列 or null
+
         return (
           <div key={s.id} className='space-y-2'>
             <SentenceItem
@@ -39,6 +41,7 @@ export default function SentencesList({
               value={answers[s.id] ?? ''}
               isSubmitted={submitted[s.id] ?? false}
               feedback={feedback}
+              teacherFeedback={teacherFeedback}
               tags={tags} // ← items ではなく tags を渡す
               onChange={(val) => onChangeAnswer(s.id, val)}
               onSubmit={onSubmitOne}

@@ -16,6 +16,7 @@ export type SentenceItemProps = {
   value: string;
   isSubmitted: boolean;
   feedback: string | null;
+  teacherFeedback: string | null;
   tags: Tag[];
   submitting: boolean;
   onChange: (v: string) => void;
@@ -31,6 +32,7 @@ function SentenceItemBase({
   value,
   isSubmitted,
   feedback,
+  teacherFeedback,
   onChange,
   onSubmit,
   submitting,
@@ -136,7 +138,11 @@ function SentenceItemBase({
         ariaLiveId={`sentence-${sentence.id}-feedback`}
         selfAssessedComprehension={displaySac}
       />
-      <AdminFeedbackBlock tags={localItems} feedback={feedback} mode='view' />
+      <AdminFeedbackBlock
+        tags={localItems}
+        feedback={teacherFeedback}
+        mode='view'
+      />
     </section>
   );
 }
