@@ -17,7 +17,7 @@ type RpcFeedbackTag = {
 type RpcFeedbackWithTags = {
   id: string;
   created_at: string;
-  sentence_id: string;
+  submission_id: string;
   note_md: string;
   tags: RpcFeedbackTag[];
 };
@@ -79,7 +79,7 @@ export async function fetchArticleWithSentences(
               (f): FeedbackWithTags => ({
                 id: f.id,
                 created_at: f.created_at,
-                sentence_id: f.sentence_id,
+                submission_id: f.submission_id,
                 note_md: f.note_md,
                 tags: (Array.isArray(f.tags) ? f.tags : []) as Tag[],
               })

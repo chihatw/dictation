@@ -1,22 +1,26 @@
 'use server';
 
 import { createClientAction } from '@/lib/supabase/server-action';
-import { Tag } from '@/types/dictation';
+import { FeedbackWithTags, Tag } from '@/types/dictation';
 
-export async function addFeedbackWithTags(sentenceId: string, note_md: string) {
+export async function addFeedbackWithTags(
+  submissionId: string,
+  note_md: string
+): Promise<FeedbackWithTags> {
   const supabase = await createClientAction();
   const { data, error } = await supabase
     .from('dictation_teacher_feedback')
-    .insert({ sentence_id: sentenceId, note_md })
-    .select(
-      `
-      id, note_md, created_at,
-      tags:dictation_teacher_feedback_tags(id, label, tag_master_id, created_at)
-    `
-    )
+    .insert({ submission_id: submissionId, note_md })
+    .select(`id, created_at, submission_id, note_md`)
     .single();
   if (error) throw new Error(error.message);
-  return data;
+  return {
+    id: data.id,
+    created_at: data.created_at,
+    submission_id: data.submission_id,
+    note_md: data.note_md,
+    tags: [],
+  };
 }
 
 export async function deleteFeedback(feedbackId: string) {

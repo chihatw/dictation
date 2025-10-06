@@ -47,7 +47,22 @@ export type Tag = {
 export type FeedbackWithTags = {
   id: string;
   created_at: string;
-  sentence_id: string;
+  submission_id: string;
   note_md: string;
   tags: Tag[];
+};
+
+export type SubmissionAdminData = {
+  id: string;
+  seq: number;
+  content: string;
+  audio_path: string | null;
+  article: { id: string; subtitle: string; audio_path_full: string | null };
+  submission: {
+    id: string;
+    created_at: string;
+    answer: string;
+    self_assessed_comprehension: number;
+  };
+  teacher_feedback: FeedbackWithTags[];
 };

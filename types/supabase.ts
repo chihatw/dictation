@@ -784,26 +784,26 @@ export type Database = {
           created_at: string
           id: string
           note_md: string
-          sentence_id: string
+          submission_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           note_md: string
-          sentence_id: string
+          submission_id: string
         }
         Update: {
           created_at?: string
           id?: string
           note_md?: string
-          sentence_id?: string
+          submission_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "dictation_teacher_feedback_sentence_id_fkey"
-            columns: ["sentence_id"]
+            foreignKeyName: "dictation_teacher_feedback_submission_id_fkey"
+            columns: ["submission_id"]
             isOneToOne: false
-            referencedRelation: "dictation_sentences"
+            referencedRelation: "dictation_submissions"
             referencedColumns: ["id"]
           },
         ]
@@ -2079,16 +2079,6 @@ export type Database = {
           tags: string[]
         }[]
       }
-      get_feedbacks_with_tags: {
-        Args: { p_sentence_ids: string[] }
-        Returns: {
-          created_at: string
-          id: string
-          note_md: string
-          sentence_id: string
-          tags: Json
-        }[]
-      }
       get_home_next_task: {
         Args: { p_uid: string }
         Returns: {
@@ -2124,8 +2114,8 @@ export type Database = {
           title: string
         }[]
       }
-      get_sentence_admin: {
-        Args: { p_sentence_id: string }
+      get_submission_admin: {
+        Args: { p_submission_id: string }
         Returns: Json
       }
       get_submission_latest: {

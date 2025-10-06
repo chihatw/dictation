@@ -3,7 +3,6 @@
 
 import { chat } from '@/lib/chat';
 import { createClientAction } from '@/lib/supabase/server-action';
-import { FeedbackWithTags } from '@/types/dictation';
 import { z } from 'zod';
 
 type CreateRes = {
@@ -81,30 +80,5 @@ export async function createFeedbackAndLogAction(input: unknown) {
     feedbackMarkdown,
     completed: data.completed,
     articleId: data.article_id,
-  };
-}
-
-/**
- * 教員用フィードバックを1件作成し、作成直後のタグ付きレコードを返す
- * - 返値には関連タグ配列を含める（空配列になり得る）
- */
-export async function addFeedbackWithTags(
-  sentenceId: string,
-  noteMd: string
-): Promise<FeedbackWithTags> {
-  const supabase = await createClientAction();
-  const { data, error } = await supabase
-    .from('dictation_teacher_feedback')
-    .insert({ sentence_id: sentenceId, note_md: noteMd })
-    .select(`id, created_at, sentence_id, note_md`)
-    .single();
-  if (error) throw new Error(error.message);
-
-  return {
-    id: data.id,
-    created_at: data.created_at,
-    sentence_id: data.sentence_id,
-    note_md: data.note_md,
-    tags: [],
   };
 }

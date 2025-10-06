@@ -1,15 +1,15 @@
 'use client';
 
-import { addFeedbackWithTags } from '@/app/articles/[id]/action';
+import { addFeedbackWithTags } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 import { FeedbackWithTags } from '@/types/dictation';
 import { useState, useTransition } from 'react';
 
 export function TeacherFeedbackForm({
-  sentenceId,
+  submissionId,
   onSubmitted,
 }: {
-  sentenceId: string;
+  submissionId: string;
   onSubmitted?: (created: FeedbackWithTags) => void;
 }) {
   const [draft, setDraft] = useState('');
@@ -19,7 +19,7 @@ export function TeacherFeedbackForm({
     const md = draft.trim();
     if (!md) return;
     startTransition(async () => {
-      const created = await addFeedbackWithTags(sentenceId, md);
+      const created = await addFeedbackWithTags(submissionId, md);
       setDraft('');
       onSubmitted?.(created);
     });

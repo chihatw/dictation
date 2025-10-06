@@ -50,7 +50,7 @@ export default function SentencesList({
             {isAdmin && (
               <div className='flex justify-end'>
                 <Link
-                  href={`/admin/sentences/${s.id}/teacher_feedback`}
+                  href={`/admin/submissions/${s.submission?.id}/teacher_feedback`}
                   className='text-xs underline text-slate-600'
                 >
                   短評を編集（管理）

@@ -4,7 +4,7 @@ import { TeacherFeedbackForm } from './TeacherFeedbackForm';
 import { TeacherFeedbackList } from './TeacherFeedbackList';
 
 export function AdminFeedbackBlock({
-  sentenceId,
+  submissionId,
   items,
   mode = 'view',
   onDelete,
@@ -12,7 +12,7 @@ export function AdminFeedbackBlock({
   onCreated,
   onAddTag,
 }: {
-  sentenceId: string;
+  submissionId?: string;
   items: FeedbackWithTags[];
   mode?: 'view' | 'manage';
   onDelete?: (feedbackId: string) => void;
@@ -20,11 +20,14 @@ export function AdminFeedbackBlock({
   onCreated?: (created: FeedbackWithTags) => void;
   onAddTag?: (label: string, fbId: string) => void;
 }) {
-  const canManage = mode === 'manage';
+  const canManage = mode === 'manage' && !!submissionId;
   return (
     <div className='mt-4 space-y-3'>
       {canManage && (
-        <TeacherFeedbackForm sentenceId={sentenceId} onSubmitted={onCreated} />
+        <TeacherFeedbackForm
+          submissionId={submissionId}
+          onSubmitted={onCreated}
+        />
       )}
       <TeacherFeedbackList
         items={items}

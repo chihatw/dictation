@@ -136,11 +136,7 @@ function SentenceItemBase({
         ariaLiveId={`sentence-${sentence.id}-feedback`}
         selfAssessedComprehension={displaySac}
       />
-      <AdminFeedbackBlock
-        items={localItems}
-        sentenceId={sentence.id}
-        mode='view'
-      />
+      <AdminFeedbackBlock items={localItems} mode='view' />
     </section>
   );
 }
