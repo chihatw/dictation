@@ -2096,11 +2096,14 @@ export type Database = {
           collection_title: string
           done_count: number
           due_at: string
+          end_at: string
           journals: Json
           next_article_id: string
           next_sentence_id: string
           sentence_seq: number
+          start_at: string
           subtitle: string
+          time_progress_pct: number
           total_count: number
         }[]
       }

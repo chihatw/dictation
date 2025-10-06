@@ -5,7 +5,6 @@ import TodayPanel from '@/components/home/TodayPanel';
 
 import { createClient } from '@/lib/supabase/server';
 import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
-import { remainDaysHours } from '@/utils/home/remainDaysHours';
 import { LinkIcon } from 'lucide-react';
 
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
@@ -37,11 +36,12 @@ export default async function Home() {
   const dueAt = row?.due_at as string | null | undefined;
   const nextArticleId = row?.next_article_id as string | null | undefined;
   const dueStr = formatDueTW(dueAt);
-  const remain = remainDaysHours(dueAt);
   const todayStr = formatTodayTW();
   const pct = row?.total_count
     ? Math.round((row.done_count / row.total_count) * 100)
     : 0;
+  const timeProgress =
+    typeof row?.time_progress_pct === 'number' ? row.time_progress_pct : 0;
 
   const journals: JournalItem[] = Array.isArray(row?.journals)
     ? (row!.journals as JournalItem[])
@@ -56,27 +56,30 @@ export default async function Home() {
         <section className='rounded-xl border p-5 space-y-3 bg-white'>
           <div className='text-sm text-gray-500'>下次上課</div>
           <div className='text-xl'>{dueStr ?? '未設定'}</div>
-          <div className='text-sm text-gray-600'>
-            剩餘時間：
-            {remain ? (
-              <span>
-                {remain.days}天 {remain.hours}小時
-              </span>
-            ) : (
-              <span>—</span>
-            )}
+
+          <div className='text-sm text-gray-700'>
+            <div>
+              時間進度為{` `}
+              <span className='font-bold text-4xl'>{timeProgress}</span>%
+            </div>
+            <div className=' leading-none font-extralight text-gray-500'>
+              <div>這表示從聽寫題目發布到上課當天凌晨 0 點為止的時間經過。</div>
+              <div>請盡量規劃好進度，別在上課前一晚熬夜練習。</div>
+            </div>
           </div>
         </section>
 
         {/* 下一個作業 */}
         <section className='rounded-xl border p-5 bg-white space-y-3'>
-          <div className='text-sm text-gray-500'>下一個作業</div>
+          <div className='text-sm text-gray-500'>作業</div>
 
           <div className='text-sm text-gray-700'>
             <div>
-              目前進度為 <span className='font-semibold text-xl'>{pct}</span>%
+              作業進度為 <span className='font-bold text-4xl'>{pct}</span>%
             </div>
-            <div>語言學習重在習慣。 與其一天做很多，不如盡量每天都做一點。</div>
+            <div className=' leading-none font-extralight text-gray-500'>
+              語言學習重在習慣。 與其一天做很多，不如盡量每天都做一點。
+            </div>
           </div>
 
           {nextArticleId ? (
