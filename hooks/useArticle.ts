@@ -12,7 +12,7 @@ export function useArticle(articleId: string | undefined) {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
-  const [feedbacks, setFeedbacks] = useState<Record<string, string>>({});
+
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -36,17 +36,15 @@ export function useArticle(articleId: string | undefined) {
       // 既存回答を状態へ
       const nextAnswers: Record<string, string> = {};
       const nextSubmitted: Record<string, boolean> = {};
-      const nextFeedbacks: Record<string, string> = {};
 
       for (const s of data.sentences ?? []) {
         const one = s.submission ?? null;
         nextAnswers[s.id] = one?.answer ?? '';
         nextSubmitted[s.id] = !!one;
-        nextFeedbacks[s.id] = one?.feedback_md ?? '';
       }
       setAnswers(nextAnswers);
       setSubmitted(nextSubmitted);
-      setFeedbacks(nextFeedbacks);
+
       setLoading(false);
     })();
     return () => {
@@ -85,7 +83,6 @@ export function useArticle(articleId: string | undefined) {
           setSubmitted((o) => ({ ...o, [s.id]: false }));
           alert(res.error ?? '保存に失敗しました。');
         } else {
-          setFeedbacks((o) => ({ ...o, [s.id]: res.feedbackMarkdown ?? '' }));
           return { completed: res.completed, articleId: res.articleId };
         }
       } finally {
@@ -106,7 +103,6 @@ export function useArticle(articleId: string | undefined) {
     answers,
     setAnswers,
     submitted,
-    feedbacks,
     loadingMap,
     // 動作
     submitOne,

@@ -725,6 +725,7 @@ export type Database = {
           plays_count: number
           self_assessed_comprehension: number
           sentence_id: string
+          teacher_feedback: string | null
         }
         Insert: {
           answer: string
@@ -736,6 +737,7 @@ export type Database = {
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id: string
+          teacher_feedback?: string | null
         }
         Update: {
           answer?: string
@@ -747,6 +749,7 @@ export type Database = {
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id?: string
+          teacher_feedback?: string | null
         }
         Relationships: [
           {
@@ -779,60 +782,31 @@ export type Database = {
         }
         Relationships: []
       }
-      dictation_teacher_feedback: {
-        Row: {
-          created_at: string
-          id: string
-          note_md: string
-          submission_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          note_md: string
-          submission_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          note_md?: string
-          submission_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_teacher_feedback_submission_id_fkey"
-            columns: ["submission_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_submissions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dictation_teacher_feedback_tags: {
         Row: {
           created_at: string
           id: string
+          submission_id: string
           tag_master_id: string | null
-          teacher_feedback_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          submission_id: string
           tag_master_id?: string | null
-          teacher_feedback_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          submission_id?: string
           tag_master_id?: string | null
-          teacher_feedback_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "dictation_teacher_feedback_tags_teacher_feedback_id_fkey"
-            columns: ["teacher_feedback_id"]
+            foreignKeyName: "dictation_teacher_feedback_tags_submission_id_fkey"
+            columns: ["submission_id"]
             isOneToOne: false
-            referencedRelation: "dictation_teacher_feedback"
+            referencedRelation: "dictation_submissions"
             referencedColumns: ["id"]
           },
           {

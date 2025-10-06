@@ -1,70 +1,60 @@
 // components/articles/AdminFeedbackClient.tsx
 'use client';
 
-import type { FeedbackWithTags } from '@/types/dictation';
+import type { Tag } from '@/types/dictation';
 import { useState, useTransition } from 'react';
 import { AdminFeedbackBlock } from './AdminFeedbackBlock';
 
 // サーバーアクションを直接 import
 import {
   addFeedbackTag,
-  deleteFeedback,
   deleteFeedbackTag,
+  setSubmissionTeacherFeedback,
 } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
 
 export function AdminFeedbackClient({
   submissionId,
-  initialItems,
+  initialFeedback,
+  initialTags,
 }: {
   submissionId: string;
-  initialItems: FeedbackWithTags[];
+  initialFeedback: string;
+  initialTags: Tag[];
 }) {
-  const [items, setItems] = useState<FeedbackWithTags[]>(initialItems);
-  const [isPending, startTransition] = useTransition();
+  const [feedback, setFeedback] = useState<string>(initialFeedback ?? '');
+  const [tags, setTags] = useState<Tag[]>(initialTags ?? []);
+  const [, startTransition] = useTransition();
 
   return (
     <AdminFeedbackBlock
       submissionId={submissionId}
-      items={items}
+      tags={tags}
+      feedback={feedback}
       mode='manage'
-      onCreated={(created) => setItems((p) => [...p, created])}
-      onDelete={(fid) =>
+      onCreated={() => {}}
+      onDelete={() =>
         startTransition(async () => {
-          setItems((p) => p.filter((x) => x.id !== fid)); // 楽観
-          await deleteFeedback(fid);
+          setFeedback(''); // 楽観的に空へ
+          await setSubmissionTeacherFeedback(submissionId, null);
         })
       }
       onDeleteTag={(tid) =>
         startTransition(async () => {
-          setItems((p) =>
-            p.map((f) => ({ ...f, tags: f.tags.filter((t) => t.id !== tid) }))
-          );
+          setTags((p) => p.filter((t) => t.id !== tid)); // 楽観削除
           await deleteFeedbackTag(tid);
         })
       }
-      onAddTag={(label, fid) =>
+      onAddTag={(label) =>
         startTransition(async () => {
-          // 楽観追加（temp-id）
-          setItems((p) =>
-            p.map((f) =>
-              f.id === fid
-                ? {
-                    ...f,
-                    tags: [
-                      ...f.tags,
-                      {
-                        id: `temp-${Date.now()}`,
-                        created_at: new Date().toISOString(),
-                        teacher_feedback_id: fid,
-                        tag_master_id: null,
-                        label,
-                      },
-                    ],
-                  }
-                : f
-            )
-          );
-          await addFeedbackTag(fid, label); // 引数順に注意
+          const temp: Tag = {
+            id: `temp-${Date.now()}`,
+            created_at: new Date().toISOString(),
+            submission_id: submissionId,
+            tag_master_id: null,
+            label,
+          };
+          setTags((p) => [...p, temp]); // 楽観追加
+          await addFeedbackTag(submissionId, label);
         })
       }
     />

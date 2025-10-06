@@ -1,18 +1,21 @@
 // types/dictation.ts
 
-export type Submission = {
+export type Tag = {
   id: string;
-  answer: string;
-  feedback_md: string | null;
-  self_assessed_comprehension: number;
   created_at: string;
+  submission_id: string; // ← teacher_feedback_id は撤廃
+  tag_master_id: string | null;
+  label: string;
 };
 
-export type Metrics = {
-  playsCount: number;
-  listenedFullCount: number;
-  elapsedMsSinceItemView: number;
-  elapsedMsSinceFirstPlay: number;
+export type Submission = {
+  id: string;
+  answer: string | null; // RPC では null あり得る
+  feedback_md: string | null;
+  teacher_feedback: string | null; // ← 追加: 統合先
+  self_assessed_comprehension: number | null; // RPC 整合
+  created_at: string;
+  tags: Tag[]; // ← 追加: submission 紐づけのタグ
 };
 
 export type Sentence = {
@@ -22,7 +25,7 @@ export type Sentence = {
   created_at: string;
   audio_path?: string | null;
   submission?: Submission | null;
-  teacher_feedback: FeedbackWithTags[] | null;
+  // teacher_feedback: FeedbackWithTags[] | null; // ← 削除
 };
 
 export type Article = {
@@ -36,20 +39,14 @@ export type Article = {
   collection_id: string;
 };
 
-export type Tag = {
-  id: string;
-  created_at: string;
-  teacher_feedback_id: string;
-  tag_master_id: string | null;
-  label: string;
-};
+// 旧型は不要。互換が必要なら残す:
+export type FeedbackWithTags = never; // or remove/export only for legacy
 
-export type FeedbackWithTags = {
-  id: string;
-  created_at: string;
-  submission_id: string;
-  note_md: string;
-  tags: Tag[];
+export type Metrics = {
+  playsCount: number;
+  listenedFullCount: number;
+  elapsedMsSinceItemView: number;
+  elapsedMsSinceFirstPlay: number;
 };
 
 export type SubmissionAdminData = {
@@ -61,8 +58,11 @@ export type SubmissionAdminData = {
   submission: {
     id: string;
     created_at: string;
-    answer: string;
-    self_assessed_comprehension: number;
+    answer: string | null;
+    self_assessed_comprehension: number | null;
+    feedback_md: string | null;
+    teacher_feedback: string | null; // ← 追加
+    tags: Tag[]; // ← 追加
   };
-  teacher_feedback: FeedbackWithTags[];
+  // teacher_feedback: FeedbackWithTags[]; // ← 削除
 };

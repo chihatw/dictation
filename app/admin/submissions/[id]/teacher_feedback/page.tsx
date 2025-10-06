@@ -1,3 +1,4 @@
+// app/admin/submissions/[id]/teacher_feedback/page.tsx
 import { AdminFeedbackClient } from '@/components/articles/AdminFeedbackClient';
 import { HeaderRow } from '@/components/sentence/parts/HeaderRow';
 import { createClient } from '@/lib/supabase/server';
@@ -6,7 +7,6 @@ import { SubmissionAdminData } from '@/types/dictation';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-// app/admin/submissions/[id]/teacher_feedback/page.tsx
 export default async function Page(props: {
   params: Promise<{ id: string }>;
   searchParams: Promise<Record<string, string | string[]>>;
@@ -28,7 +28,7 @@ export default async function Page(props: {
         <h1 className='text-lg font-semibold'>
           短評編集 / {s.article.subtitle} / #{s.seq}
         </h1>
-        <Link href={`/articles/${s.article.id}`} className='text-sm underline '>
+        <Link href={`/articles/${s.article.id}`} className='text-sm underline'>
           ← 記事に戻る
         </Link>
       </div>
@@ -39,6 +39,7 @@ export default async function Page(props: {
           seq={s.seq}
           audioUrl={s.audio_path ? toPublicUrl(s.audio_path) : undefined}
         />
+
         <div className='mt-3 text-sm text-slate-600'>
           <span className='font-medium'>原文：</span>
           {s.content}
@@ -46,7 +47,8 @@ export default async function Page(props: {
 
         <AdminFeedbackClient
           submissionId={s.submission.id}
-          initialItems={s.teacher_feedback ?? []}
+          initialFeedback={s.submission.teacher_feedback ?? ''}
+          initialTags={s.submission.tags ?? []}
         />
       </section>
     </div>

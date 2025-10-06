@@ -1,8 +1,7 @@
 'use client';
 
-import { addFeedbackWithTags } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
+import { setSubmissionTeacherFeedback } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import { FeedbackWithTags } from '@/types/dictation';
 import { useState, useTransition } from 'react';
 
 export function TeacherFeedbackForm({
@@ -10,7 +9,7 @@ export function TeacherFeedbackForm({
   onSubmitted,
 }: {
   submissionId: string;
-  onSubmitted?: (created: FeedbackWithTags) => void;
+  onSubmitted?: () => void;
 }) {
   const [draft, setDraft] = useState('');
   const [isPending, startTransition] = useTransition();
@@ -19,9 +18,9 @@ export function TeacherFeedbackForm({
     const md = draft.trim();
     if (!md) return;
     startTransition(async () => {
-      const created = await addFeedbackWithTags(submissionId, md);
+      await setSubmissionTeacherFeedback(submissionId, md);
       setDraft('');
-      onSubmitted?.(created);
+      onSubmitted?.();
     });
   };
 

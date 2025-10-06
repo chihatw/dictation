@@ -1,7 +1,7 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { FeedbackWithTags, Metrics, Sentence } from '@/types/dictation';
+import { Article, Metrics, Tag } from '@/types/dictation';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 import { AdminFeedbackBlock } from '../articles/AdminFeedbackBlock';
@@ -12,18 +12,18 @@ import { SelfAssessmentSelectorCompact } from './parts/SelfAssessmentSelector';
 import { SubmitButton } from './parts/SubmitButton';
 
 export type SentenceItemProps = {
-  sentence: Sentence;
+  sentence: Article['sentences'][number];
   value: string;
   isSubmitted: boolean;
-  feedback?: string | null;
-  onChange: (val: string) => void;
+  feedback: string | null;
+  tags: Tag[];
+  submitting: boolean;
+  onChange: (v: string) => void;
   onSubmit: (
     sentenceId: string,
     metrics: Metrics,
     selfAssessedComprehension: number
-  ) => void; // 型を差し替え
-  submitting?: boolean;
-  items: FeedbackWithTags[];
+  ) => void;
 };
 
 function SentenceItemBase({
@@ -34,17 +34,17 @@ function SentenceItemBase({
   onChange,
   onSubmit,
   submitting,
-  items,
+  tags,
 }: SentenceItemProps) {
-  const [localItems, setLocalItems] = useState<FeedbackWithTags[]>(items);
+  const [localItems, setLocalItems] = useState<Tag[]>(tags);
   const [playsCount, setPlaysCount] = useState(0);
   const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
   const [selfAssessedComprehension, setSelfAssessedComprehension] = useState(0);
   const itemViewAt = useRef(Date.now());
 
   useEffect(() => {
-    setLocalItems(items);
-  }, [sentence.id, items]);
+    setLocalItems(tags);
+  }, [sentence.id, tags]);
 
   const displaySac = isSubmitted
     ? selfAssessedComprehension ||
@@ -136,7 +136,7 @@ function SentenceItemBase({
         ariaLiveId={`sentence-${sentence.id}-feedback`}
         selfAssessedComprehension={displaySac}
       />
-      <AdminFeedbackBlock items={localItems} mode='view' />
+      <AdminFeedbackBlock tags={localItems} feedback={feedback} mode='view' />
     </section>
   );
 }

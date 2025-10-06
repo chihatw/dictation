@@ -6,9 +6,9 @@ import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
 import { useJournalModal } from '@/hooks/useJournalModal';
 import { supabase } from '@/lib/supabase/browser';
-import { FeedbackWithTags, Metrics } from '@/types/dictation';
+import { Metrics } from '@/types/dictation';
 import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
@@ -30,22 +30,11 @@ export default function ArticlePage() {
     answers,
     setAnswers,
     submitted,
-    feedbacks,
     loadingMap,
     submitOne,
   } = useArticle(id);
 
   const { openJournalModal, JournalModalElement } = useJournalModal();
-
-  // Article から都度生成。別取得は不要。
-  const fbMap = useMemo<Record<string, FeedbackWithTags[]>>(() => {
-    if (!article) return {};
-    const m: Record<string, FeedbackWithTags[]> = {};
-    for (const s of article.sentences) {
-      m[s.id] = s.teacher_feedback ?? [];
-    }
-    return m;
-  }, [article]);
 
   const handleSubmitOne = async (
     sentenceId: string,
@@ -119,14 +108,12 @@ export default function ArticlePage() {
           article={article}
           answers={answers}
           submitted={submitted}
-          feedbacks={feedbacks}
           loadingMap={loadingMap}
           onChangeAnswer={(sid, val) =>
             setAnswers((p) => ({ ...p, [sid]: val }))
           }
           onSubmitOne={handleSubmitOne}
           isAdmin={isAdmin}
-          feedbackMap={fbMap}
         />
 
         <div className='mt-8 text-center text-sm text-gray-600'>
