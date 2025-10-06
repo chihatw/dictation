@@ -2,7 +2,7 @@ name: Daily Next.js Build
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *' # JST 09:00
   workflow_dispatch:
 
 jobs:
@@ -11,27 +11,42 @@ jobs:
     env:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
       NEXT_TELEMETRY_DISABLED: '1'
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      # どちらか一つでOK。確実なのは npm -g
+      - name: Install pnpm
+        run: npm i -g pnpm@9
+      # - uses: pnpm/action-setup@v4
+      #   with: { version: 9 }
 
-      - run: echo '${{ secrets.GCP_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+      - name: Verify pnpm
+        run: pnpm -v
 
-      - run: pnpm install --frozen-lockfile
+      - name: Write GCP credentials
+        run: echo '${{ secrets.GCP_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
-      - run: pnpm exec tsc -p .
-      - run: pnpm exec next lint
-      - run: pnpm build
+      - name: Type check
+        run: pnpm exec tsc -p .
+
+      - name: Lint
+        run: pnpm exec next lint
+
+      - name: Build
+        run: pnpm build
