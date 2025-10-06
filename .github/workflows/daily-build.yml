@@ -1,5 +1,4 @@
 name: Daily Next.js Build
-
 on:
   schedule:
     - cron: '0 0 * * *' # JST 09:00
@@ -13,23 +12,19 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: 20
+          cache: pnpm
 
-      # どちらか一つでOK。確実なのは npm -g
-      - name: Install pnpm
-        run: npm i -g pnpm@9
-      # - uses: pnpm/action-setup@v4
-      #   with: { version: 9 }
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
-      - name: Verify pnpm
-        run: pnpm -v
+      - run: pnpm -v
 
       - name: Write GCP credentials
         run: echo '${{ secrets.GCP_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
