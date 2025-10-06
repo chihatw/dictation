@@ -2,15 +2,15 @@ name: Daily Next.js Build
 
 on:
   schedule:
-    - cron: '0 0 * * *' # JST 09:00
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_TELEMETRY_DISABLED: '1'
       GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
+      NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +19,9 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      - run: corepack enable && corepack prepare pnpm@latest --activate
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - run: echo '${{ secrets.GCP_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
 
