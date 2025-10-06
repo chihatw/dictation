@@ -2145,6 +2145,7 @@ export type Database = {
           self_assessed_comprehension: number
           sentence_id: string
           seq: number
+          subtitle: string
           title: string
           user_id: string
         }[]

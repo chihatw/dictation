@@ -85,7 +85,7 @@ export default async function Page(props: PageProps) {
             href={`/admin/collections?user_id=${userId}`}
             className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
           >
-            課題一覧に戻る
+            ユーザー別課題一覧に戻る
           </Link>
 
           <Link
@@ -103,8 +103,8 @@ export default async function Page(props: PageProps) {
         <table className='w-full text-sm'>
           <thead>
             <tr className='text-left'>
-              <th className='px-2 py-1'>seq</th>
-              <th className='px-2 py-1'>subtitle</th>
+              <th className='px-2 py-1'>順</th>
+              <th className='px-2 py-1'>サブタイトル</th>
               <th className='px-2 py-1'>created_at</th>
               <th className='px-2 py-1'>操作</th>
             </tr>
@@ -113,24 +113,25 @@ export default async function Page(props: PageProps) {
             {(articles ?? []).map((a) => (
               <tr key={a.id} className='border-t'>
                 <td className='px-2 py-1'>{a.seq}</td>
-                <td className='px-2 py-1'>
-                  <Link
-                    href={`/articles/${a.id}`}
-                    className='underline hover:no-underline cursor-pointer'
-                  >
-                    {a.subtitle}
-                  </Link>
-                </td>
+                <td className='px-2 py-1'>{a.subtitle}</td>
                 <td className='px-2 py-1'>
                   {new Date(a.created_at).toLocaleString('ja-JP')}
                 </td>
                 <td className='px-2 py-1 space-x-2'>
-                  <Link
-                    href={`/admin/articles/${a.id}/edit`}
-                    className='rounded-md border px-2 py-1'
-                  >
-                    subtitle編集
-                  </Link>
+                  <div className='flex gap-x-2'>
+                    <Link
+                      href={`/articles/${a.id}`}
+                      className='rounded-md border px-2 py-1'
+                    >
+                      Article ページ
+                    </Link>
+                    <Link
+                      href={`/admin/articles/${a.id}/edit`}
+                      className='rounded-md border px-2 py-1'
+                    >
+                      サブタイトル編集
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}

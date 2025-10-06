@@ -20,12 +20,14 @@ type Row = {
   seq: number;
   article_id: string;
   title: string;
+  subtitle: string;
 };
 
 type UserOpt = { uid: string; display: string };
 
 const COLS = [
-  'w-32',
+  'w-16',
+  'w-10',
   'w-10',
   'w-64',
   'w-64',
@@ -160,7 +162,8 @@ export default function LogsPage() {
             <thead>
               <tr className='bg-gray-50'>
                 {[
-                  '問題タイトル',
+                  '課題',
+                  '',
                   '行',
                   '文本文',
                   '回答',
@@ -190,6 +193,7 @@ export default function LogsPage() {
                 rows.map((r) => (
                   <tr key={r.id} className='align-top'>
                     <td className='border p-1'>{r.title}</td>
+                    <td className='border p-1'>{r.subtitle}</td>
                     <td className='border p-1 text-center'>{r.seq}</td>
                     <td className='border p-1 max-w-64 whitespace-normal break-words'>
                       {r.content}
