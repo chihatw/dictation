@@ -1,0 +1,35 @@
+name: Daily Next.js Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # JST 09:00
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/gcp-creds.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - run: corepack enable && corepack prepare pnpm@latest --activate
+
+      - run: echo '${{ secrets.GCP_CREDENTIALS_JSON }}' > "$GOOGLE_APPLICATION_CREDENTIALS"
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - run: pnpm exec tsc -p .
+      - run: pnpm exec next lint
+      - run: pnpm build
