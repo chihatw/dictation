@@ -71,7 +71,9 @@ export default async function Page(props: {
                   <div className='min-w-44'>
                     <div className='text-xs text-gray-500'>Due</div>
                     <div className='font-medium'>
-                      {new Date(r.due_at).toLocaleString('ja-JP')}
+                      {new Date(r.due_at).toLocaleString('ja-JP', {
+                        timeZone: 'Asia/Tokyo',
+                      })}
                     </div>
                   </div>
                   <div className='flex-1'>

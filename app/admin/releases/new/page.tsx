@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import { jstLocalToUtcIso } from '@/utils/jstLocalToUtcIso';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createRelease } from '../actions';
@@ -23,7 +24,8 @@ export default async function Page(props: {
     const dueAtLocal = String(formData.get('due_at') || '');
     if (!userId || !collectionId || !dueAtLocal)
       throw new Error('missing fields');
-    const dueAtIso = new Date(dueAtLocal).toISOString();
+
+    const dueAtIso = jstLocalToUtcIso(dueAtLocal);
     await createRelease({ userId, collectionId, dueAtIso });
     redirect(`/admin/releases?user_id=${userId}`);
   }
@@ -77,6 +79,7 @@ export default async function Page(props: {
                 name='due_at'
                 required
                 className='border rounded-md px-3 py-2'
+                step='3600'
               />
             </div>
 
