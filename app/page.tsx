@@ -151,12 +151,14 @@ export default async function Home() {
                         year: 'numeric',
                         month: 'numeric',
                         day: 'numeric',
+                        timeZone: 'Asia/Taipei',
                       })}
                     </time>
                     <time className='font-light text-slate-500 text-sm'>
                       {new Date(j.created_at).toLocaleString('ja-JP', {
                         hour: 'numeric',
                         minute: 'numeric',
+                        timeZone: 'Asia/Taipei',
                       })}
                     </time>
                     <LinkIcon className='w-3 h-3 text-slate-500' />
