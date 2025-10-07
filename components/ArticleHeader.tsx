@@ -38,7 +38,7 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
 
         {isAdmin && (
           <Link
-            href={`/admin/collections/${article.collection_id}`}
+            href={`/admin/articles?collection_id=${article.collection_id}&user_id=${article.uid}`}
             className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             管理者課題詳細ページ
