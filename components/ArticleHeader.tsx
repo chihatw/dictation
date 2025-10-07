@@ -38,10 +38,10 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
 
         {isAdmin && (
           <Link
-            href={'/admin/collections'}
+            href={`/admin/collections?user_id=${article.uid}`}
             className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
-            管理
+            ユーザー別課題一覧
           </Link>
         )}
         {audioUrl && (
