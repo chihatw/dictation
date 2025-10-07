@@ -1,5 +1,5 @@
 // app/admin/submissions/[id]/teacher_feedback/page.tsx
-import { AdminFeedbackClient } from '@/components/articles/AdminFeedbackClient';
+import { AdminTeacherFeedbackClient } from '@/components/articles/AdminTeacherFeedbackClient';
 import { HeaderRow } from '@/components/sentence/parts/HeaderRow';
 import { createClient } from '@/lib/supabase/server';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
@@ -45,11 +45,12 @@ export default async function Page(props: {
           {s.content}
         </div>
 
-        <AdminFeedbackClient
-          submissionId={s.submission.id}
-          initialFeedback={s.submission.teacher_feedback ?? ''}
-          initialTags={s.submission.tags ?? []}
-        />
+        <div className='mt-3 text-sm text-slate-600'>
+          <span className='font-medium'>回答：</span>
+          {s.submission.answer}
+        </div>
+
+        <AdminTeacherFeedbackClient submission={s.submission} />
       </section>
     </div>
   );

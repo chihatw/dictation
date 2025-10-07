@@ -1,28 +1,27 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { Article, Metrics, Tag } from '@/types/dictation';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { Article } from '@/types/dictation';
+import { memo, useMemo, useRef, useState } from 'react';
 
-import { AdminFeedbackBlock } from '../articles/AdminFeedbackBlock';
+import { TeacherFeedbackPanel } from '../articles/TeacherFeedbackPanel';
+import { AIFeedbackPanel } from './parts/AIFeedbackPanel';
 import { AnswerField } from './parts/AnswerField';
-import { FeedbackPanel } from './parts/FeedbackPanel';
 import { HeaderRow } from './parts/HeaderRow';
 import { SelfAssessmentSelectorCompact } from './parts/SelfAssessmentSelector';
 import { SubmitButton } from './parts/SubmitButton';
 
-export type SentenceItemProps = {
+type SentenceItemProps = {
   sentence: Article['sentences'][number];
   value: string;
   isSubmitted: boolean;
-  feedback: string | null;
-  teacherFeedback: string | null;
-  tags: Tag[];
   submitting: boolean;
   onChange: (v: string) => void;
   onSubmit: (
     sentenceId: string,
-    metrics: Metrics,
+    playsCount: number,
+    elapsedMsSinceItemView: number,
+    elapsedMsSinceFirstPlay: number,
     selfAssessedComprehension: number
   ) => void;
 };
@@ -31,22 +30,14 @@ function SentenceItemBase({
   sentence,
   value,
   isSubmitted,
-  feedback,
-  teacherFeedback,
   onChange,
   onSubmit,
   submitting,
-  tags,
 }: SentenceItemProps) {
-  const [localItems, setLocalItems] = useState<Tag[]>(tags);
   const [playsCount, setPlaysCount] = useState(0);
   const [firstPlayAt, setFirstPlayAt] = useState<number | null>(null);
   const [selfAssessedComprehension, setSelfAssessedComprehension] = useState(0);
   const itemViewAt = useRef(Date.now());
-
-  useEffect(() => {
-    setLocalItems(tags);
-  }, [sentence.id, tags]);
 
   const displaySac = isSubmitted
     ? selfAssessedComprehension ||
@@ -75,12 +66,9 @@ function SentenceItemBase({
   const handleSubmit = async () => {
     onSubmit(
       sentence.id,
-      {
-        playsCount,
-        listenedFullCount: playsCount,
-        elapsedMsSinceItemView: Date.now() - itemViewAt.current,
-        elapsedMsSinceFirstPlay: firstPlayAt ? Date.now() - firstPlayAt : 0,
-      },
+      playsCount,
+      Date.now() - itemViewAt.current,
+      firstPlayAt ? Date.now() - firstPlayAt : 0,
       selfAssessedComprehension
     );
   };
@@ -131,18 +119,14 @@ function SentenceItemBase({
         />
       </div>
 
-      <FeedbackPanel
-        show={isSubmitted && !!feedback}
-        feedback={feedback ?? ''}
-        transcript={sentence.content}
-        ariaLiveId={`sentence-${sentence.id}-feedback`}
+      <AIFeedbackPanel
+        show={isSubmitted && !!sentence.submission?.feedback_md}
+        sentence={sentence}
         selfAssessedComprehension={displaySac}
       />
-      <AdminFeedbackBlock
-        tags={localItems}
-        feedback={teacherFeedback}
-        mode='view'
-      />
+      <div className='mt-3'>
+        <TeacherFeedbackPanel submission={sentence.submission} />
+      </div>
     </section>
   );
 }

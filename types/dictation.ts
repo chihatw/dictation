@@ -1,37 +1,39 @@
 // types/dictation.ts
 
-export type Tag = {
+type Tag = {
   id: string;
   created_at: string;
-  submission_id: string; // ← teacher_feedback_id は撤廃
+  submission_id: string;
   tag_master_id: string | null;
   label: string;
 };
 
-export type Submission = {
+type Submission = {
   id: string;
-  answer: string | null; // RPC では null あり得る
+  answer: string | null;
   feedback_md: string | null;
-  teacher_feedback: string | null; // ← 追加: 統合先
-  self_assessed_comprehension: number | null; // RPC 整合
+  teacher_feedback: string | null;
+  self_assessed_comprehension: number | null;
   created_at: string;
-  tags: Tag[]; // ← 追加: submission 紐づけのタグ
+  tags: Tag[];
+  plays_count: number;
+  elapsed_ms_since_item_view: number;
+  elapsed_ms_since_first_play: number;
 };
 
-export type Sentence = {
+type Sentence = {
   id: string;
   seq: number;
   content: string;
   created_at: string;
   audio_path?: string | null;
   submission?: Submission | null;
-  // teacher_feedback: FeedbackWithTags[] | null; // ← 削除
 };
 
 export type Article = {
   id: string;
   uid: string;
-  title: string;
+  title: string; // todo title -> subtitle
   created_at: string;
   journal: { body: string; created_at: string } | null;
   sentences: Sentence[];
@@ -39,30 +41,26 @@ export type Article = {
   collection_id: string;
 };
 
-// 旧型は不要。互換が必要なら残す:
-export type FeedbackWithTags = never; // or remove/export only for legacy
-
-export type Metrics = {
-  playsCount: number;
-  listenedFullCount: number;
-  elapsedMsSinceItemView: number;
-  elapsedMsSinceFirstPlay: number;
-};
-
 export type SubmissionAdminData = {
   id: string;
   seq: number;
   content: string;
   audio_path: string | null;
-  article: { id: string; subtitle: string; audio_path_full: string | null };
+  article: {
+    id: string;
+    subtitle: string;
+    audio_path_full: string | null;
+  };
   submission: {
     id: string;
     created_at: string;
     answer: string | null;
     self_assessed_comprehension: number | null;
     feedback_md: string | null;
-    teacher_feedback: string | null; // ← 追加
-    tags: Tag[]; // ← 追加
+    teacher_feedback: string | null;
+    plays_count: number;
+    elapsed_ms_since_item_view: number;
+    elapsed_ms_since_first_play: number;
+    tags: Tag[];
   };
-  // teacher_feedback: FeedbackWithTags[]; // ← 削除
 };

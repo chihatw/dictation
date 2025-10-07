@@ -2,7 +2,7 @@
 
 import { createFeedbackAndLogAction } from '@/app/articles/[id]/action';
 import { fetchArticleWithSentences } from '@/lib/dictation/queries';
-import type { Article, Metrics, Sentence } from '@/types/dictation';
+import type { Article } from '@/types/dictation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function useArticle(articleId: string | undefined) {
@@ -59,8 +59,10 @@ export function useArticle(articleId: string | undefined) {
 
   const submitOne = useCallback(
     async (
-      s: Sentence,
-      metrics: Metrics,
+      s: Article['sentences'][number],
+      plays_count: number,
+      elapsed_ms_since_item_view: number,
+      elapsed_ms_since_first_play: number,
       selfAssessedComprehension: number
     ) => {
       const val = (answers[s.id] ?? '').trim();
@@ -74,7 +76,9 @@ export function useArticle(articleId: string | undefined) {
         sentenceId: s.id,
         sentenceScript: s.content,
         userAnswer: val,
-        metrics,
+        playsCount: plays_count,
+        elapsedMsSinceItemView: elapsed_ms_since_item_view,
+        elapsedMsSinceFirstPlay: elapsed_ms_since_first_play,
         selfAssessedComprehension,
       });
 

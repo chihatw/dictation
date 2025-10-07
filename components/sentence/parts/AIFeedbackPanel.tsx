@@ -1,24 +1,23 @@
 'use client';
 
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
+import { Article } from '@/types/dictation';
 import { memo } from 'react';
 
-export type FeedbackPanelProps = {
+type AIFeedbackPanelProps = {
   show: boolean;
-  feedback: string;
-  transcript: string;
-  ariaLiveId?: string;
+  sentence: Article['sentences'][number];
   selfAssessedComprehension: number;
 };
 
-function FeedbackPanelBase({
+function AIFeedbackPanelBase({
   show,
-  feedback,
-  transcript,
-  ariaLiveId,
+  sentence,
   selfAssessedComprehension,
-}: FeedbackPanelProps) {
+}: AIFeedbackPanelProps) {
   if (!show) return null;
+
+  const aiFeedback = sentence.submission?.feedback_md ?? '';
 
   // 表示用マップ
   const compMap: Record<number, string> = {
@@ -32,16 +31,16 @@ function FeedbackPanelBase({
     <div
       className='mt-4 rounded-md border p-3'
       aria-live='polite'
-      id={ariaLiveId}
+      id={`sentence-${sentence.id}-feedback`}
     >
       <div className='mb-2 text-sm font-semibold text-gray-700'>AI回饋</div>
       <div className='prose prose-sm max-w-none'>
-        <MarkdownRenderer markdown={feedback} />
+        <MarkdownRenderer markdown={aiFeedback} />
       </div>
 
       <div className='mt-4 rounded-md bg-gray-50 p-3'>
         <div className='mb-1 text-xs font-semibold text-gray-500'>音聲原文</div>
-        <p className='whitespace-pre-wrap text-gray-800'>{transcript}</p>
+        <p className='whitespace-pre-wrap text-gray-800'>{sentence.content}</p>
       </div>
 
       <div className='mt-2 flex gap-4 justify-end px-2'>
@@ -54,4 +53,4 @@ function FeedbackPanelBase({
   );
 }
 
-export const FeedbackPanel = memo(FeedbackPanelBase);
+export const AIFeedbackPanel = memo(AIFeedbackPanelBase);

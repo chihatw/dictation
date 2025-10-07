@@ -1,7 +1,7 @@
 'use server';
 
 import { createClientAction } from '@/lib/supabase/server-action';
-import { Tag } from '@/types/dictation';
+import { Article } from '@/types/dictation';
 
 export async function setSubmissionTeacherFeedback(
   submissionId: string,
@@ -48,7 +48,9 @@ export async function addFeedbackTag(submissionId: string, label: string) {
     submission_id: data.submission_id,
     tag_master_id: data.tag_master_id,
     label: data.tag?.label ?? '',
-  } satisfies Tag;
+  } satisfies NonNullable<
+    Article['sentences'][number]['submission']
+  >['tags'][number];
 }
 
 export async function deleteFeedbackTag(tagId: string) {

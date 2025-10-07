@@ -6,7 +6,6 @@ import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
 import { useJournalModal } from '@/hooks/useJournalModal';
 import { supabase } from '@/lib/supabase/browser';
-import { Metrics } from '@/types/dictation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -38,12 +37,20 @@ export default function ArticlePage() {
 
   const handleSubmitOne = async (
     sentenceId: string,
-    metrics: Metrics,
+    playsCount: number,
+    elapsedMsSinceItemView: number,
+    elapsedMsSinceFirstPlay: number,
     selfAssessedComprehension: number
   ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
     if (!s) return;
-    const result = await submitOne(s, metrics, selfAssessedComprehension);
+    const result = await submitOne(
+      s,
+      playsCount,
+      elapsedMsSinceItemView,
+      elapsedMsSinceFirstPlay,
+      selfAssessedComprehension
+    );
 
     if (result?.completed && result.articleId) {
       openJournalModal(result.articleId);
@@ -72,12 +79,7 @@ export default function ArticlePage() {
 
   return (
     <div className='min-h-screen'>
-      <ArticleHeader
-        title={article.title}
-        audioPathFull={article.audio_path_full ?? null}
-        isAdmin={isAdmin}
-        collectionId={article.collection_id}
-      />
+      <ArticleHeader article={article} isAdmin={isAdmin} />
 
       <main className='mx-auto max-w-4xl px-4 py-6'>
         {article.journal && (

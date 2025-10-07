@@ -1,6 +1,6 @@
 'use client';
 
-import type { Article, Metrics, Tag } from '@/types/dictation';
+import type { Article } from '@/types/dictation';
 import Link from 'next/link';
 import SentenceItem from './sentence/SentenceItem';
 
@@ -12,7 +12,9 @@ type Props = {
   onChangeAnswer: (id: string, val: string) => void;
   onSubmitOne: (
     sentenceId: string,
-    metrics: Metrics,
+    playsCount: number,
+    elapsedMsSinceItemView: number,
+    elapsedMsSinceFirstPlay: number,
     selfAssessedComprehension: number
   ) => void;
   isAdmin: boolean;
@@ -30,19 +32,12 @@ export default function SentencesList({
   return (
     <div className='space-y-5'>
       {article.sentences.map((s) => {
-        const tags: Tag[] = s.submission?.tags ?? []; // ← 常に配列
-        const feedback = s.submission?.feedback_md ?? null; // ← 文字列 or null
-        const teacherFeedback = s.submission?.teacher_feedback ?? null; // ← 文字列 or null
-
         return (
           <div key={s.id} className='space-y-2'>
             <SentenceItem
               sentence={s}
               value={answers[s.id] ?? ''}
               isSubmitted={submitted[s.id] ?? false}
-              feedback={feedback}
-              teacherFeedback={teacherFeedback}
-              tags={tags} // ← items ではなく tags を渡す
               onChange={(val) => onChangeAnswer(s.id, val)}
               onSubmit={onSubmitOne}
               submitting={loadingMap[s.id] ?? false}

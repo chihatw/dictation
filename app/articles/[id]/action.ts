@@ -12,20 +12,15 @@ type CreateRes = {
   article_id: string;
 };
 
-/** クライアントから渡る入力の検証スキーマ */
 const schema = z.object({
   sentenceId: z.string().uuid(),
   sentenceScript: z.string().min(1),
   userAnswer: z.string().min(1),
-  metrics: z.object({
-    playsCount: z.number().int().nonnegative(),
-    listenedFullCount: z.number().int().nonnegative(),
-    elapsedMsSinceItemView: z.number().int().nonnegative(),
-    elapsedMsSinceFirstPlay: z.number().int().nonnegative(),
-  }),
-  selfAssessedComprehension: z.number().int().min(1).max(4), // 1=低, 4=高+運用可
+  playsCount: z.number().int().nonnegative(),
+  elapsedMsSinceItemView: z.number().int().nonnegative(),
+  elapsedMsSinceFirstPlay: z.number().int().nonnegative(),
+  selfAssessedComprehension: z.number().int().min(1).max(4),
 });
-
 export type CreateFeedbackAndLogArgs = z.infer<typeof schema>;
 
 export async function createFeedbackAndLogAction(input: unknown) {
@@ -36,7 +31,9 @@ export async function createFeedbackAndLogAction(input: unknown) {
     sentenceId,
     sentenceScript,
     userAnswer,
-    metrics,
+    playsCount,
+    elapsedMsSinceItemView,
+    elapsedMsSinceFirstPlay,
     selfAssessedComprehension,
   } = parsed.data;
 
@@ -44,7 +41,6 @@ export async function createFeedbackAndLogAction(input: unknown) {
   const { data: _data } = await supabase.auth.getUser();
   if (!_data.user?.id) return { ok: false as const, error: '未認証です。' };
 
-  // フィードバック生成（失敗時はフォールバック文言）
   let feedbackMarkdown = '';
   try {
     const prompt =
@@ -61,15 +57,14 @@ export async function createFeedbackAndLogAction(input: unknown) {
     feedbackMarkdown = '（系統忙碌，稍後自動補上老師回饋）';
   }
 
-  // DB内Txで 保存 + ログ
   const { data, error } = await supabase
     .rpc('create_feedback_and_log', {
       p_sentence_id: sentenceId,
       p_answer: userAnswer,
       p_feedback_md: feedbackMarkdown,
-      p_plays_count: metrics.playsCount,
-      p_elapsed_ms_since_item_view: metrics.elapsedMsSinceItemView,
-      p_elapsed_ms_since_first_play: metrics.elapsedMsSinceFirstPlay,
+      p_plays_count: playsCount,
+      p_elapsed_ms_since_item_view: elapsedMsSinceItemView,
+      p_elapsed_ms_since_first_play: elapsedMsSinceFirstPlay,
       p_self_comp: selfAssessedComprehension,
     })
     .single<CreateRes>();

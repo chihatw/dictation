@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/browser';
-import type { Article, Sentence, Tag } from '@/types/dictation';
+import type { Article } from '@/types/dictation';
 
 type RpcArticle = {
   id: string;
@@ -22,7 +22,7 @@ type RpcArticle = {
       id: string;
       answer: string | null;
       feedback_md: string | null;
-      teacher_feedback: string | null; // ←統合後に追加
+      teacher_feedback: string | null;
       created_at: string;
       self_assessed_comprehension: number | null;
       tags: {
@@ -30,7 +30,11 @@ type RpcArticle = {
         created_at: string;
         tag_master_id: string;
         label: string;
+        submission_id: string;
       }[];
+      plays_count: number;
+      elapsed_ms_since_item_view: number;
+      elapsed_ms_since_first_play: number;
     } | null;
   }[];
 };
@@ -54,30 +58,7 @@ export async function fetchArticleWithSentences(
     journal: a.journal,
     audio_path_full: a.audio_path_full,
     collection_id: a.collection_id,
-    sentences: a.sentences.map(
-      (s): Sentence => ({
-        id: s.id,
-        seq: s.seq,
-        content: s.content,
-        created_at: s.created_at,
-        audio_path: s.audio_path,
-        // submission に teacher_feedback と tags が既に内包されている
-        submission: s.submission
-          ? {
-              id: s.submission.id,
-              answer: s.submission.answer,
-              feedback_md: s.submission.feedback_md,
-              teacher_feedback: s.submission.teacher_feedback,
-              created_at: s.submission.created_at,
-              self_assessed_comprehension:
-                s.submission.self_assessed_comprehension,
-              tags: (Array.isArray(s.submission.tags)
-                ? s.submission.tags
-                : []) as Tag[],
-            }
-          : null,
-      })
-    ),
+    sentences: a.sentences,
   };
 
   return article;
