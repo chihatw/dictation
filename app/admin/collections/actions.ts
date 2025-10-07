@@ -20,7 +20,7 @@ export async function createCollection(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath('/admin/collections');
-  redirect('/admin/collections');
+  redirect(`/admin/collections?user_id=${user_id}`);
 }
 
 // 更新
@@ -42,7 +42,7 @@ export async function updateCollection(formData: FormData) {
   if (error) throw new Error(error.message);
 
   revalidatePath('/admin/collections');
-  redirect('/admin/collections');
+  redirect(`/admin/collections?user_id=${user_id}`);
 }
 
 // 削除
