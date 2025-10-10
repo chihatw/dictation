@@ -1,66 +1,37 @@
 // types/dictation.ts
 
-type Tag = {
-  id: string;
-  created_at: string;
-  submission_id: string;
-  tag_master_id: string | null;
-  label: string;
-};
+import { Tables } from './supabase';
 
-type Submission = {
-  id: string;
-  answer: string | null;
-  feedback_md: string | null;
-  teacher_feedback: string | null;
-  self_assessed_comprehension: number | null;
-  created_at: string;
+type UserDb = Tables<'users'>;
+type ArticleDb = Tables<'dictation_articles'>;
+type SentenceDb = Tables<'dictation_sentences'>;
+type SubmissionDb = Tables<'dictation_submissions'>;
+type TagDb = Tables<'dictation_teacher_feedback_tags'>;
+type TagMasterDb = Tables<'dictation_tag_master'>;
+type JournalDb = Tables<'dictation_journals'>;
+
+type User = UserDb;
+type Article = ArticleDb;
+export type Journal = JournalDb;
+
+export type UserInput = Omit<User, 'created_at'>;
+
+type Tag = TagDb & Pick<TagMasterDb, 'label'>;
+
+type Submission = Omit<SubmissionDb, 'sentence_id'> & {
   tags: Tag[];
-  plays_count: number;
-  elapsed_ms_since_item_view: number;
-  elapsed_ms_since_first_play: number;
 };
 
-type Sentence = {
-  id: string;
-  seq: number;
-  content: string;
-  created_at: string;
-  audio_path?: string | null;
+type Sentence = Omit<SentenceDb, 'article_id'> & {
   submission?: Submission | null;
 };
 
-export type Article = {
-  id: string;
-  uid: string;
-  title: string; // todo title -> subtitle
-  created_at: string;
-  journal: { body: string; created_at: string } | null;
-  sentences: Sentence[];
-  audio_path_full?: string | null;
-  collection_id: string;
-};
+export type RpcArticle = Omit<Article, 'seq'> &
+  Pick<UserDb, 'uid'> & {
+    // title: string; // todo title -> subtitle
+    sentences: Sentence[];
+  };
 
-export type SubmissionAdminData = {
-  id: string;
-  seq: number;
-  content: string;
-  audio_path: string | null;
-  article: {
-    id: string;
-    subtitle: string;
-    audio_path_full: string | null;
-  };
-  submission: {
-    id: string;
-    created_at: string;
-    answer: string | null;
-    self_assessed_comprehension: number | null;
-    feedback_md: string | null;
-    teacher_feedback: string | null;
-    plays_count: number;
-    elapsed_ms_since_item_view: number;
-    elapsed_ms_since_first_play: number;
-    tags: Tag[];
-  };
-};
+export type SubmissionAdminData = Omit<Sentence, 'created_at'> & {
+  article: Pick<RpcArticle, 'id' | 'audio_path_full'> & { subtitle: string };
+} & { submission: Submission };

@@ -1,13 +1,13 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { Article } from '@/types/dictation';
+import { RpcArticle } from '@/types/dictation';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { UrlPlayButton } from './audio/UrlPlayButton';
 
 type Props = {
-  article: Article;
+  article: RpcArticle;
   isAdmin?: boolean;
 };
 
@@ -33,7 +33,7 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
           </Link>
         </div>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>
-          {article.title}
+          {article.subtitle}
         </h1>
 
         {isAdmin && (

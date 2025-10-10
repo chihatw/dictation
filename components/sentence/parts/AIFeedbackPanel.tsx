@@ -1,12 +1,12 @@
 'use client';
 
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import { Article } from '@/types/dictation';
+import { RpcArticle } from '@/types/dictation';
 import { memo } from 'react';
 
 type AIFeedbackPanelProps = {
   show: boolean;
-  sentence: Article['sentences'][number];
+  sentence: RpcArticle['sentences'][number];
   selfAssessedComprehension: number;
 };
 

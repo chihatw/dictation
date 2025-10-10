@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { UserSelect } from '../_components/UserSelect';
 import { deleteCollection } from './actions';
 
-type User = { uid: string; display: string };
 type Collection = {
   id: string;
   created_at: string;
@@ -26,7 +25,7 @@ export default async function Page(props: {
   // users
   const { data: users, error: ue } = await supabase
     .from('users')
-    .select('uid, display')
+    .select('*')
     .order('created_at', { ascending: true });
   if (ue) throw new Error(ue.message);
 
@@ -41,14 +40,14 @@ export default async function Page(props: {
       ).data ?? []
     : [];
 
-  const nameByUid = new Map(users!.map((u: User) => [u.uid, u.display]));
+  const nameByUid = new Map(users!.map((u) => [u.uid, u.display]));
 
   return (
     <div className='space-y-4 max-w-3xl mx-auto pb-6'>
       <h1 className='text-xl font-semibold'>ユーザー別課題一覧</h1>
 
       <div className='flex gap-3 items-end'>
-        <UserSelect users={users as User[]} selectedUserId={selectedUserId} />
+        <UserSelect users={users} selectedUserId={selectedUserId} />
         <Link
           href={`/admin/collections/new${
             selectedUserId ? `?user_id=${selectedUserId}` : ''

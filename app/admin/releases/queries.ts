@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
+import { UserInput } from '@/types/dictation';
 
-export type AdminUser = { uid: string; display: string };
 export type AdminCollection = { id: string; title: string };
 export type AdminReleaseRow = {
   id: string;
@@ -24,7 +24,7 @@ type AdminReleaseRowRPC = {
   collection_title: string;
 };
 
-export async function listUsers(): Promise<AdminUser[]> {
+export async function listUsers(): Promise<UserInput[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('users')

@@ -1,11 +1,11 @@
 'use client';
 
-import type { Article } from '@/types/dictation';
+import type { RpcArticle } from '@/types/dictation';
 import Link from 'next/link';
 import SentenceItem from './sentence/SentenceItem';
 
 type Props = {
-  article: Article;
+  article: RpcArticle;
   answers: Record<string, string>;
   submitted: Record<string, boolean>;
   loadingMap: Record<string, boolean>;

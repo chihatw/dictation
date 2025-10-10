@@ -5,12 +5,12 @@ import {
   addFeedbackTag,
   deleteFeedbackTag,
 } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
-import type { Article } from '@/types/dictation';
+import type { RpcArticle } from '@/types/dictation';
 import { useCallback, useState, useTransition } from 'react';
 import { TeacherFeedbackEditor } from './TeacherFeedbackEditor';
 
 type Props = {
-  submission: NonNullable<Article['sentences'][number]['submission']>;
+  submission: NonNullable<RpcArticle['sentences'][number]['submission']>;
 };
 
 export function AdminTeacherFeedbackClient({ submission }: Props) {

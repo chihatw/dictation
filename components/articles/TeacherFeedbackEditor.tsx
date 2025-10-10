@@ -2,13 +2,13 @@
 
 import { setSubmissionTeacherFeedback } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import type { Article } from '@/types/dictation';
+import type { RpcArticle } from '@/types/dictation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { Tags } from '../tag/Tags';
 import TagAdder from './TagAdder';
 
 type TagItem = NonNullable<
-  Article['sentences'][number]['submission']
+  RpcArticle['sentences'][number]['submission']
 >['tags'][number];
 
 export function TeacherFeedbackEditor({

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "typewatch": "tsc --noEmit --watch"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.3.0",

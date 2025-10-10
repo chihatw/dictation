@@ -2,11 +2,15 @@
 
 import { createFeedbackAndLogAction } from '@/app/articles/[id]/action';
 import { fetchArticleWithSentences } from '@/lib/dictation/queries';
-import type { Article } from '@/types/dictation';
+import type { Journal, RpcArticle } from '@/types/dictation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function useArticle(articleId: string | undefined) {
-  const [article, setArticle] = useState<Article | null>(null);
+  const [article, setArticle] = useState<RpcArticle | null>(null);
+  const [journal, setJournal] = useState<Pick<
+    Journal,
+    'body' | 'created_at'
+  > | null>(null);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
@@ -27,17 +31,19 @@ export function useArticle(articleId: string | undefined) {
       if (!data) {
         setErrMsg('記事の取得に失敗しました。');
         setArticle(null);
+        setJournal(null);
         setLoading(false);
         return;
       }
 
-      setArticle(data);
+      setArticle(data.article);
+      setJournal(data.journal);
 
       // 既存回答を状態へ
       const nextAnswers: Record<string, string> = {};
       const nextSubmitted: Record<string, boolean> = {};
 
-      for (const s of data.sentences ?? []) {
+      for (const s of data.article.sentences ?? []) {
         const one = s.submission ?? null;
         nextAnswers[s.id] = one?.answer ?? '';
         nextSubmitted[s.id] = !!one;
@@ -59,7 +65,7 @@ export function useArticle(articleId: string | undefined) {
 
   const submitOne = useCallback(
     async (
-      s: Article['sentences'][number],
+      s: RpcArticle['sentences'][number],
       plays_count: number,
       elapsed_ms_since_item_view: number,
       elapsed_ms_since_first_play: number,
@@ -99,6 +105,7 @@ export function useArticle(articleId: string | undefined) {
   return {
     // データ
     article,
+    journal,
     loading,
     errMsg,
     // 派生

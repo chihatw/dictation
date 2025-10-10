@@ -8,15 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UserInput } from '@/types/dictation';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
-type User = { uid: string; display: string };
 
 export function UserSelect({
   users,
   selectedUserId,
 }: {
-  users: User[];
+  users: UserInput[];
   selectedUserId?: string;
 }) {
   const router = useRouter();

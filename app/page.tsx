@@ -8,16 +8,9 @@ import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
 import { LinkIcon } from 'lucide-react';
 
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
+import { Journal } from '@/types/dictation';
 import Link from 'next/link';
 import { Vote } from './journals/Vote';
-
-type JournalItem = {
-  id: string;
-  created_at: string;
-  article_id: string;
-  body: string;
-  rating_score: number;
-};
 
 export default async function Home() {
   const supabase = await createClient();
@@ -43,8 +36,8 @@ export default async function Home() {
   const timeProgress =
     typeof row?.time_progress_pct === 'number' ? row.time_progress_pct : 0;
 
-  const journals: JournalItem[] = Array.isArray(row?.journals)
-    ? (row!.journals as JournalItem[])
+  const journals: Journal[] = Array.isArray(row?.journals)
+    ? (row!.journals as Journal[])
     : [];
 
   return (
