@@ -17,7 +17,7 @@ export default async function Page({
   const { id } = await params;
   const supabase = await createClient();
 
-  // コレクション存在確認（任意）
+  // 課題存在確認（任意）
   const { data: col } = await supabase
     .from('dictation_assignments')
     .select('id, title')
@@ -25,7 +25,7 @@ export default async function Page({
     .maybeSingle();
   if (!col) return notFound();
 
-  const { data, error } = await supabase.rpc('get_collection_article_tags', {
+  const { data, error } = await supabase.rpc('get_assignment_article_tags', {
     p_assignment_id: id,
   });
   if (error) throw new Error(error.message);

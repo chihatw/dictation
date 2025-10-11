@@ -42,7 +42,7 @@ export default function AssignmentForm({
           defaultValue={defaultValues?.title ?? ''}
           required
           className='w-full rounded-md border px-3 py-2'
-          placeholder='コレクション名'
+          placeholder='課題名'
         />
       </div>
 

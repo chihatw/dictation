@@ -797,7 +797,7 @@ export type Database = {
         Args: { p_article_id: string }
         Returns: Json
       }
-      get_collection_article_tags: {
+      get_assignment_article_tags: {
         Args: { p_assignment_id: string }
         Returns: {
           created_at: string

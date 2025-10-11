@@ -33,7 +33,7 @@ export default async function Page() {
       <main className='p-6 space-y-4 max-w-2xl mx-auto w-full bg-white rounded-lg shadow-md mt-10'>
         {!cols || cols.length === 0 ? (
           <div className='rounded border p-4 text-sm text-gray-600'>
-            まだコレクションがありません。
+            まだ課題がありません。
           </div>
         ) : (
           <ul className='space-y-2'>

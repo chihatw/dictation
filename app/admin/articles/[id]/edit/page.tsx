@@ -30,7 +30,7 @@ export default async function Page(props: PageProps) {
           href={`/admin/articles?assignment_id=${art.assignment_id}`}
           className='underline hover:opacity-80'
         >
-          コレクションの記事一覧に戻る
+          課題の記事一覧に戻る
         </Link>
       </div>
       <h1 className='text-xl font-semibold'>subtitle 編集</h1>
