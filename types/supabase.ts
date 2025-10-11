@@ -155,7 +155,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "dictation_articles_collection_fkey"
+            foreignKeyName: "dictation_articles_assignment_fkey"
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "dictation_assignments"
@@ -243,7 +243,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "dictation_releases_collection_id_fkey"
+            foreignKeyName: "dictation_releases_assignment_id_fkey"
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "dictation_assignments"

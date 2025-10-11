@@ -1,4 +1,4 @@
-// app/collections/[id]/page.tsx
+// app/assignments/[id]/page.tsx
 export const dynamic = 'force-dynamic';
 
 import Journal from '@/components/journal/Journal';

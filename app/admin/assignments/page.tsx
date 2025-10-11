@@ -1,4 +1,4 @@
-// app/admin/collections/page.tsx
+// app/admin/assignments/page.tsx
 export const dynamic = 'force-dynamic';
 
 import { createClient } from '@/lib/supabase/server';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import { Assignment } from '@/types/dictation';
 import { UserSelect } from '../_components/UserSelect';
-import { deleteCollection } from './actions';
+import { deleteAssignment } from './actions';
 
 export default async function Page(props: {
   searchParams: Promise<{ user_id?: string }>;
@@ -23,7 +23,7 @@ export default async function Page(props: {
     .order('created_at', { ascending: true });
   if (ue) throw new Error(ue.message);
 
-  // collections: ユーザー未選択なら空配列
+  // assignments: ユーザー未選択なら空配列
   const cols: Pick<Assignment, 'id' | 'created_at' | 'title' | 'user_id'>[] =
     selectedUserId
       ? (
@@ -44,7 +44,7 @@ export default async function Page(props: {
       <div className='flex gap-3 items-end'>
         <UserSelect users={users} selectedUserId={selectedUserId} />
         <Link
-          href={`/admin/collections/new${
+          href={`/admin/assignments/new${
             selectedUserId ? `?user_id=${selectedUserId}` : ''
           }`}
           className='ml-auto rounded-md border px-4 h-10 flex items-center hover:bg-gray-50'
@@ -79,12 +79,12 @@ export default async function Page(props: {
                     文章一覧
                   </Link>
                   <Link
-                    href={`/admin/collections/${col.id}?user_id=${selectedUserId}`}
+                    href={`/admin/assignments/${col.id}?user_id=${selectedUserId}`}
                     className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
                   >
                     タイトル編集
                   </Link>
-                  <form action={deleteCollection}>
+                  <form action={deleteAssignment}>
                     <input type='hidden' name='id' value={col.id} />
                     <button
                       type='submit'

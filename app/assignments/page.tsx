@@ -39,7 +39,7 @@ export default async function Page() {
           <ul className='space-y-2'>
             {cols.map((c) => (
               <li key={c.id} className='rounded border p-3 hover:bg-gray-50'>
-                <Link href={`/collections/${c.id}`} className='block'>
+                <Link href={`/assignments/${c.id}`} className='block'>
                   <div className='flex items-center gap-3'>
                     {/* 固定幅で日付。tabular-numsで桁幅を統一 */}
                     <div className='w-18 shrink-0 text-sm text-gray-500 tabular-nums'>

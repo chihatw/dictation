@@ -2,7 +2,7 @@
 
 type DefaultValues = { id?: string; title?: string; user_id?: string };
 
-export default function CollectionForm({
+export default function AssignmentForm({
   defaultValues,
   action,
   submitLabel,

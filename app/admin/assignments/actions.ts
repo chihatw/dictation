@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 // 作成
-export async function createCollection(formData: FormData) {
+export async function createAssignment(formData: FormData) {
   const supabase = await createClientAction();
   const title = String(formData.get('title') ?? '').trim();
   const user_id = String(formData.get('user_id') ?? '');
@@ -19,12 +19,12 @@ export async function createCollection(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
-  revalidatePath('/admin/collections');
-  redirect(`/admin/collections?user_id=${user_id}`);
+  revalidatePath('/admin/assignments');
+  redirect(`/admin/assignments?user_id=${user_id}`);
 }
 
 // 更新
-export async function updateCollection(formData: FormData) {
+export async function updateAssignment(formData: FormData) {
   const supabase = await createClientAction();
   const id = String(formData.get('id') ?? '');
   const title = String(formData.get('title') ?? '').trim();
@@ -41,12 +41,12 @@ export async function updateCollection(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
-  revalidatePath('/admin/collections');
-  redirect(`/admin/collections?user_id=${user_id}`);
+  revalidatePath('/admin/assignments');
+  redirect(`/admin/assignments?user_id=${user_id}`);
 }
 
 // 削除
-export async function deleteCollection(formData: FormData) {
+export async function deleteAssignment(formData: FormData) {
   const supabase = await createClientAction();
   const id = String(formData.get('id') ?? '');
   if (!id) throw new Error('id is required');
@@ -58,5 +58,5 @@ export async function deleteCollection(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
-  revalidatePath('/admin/collections');
+  revalidatePath('/admin/assignments');
 }

@@ -4,7 +4,7 @@ import { jstLocalToUtcIso } from '@/utils/jstLocalToUtcIso';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createRelease } from '../actions';
-import { listCollectionsByUser, listUsers } from '../queries';
+import { listAssignmentsByUser, listUsers } from '../queries';
 import { UserSelect } from './UserSelect';
 
 export default async function Page(props: {
@@ -13,8 +13,8 @@ export default async function Page(props: {
   const sp = await props.searchParams;
   const initialUserId = sp.user_id ?? '';
   const users = await listUsers();
-  const collections = initialUserId
-    ? await listCollectionsByUser(initialUserId)
+  const assignments = initialUserId
+    ? await listAssignmentsByUser(initialUserId)
     : [];
 
   async function createAction(formData: FormData) {
@@ -62,9 +62,9 @@ export default async function Page(props: {
                 defaultValue=''
               >
                 <option value='' disabled>
-                  -- select collection --
+                  -- select assignment --
                 </option>
-                {collections.map((c) => (
+                {assignments.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title}
                   </option>

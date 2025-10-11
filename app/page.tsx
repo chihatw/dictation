@@ -87,7 +87,7 @@ export default async function Home() {
                 所有作業都結束了，辛苦了！🎉
               </div>
               <Link
-                href={`/collections/${row.assignment_id}`}
+                href={`/assignments/${row.assignment_id}`}
                 className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
               >
                 {`查看「${row.title ?? ''}」的成果`}

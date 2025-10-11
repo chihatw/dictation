@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import CollectionForm from '../_CollectionForm';
-import { createCollection } from '../actions';
+import AssignmentForm from '../_AssignmentForm';
+import { createAssignment } from '../actions';
 
-export default async function NewCollectionPage(props: {
+export default async function Page(props: {
   searchParams: Promise<{ user_id?: string }>;
 }) {
   const sp = await props.searchParams;
@@ -22,16 +22,16 @@ export default async function NewCollectionPage(props: {
   return (
     <div className='space-y-4'>
       <Link
-        href={`/admin/collections?user_id=${user.uid}`}
+        href={`/admin/assignments?user_id=${user.uid}`}
         className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-800 hover:bg-gray-50 mb-2'
       >
         <ChevronLeft className='h-4 w-4' />
         <span>課題一覧</span>
       </Link>
       <h2 className='text-xl font-medium'>課題作成</h2>
-      <CollectionForm
+      <AssignmentForm
         defaultValues={{ user_id: user.uid }}
-        action={createCollection}
+        action={createAssignment}
         submitLabel='作成'
         userDisplay={user.display}
       />

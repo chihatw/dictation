@@ -22,7 +22,7 @@ export async function listReleasesByUser(
   return data ?? [];
 }
 
-export async function listCollectionsByUser(
+export async function listAssignmentsByUser(
   userId: string
 ): Promise<Pick<Assignment, 'id' | 'title'>[]> {
   const supabase = await createClient();

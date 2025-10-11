@@ -26,7 +26,7 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
             <ChevronLeft className='h-4 w-4' /> 返回首頁
           </Link>
           <Link
-            href={`/collections/${article.assignment_id}`}
+            href={`/assignments/${article.assignment_id}`}
             className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             <ChevronLeft className='h-4 w-4' /> 返回主題頁

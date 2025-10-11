@@ -23,7 +23,7 @@ export default async function Page(props: PageProps) {
           assignment_id が指定されていません。課題一覧から選択してください。
         </p>
         <Link
-          href='/admin/collections'
+          href='/admin/assignments'
           className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
         >
           課題一覧へ
@@ -32,7 +32,6 @@ export default async function Page(props: PageProps) {
     );
   }
 
-  // collection
   const { data: col, error: colErr } = await supabase
     .from('dictation_assignments')
     .select('id, title')
@@ -47,7 +46,7 @@ export default async function Page(props: PageProps) {
         <h1 className='text-xl font-semibold'>課題文章一覧</h1>
         <p className='text-sm text-red-600'>指定の課題が見つかりません。</p>
         <Link
-          href='/admin/collections'
+          href='/admin/assignments'
           className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
         >
           課題一覧へ
@@ -76,7 +75,7 @@ export default async function Page(props: PageProps) {
         <div className='ml-auto flex items-center gap-2'>
           {/* 追加: 戻るボタン */}
           <Link
-            href={`/admin/collections?user_id=${userId}`}
+            href={`/admin/assignments?user_id=${userId}`}
             className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
           >
             ユーザー別課題一覧に戻る
