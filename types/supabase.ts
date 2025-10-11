@@ -776,12 +776,12 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: {
           collection_id: string
-          collection_title: string
           created_at: string
+          display: string
           due_at: string
           id: string
           published_at: string
-          user_display: string
+          title: string
           user_id: string
         }[]
       }
@@ -844,7 +844,7 @@ export type Database = {
           title: string
         }[]
       }
-      get_submission_admin: {
+      get_submission_by_id: {
         Args: { p_submission_id: string }
         Returns: Json
       }

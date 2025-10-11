@@ -1,7 +1,7 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { RpcArticle } from '@/types/dictation';
+import { SentenceWithSubmission } from '@/types/dictation';
 import { memo, useMemo, useRef, useState } from 'react';
 
 import { TeacherFeedbackPanel } from '../articles/TeacherFeedbackPanel';
@@ -12,7 +12,7 @@ import { SelfAssessmentSelectorCompact } from './parts/SelfAssessmentSelector';
 import { SubmitButton } from './parts/SubmitButton';
 
 type SentenceItemProps = {
-  sentence: RpcArticle['sentences'][number];
+  sentence: SentenceWithSubmission;
   value: string;
   isSubmitted: boolean;
   submitting: boolean;
@@ -125,7 +125,7 @@ function SentenceItemBase({
         selfAssessedComprehension={displaySac}
       />
       <div className='mt-3'>
-        <TeacherFeedbackPanel submission={sentence.submission} />
+        <TeacherFeedbackPanel submission={sentence.submission || null} />
       </div>
     </section>
   );

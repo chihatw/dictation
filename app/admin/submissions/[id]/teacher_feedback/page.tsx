@@ -3,7 +3,7 @@ import { AdminTeacherFeedbackClient } from '@/components/articles/AdminTeacherFe
 import { HeaderRow } from '@/components/sentence/parts/HeaderRow';
 import { createClient } from '@/lib/supabase/server';
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { SubmissionAdminData } from '@/types/dictation';
+import { SubmissionWithSubmissionAndArticle } from '@/types/dictation';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -15,8 +15,8 @@ export default async function Page(props: {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .rpc('get_submission_admin', { p_submission_id: id })
-    .single<SubmissionAdminData>();
+    .rpc('get_submission_by_id', { p_submission_id: id })
+    .single<SubmissionWithSubmissionAndArticle>();
   if (error) throw new Error(error.message);
   if (!data) return notFound();
 
@@ -47,10 +47,10 @@ export default async function Page(props: {
 
         <div className='mt-3 text-sm text-slate-600'>
           <span className='font-medium'>回答：</span>
-          {s.submission.answer}
+          {s.submission!.answer}
         </div>
 
-        <AdminTeacherFeedbackClient submission={s.submission} />
+        <AdminTeacherFeedbackClient submission={s.submission!} />
       </section>
     </div>
   );

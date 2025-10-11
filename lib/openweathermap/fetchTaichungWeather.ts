@@ -1,8 +1,4 @@
-export type Weather = {
-  tempC?: number;
-  desc?: string;
-  main?: string; // Clear, Clouds, Rain, etc.
-};
+import { Weather } from '@/types/dictation';
 
 const LOCATIONS = {
   YUNLIN: { lat: 23.7094, lon: 120.4314 },

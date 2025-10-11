@@ -5,7 +5,7 @@ import { GlobalPlayBar } from '@/components/audio/GlobalPlayBar';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { memo, useEffect, useState } from 'react';
 
-export type HeaderRowProps = {
+type HeaderRowProps = {
   id: string;
   seq: number;
   audioUrl?: string;

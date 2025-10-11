@@ -2,15 +2,17 @@
 
 import { createFeedbackAndLogAction } from '@/app/articles/[id]/action';
 import { fetchArticleWithSentences } from '@/lib/dictation/queries';
-import type { Journal, RpcArticle } from '@/types/dictation';
+import {
+  ArticleWithSentences,
+  Journal,
+  SentenceWithSubmission,
+} from '@/types/dictation';
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function useArticle(articleId: string | undefined) {
-  const [article, setArticle] = useState<RpcArticle | null>(null);
-  const [journal, setJournal] = useState<Pick<
-    Journal,
-    'body' | 'created_at'
-  > | null>(null);
+  const [article, setArticle] = useState<ArticleWithSentences | null>(null);
+  const [journal, setJournal] = useState<Journal | null>(null);
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
@@ -65,7 +67,7 @@ export function useArticle(articleId: string | undefined) {
 
   const submitOne = useCallback(
     async (
-      s: RpcArticle['sentences'][number],
+      s: SentenceWithSubmission,
       plays_count: number,
       elapsed_ms_since_item_view: number,
       elapsed_ms_since_first_play: number,

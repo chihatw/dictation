@@ -4,19 +4,10 @@ export const dynamic = 'force-dynamic';
 import Journal from '@/components/journal/Journal';
 import { Tags } from '@/components/tag/Tags';
 import { createClient } from '@/lib/supabase/server';
+import { ArticleWithTagsAndJournal } from '@/types/dictation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-
-type Row = {
-  id: string;
-  subtitle: string;
-  created_at: string;
-  seq: number;
-  tags: string[];
-  journal_body: string | null;
-  journal_created_at: string | null;
-};
 
 export default async function Page({
   params,
@@ -39,7 +30,7 @@ export default async function Page({
   });
   if (error) throw new Error(error.message);
 
-  const items = (data ?? []) as Row[];
+  const items = (data ?? []) as ArticleWithTagsAndJournal[];
 
   return (
     <div className='min-h-screen'>

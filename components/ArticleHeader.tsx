@@ -1,13 +1,13 @@
 'use client';
 
 import { toPublicUrl } from '@/lib/tts/publicUrl';
-import { RpcArticle } from '@/types/dictation';
+import { ArticleWithSentences } from '@/types/dictation';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { UrlPlayButton } from './audio/UrlPlayButton';
 
 type Props = {
-  article: RpcArticle;
+  article: ArticleWithSentences;
   isAdmin?: boolean;
 };
 
@@ -33,12 +33,12 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
           </Link>
         </div>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>
-          {article.subtitle}
+          {article.title} {article.subtitle}
         </h1>
 
         {isAdmin && (
           <Link
-            href={`/admin/articles?collection_id=${article.collection_id}&user_id=${article.uid}`}
+            href={`/admin/articles?collection_id=${article.collection_id}&user_id=${article.user_id}`}
             className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             管理者課題詳細ページ

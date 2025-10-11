@@ -2,13 +2,13 @@
 'use client';
 
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import { RpcArticle } from '@/types/dictation';
+import { SubmissionWithTags } from '@/types/dictation';
 import { Tags } from '../tag/Tags';
 
 export function TeacherFeedbackPanel({
   submission,
 }: {
-  submission: RpcArticle['sentences'][number]['submission'];
+  submission: SubmissionWithTags | null;
 }) {
   const teacherFeedback = submission?.teacher_feedback;
   const tags = submission?.tags || [];

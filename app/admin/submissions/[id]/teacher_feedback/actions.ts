@@ -1,7 +1,7 @@
 'use server';
 
 import { createClientAction } from '@/lib/supabase/server-action';
-import { RpcArticle } from '@/types/dictation';
+import { TagWithLabel } from '@/types/dictation';
 
 export async function setSubmissionTeacherFeedback(
   submissionId: string,
@@ -43,14 +43,9 @@ export async function addFeedbackTag(submissionId: string, label: string) {
   if (error) throw new Error(error.message);
 
   return {
-    id: data.id,
-    created_at: data.created_at,
-    submission_id: data.submission_id,
-    tag_master_id: data.tag_master_id,
-    label: data.tag?.label ?? '',
-  } satisfies NonNullable<
-    RpcArticle['sentences'][number]['submission']
-  >['tags'][number];
+    ...data,
+    label: data.tag?.label,
+  } as TagWithLabel;
 }
 
 export async function deleteFeedbackTag(tagId: string) {

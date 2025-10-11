@@ -1,4 +1,4 @@
-import { Weather } from '@/lib/openweathermap/fetchTaichungWeather';
+import { Weather } from '@/types/dictation';
 import { WeatherPanel } from './WeatherPanel';
 
 export default function TodayPanel({

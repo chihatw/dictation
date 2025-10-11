@@ -77,10 +77,8 @@ export default async function Page(props: {
                     </div>
                   </div>
                   <div className='flex-1'>
-                    <div className='text-sm text-gray-500'>
-                      {r.user.display}
-                    </div>
-                    <div className='font-medium'>{r.collection.title}</div>
+                    <div className='text-sm text-gray-500'>{r.display}</div>
+                    <div className='font-medium'>{r.title}</div>
                   </div>
                   <div className='w-48'>
                     <div className='text-xs text-gray-500'>Published</div>

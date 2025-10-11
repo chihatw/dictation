@@ -1,29 +1,10 @@
 'use client';
 
 import { supabase } from '@/lib/supabase/browser';
+import { SubmissionWithContext, UserCore } from '@/types/dictation';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-type Row = {
-  id: string;
-  user_id: string;
-  sentence_id: string;
-  plays_count: number;
-  elapsed_ms_since_item_view: number;
-  elapsed_ms_since_first_play: number;
-  self_assessed_comprehension: number;
-  answer: string | null;
-  created_at: string;
-  display: string;
-  content: string;
-  seq: number;
-  article_id: string;
-  title: string;
-  subtitle: string;
-};
-
-type UserOpt = { uid: string; display: string };
 
 const COLS = [
   'w-16',
@@ -39,9 +20,9 @@ const COLS = [
 ];
 
 export default function LogsPage() {
-  const [rows, setRows] = useState<Row[]>([]);
+  const [rows, setRows] = useState<SubmissionWithContext[]>([]);
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<UserOpt[]>([]);
+  const [users, setUsers] = useState<UserCore[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>(''); // 未選択 = 空
 
   // ユーザー一覧取得（表示名用）
@@ -55,7 +36,7 @@ export default function LogsPage() {
         console.error(error);
         setUsers([]);
       } else {
-        setUsers((data ?? []) as UserOpt[]);
+        setUsers((data ?? []) as UserCore[]);
       }
     })();
   }, []);
@@ -77,7 +58,7 @@ export default function LogsPage() {
         console.error(error);
         setRows([]);
       } else {
-        setRows((data ?? []) as Row[]);
+        setRows((data ?? []) as SubmissionWithContext[]);
       }
       setLoading(false);
     })();

@@ -4,15 +4,9 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
+import { Collection } from '@/types/dictation';
 import { UserSelect } from '../_components/UserSelect';
 import { deleteCollection } from './actions';
-
-type Collection = {
-  id: string;
-  created_at: string;
-  user_id: string;
-  title: string;
-};
 
 export default async function Page(props: {
   searchParams: Promise<{ user_id?: string }>;
@@ -30,15 +24,16 @@ export default async function Page(props: {
   if (ue) throw new Error(ue.message);
 
   // collections: ユーザー未選択なら空配列
-  const cols: Collection[] = selectedUserId
-    ? (
-        await supabase
-          .from('dictation_article_collections')
-          .select('id, created_at, user_id, title')
-          .eq('user_id', selectedUserId) // 絞り込み
-          .order('created_at', { ascending: false })
-      ).data ?? []
-    : [];
+  const cols: Pick<Collection, 'id' | 'created_at' | 'title' | 'user_id'>[] =
+    selectedUserId
+      ? (
+          await supabase
+            .from('dictation_article_collections')
+            .select('id, created_at, user_id, title')
+            .eq('user_id', selectedUserId) // 絞り込み
+            .order('created_at', { ascending: false })
+        ).data ?? []
+      : [];
 
   const nameByUid = new Map(users!.map((u) => [u.uid, u.display]));
 

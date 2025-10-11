@@ -1,18 +1,11 @@
 // app/admin/articles/page.tsx
 import { createClient } from '@/lib/supabase/server';
+import { Article, Collection } from '@/types/dictation';
 import Link from 'next/link';
 
 type PageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ collection_id?: string; user_id?: string }>;
-};
-
-type Collection = { id: string; title: string };
-type Article = {
-  id: string;
-  subtitle: string;
-  created_at: string;
-  seq: number;
 };
 
 export default async function Page(props: PageProps) {
@@ -44,7 +37,7 @@ export default async function Page(props: PageProps) {
     .from('dictation_article_collections')
     .select('id, title')
     .eq('id', colId)
-    .maybeSingle<Collection>();
+    .maybeSingle<Pick<Collection, 'id' | 'title'>>();
 
   if (colErr) throw new Error(colErr.message);
 
@@ -71,7 +64,8 @@ export default async function Page(props: PageProps) {
     .order('seq', { ascending: true });
 
   if (artErr) throw new Error(artErr.message);
-  const articles: Article[] = Array.isArray(articlesRaw) ? articlesRaw : [];
+  const articles: Pick<Article, 'id' | 'subtitle' | 'created_at' | 'seq'>[] =
+    Array.isArray(articlesRaw) ? articlesRaw : [];
 
   return (
     <div className='space-y-6'>

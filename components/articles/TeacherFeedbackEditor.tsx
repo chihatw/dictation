@@ -2,14 +2,10 @@
 
 import { setSubmissionTeacherFeedback } from '@/app/admin/submissions/[id]/teacher_feedback/actions';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
-import type { RpcArticle } from '@/types/dictation';
+import type { TagWithLabel } from '@/types/dictation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { Tags } from '../tag/Tags';
 import TagAdder from './TagAdder';
-
-type TagItem = NonNullable<
-  RpcArticle['sentences'][number]['submission']
->['tags'][number];
 
 export function TeacherFeedbackEditor({
   submissionId,
@@ -23,7 +19,7 @@ export function TeacherFeedbackEditor({
 }: {
   submissionId: string;
   initialTeacherFeedback?: string | null;
-  tags: TagItem[];
+  tags: TagWithLabel[];
   canManage?: boolean;
   onSubmitted?: (next: string | null) => void;
   onDeleted?: () => void;
