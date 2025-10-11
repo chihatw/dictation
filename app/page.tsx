@@ -77,7 +77,7 @@ export default async function Home() {
               href={`/articles/${nextArticleId}`}
               className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
             >
-              {`前往「${row.collection_title ?? ''} ${row.subtitle ?? ''}」第 ${
+              {`前往「${row.title ?? ''} ${row.subtitle ?? ''}」第 ${
                 row.sentence_seq ?? ''
               } 行`}
             </Link>
@@ -87,10 +87,10 @@ export default async function Home() {
                 所有作業都結束了，辛苦了！🎉
               </div>
               <Link
-                href={`/collections/${row.collection_id}`}
+                href={`/collections/${row.assignment_id}`}
                 className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
               >
-                {`查看「${row.collection_title ?? ''}」的成果`}
+                {`查看「${row.title ?? ''}」的成果`}
               </Link>
             </div>
           )}

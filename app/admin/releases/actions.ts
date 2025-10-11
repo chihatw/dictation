@@ -5,16 +5,16 @@ import { revalidatePath } from 'next/cache';
 
 export async function createRelease(input: {
   userId: string;
-  collectionId: string;
+  assignmentId: string;
   dueAtIso: string;
 }) {
   const supabase = await createClientAction();
-  if (!input.userId || !input.collectionId || !input.dueAtIso) {
+  if (!input.userId || !input.assignmentId || !input.dueAtIso) {
     throw new Error('missing fields');
   }
   const { error } = await supabase.from('dictation_releases').insert({
     user_id: input.userId,
-    collection_id: input.collectionId,
+    assignment_id: input.assignmentId,
     due_at: input.dueAtIso,
   });
   if (error) throw new Error(error.message);

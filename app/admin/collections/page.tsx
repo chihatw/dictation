@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
-import { Collection } from '@/types/dictation';
+import { Assignment } from '@/types/dictation';
 import { UserSelect } from '../_components/UserSelect';
 import { deleteCollection } from './actions';
 
@@ -24,11 +24,11 @@ export default async function Page(props: {
   if (ue) throw new Error(ue.message);
 
   // collections: ユーザー未選択なら空配列
-  const cols: Pick<Collection, 'id' | 'created_at' | 'title' | 'user_id'>[] =
+  const cols: Pick<Assignment, 'id' | 'created_at' | 'title' | 'user_id'>[] =
     selectedUserId
       ? (
           await supabase
-            .from('dictation_article_collections')
+            .from('dictation_assignments')
             .select('id, created_at, user_id, title')
             .eq('user_id', selectedUserId) // 絞り込み
             .order('created_at', { ascending: false })
@@ -73,7 +73,7 @@ export default async function Page(props: {
 
                 <div className='flex items-center gap-2'>
                   <Link
-                    href={`/admin/articles?collection_id=${col.id}&user_id=${selectedUserId}`}
+                    href={`/admin/articles?assignment_id=${col.id}&user_id=${selectedUserId}`}
                     className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
                   >
                     文章一覧

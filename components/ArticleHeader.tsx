@@ -26,7 +26,7 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
             <ChevronLeft className='h-4 w-4' /> 返回首頁
           </Link>
           <Link
-            href={`/collections/${article.collection_id}`}
+            href={`/collections/${article.assignment_id}`}
             className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             <ChevronLeft className='h-4 w-4' /> 返回主題頁
@@ -38,7 +38,7 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
 
         {isAdmin && (
           <Link
-            href={`/admin/articles?collection_id=${article.collection_id}&user_id=${article.user_id}`}
+            href={`/admin/articles?assignment_id=${article.assignment_id}&user_id=${article.user_id}`}
             className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             管理者課題詳細ページ

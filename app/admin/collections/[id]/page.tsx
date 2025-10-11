@@ -24,7 +24,7 @@ export default async function EditCollectionPage({
     await Promise.all([
       supabase.from('users').select('uid, display').eq('uid', user_id).single(),
       supabase
-        .from('dictation_article_collections')
+        .from('dictation_assignments')
         .select('id, title, user_id')
         .eq('id', id)
         .maybeSingle(),

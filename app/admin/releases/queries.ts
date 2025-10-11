@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { Collection, ReleaseWithContext, UserCore } from '@/types/dictation';
+import { Assignment, ReleaseWithContext, UserCore } from '@/types/dictation';
 
 export async function listUsers(): Promise<UserCore[]> {
   const supabase = await createClient();
@@ -24,10 +24,10 @@ export async function listReleasesByUser(
 
 export async function listCollectionsByUser(
   userId: string
-): Promise<Pick<Collection, 'id' | 'title'>[]> {
+): Promise<Pick<Assignment, 'id' | 'title'>[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .select('id, title')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });

@@ -9,13 +9,13 @@ import { revalidatePath } from 'next/cache';
 export async function createArticle(input: unknown) {
   // 最小バリデーション（必要なら zod に差し替え可）
   const data = input as {
-    collectionId: string;
+    assignmentId: string;
     subtitle: string;
     body: string;
     ttsVoiceName: string;
     speakingRate: number;
   };
-  if (!data?.collectionId || !data?.subtitle || !data?.body) {
+  if (!data?.assignmentId || !data?.subtitle || !data?.body) {
     return { ok: false, error: '入力が不正です' };
   }
 
@@ -27,7 +27,7 @@ export async function createArticle(input: unknown) {
   // 1) 記事作成（audio_path_full は null のまま）
   const { data: ins, error: rpcErr } = await supabase.rpc(
     'insert_article_with_next_seq',
-    { p_collection_id: data.collectionId, p_subtitle: data.subtitle.trim() }
+    { p_assignment_id: data.assignmentId, p_subtitle: data.subtitle.trim() }
   );
 
   if (rpcErr || !ins?.[0]?.id)

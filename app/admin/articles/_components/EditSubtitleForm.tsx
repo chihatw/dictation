@@ -8,11 +8,11 @@ import { updateSubtitle } from '../actions';
 export function EditSubtitleForm({
   id,
   defaultSubtitle,
-  collectionId,
+  assignmentId,
 }: {
   id: string;
   defaultSubtitle: string;
-  collectionId: string;
+  assignmentId: string;
 }) {
   const router = useRouter();
   const [subtitle, setSubtitle] = useState(defaultSubtitle);
@@ -32,7 +32,7 @@ export function EditSubtitleForm({
           setErr(res.error ?? '更新に失敗しました');
           return;
         }
-        router.push(`/admin/articles?collection_id=${collectionId}`);
+        router.push(`/admin/articles?assignment_id=${assignmentId}`);
       }}
       className='space-y-4'
     >

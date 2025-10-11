@@ -20,13 +20,13 @@ export default async function Page(props: {
   async function createAction(formData: FormData) {
     'use server';
     const userId = String(formData.get('user_id') || '');
-    const collectionId = String(formData.get('collection_id') || '');
+    const assignmentId = String(formData.get('assignment_id') || '');
     const dueAtLocal = String(formData.get('due_at') || '');
-    if (!userId || !collectionId || !dueAtLocal)
+    if (!userId || !assignmentId || !dueAtLocal)
       throw new Error('missing fields');
 
     const dueAtIso = jstLocalToUtcIso(dueAtLocal);
-    await createRelease({ userId, collectionId, dueAtIso });
+    await createRelease({ userId, assignmentId, dueAtIso });
     redirect(`/admin/releases?user_id=${userId}`);
   }
 
@@ -54,9 +54,9 @@ export default async function Page(props: {
             <input type='hidden' name='user_id' value={initialUserId} />
 
             <div className='space-y-1'>
-              <div className='text-sm text-gray-600'>Collection</div>
+              <div className='text-sm text-gray-600'>Assignment</div>
               <select
-                name='collection_id'
+                name='assignment_id'
                 required
                 className='border rounded-md px-3 py-2 w-full'
                 defaultValue=''

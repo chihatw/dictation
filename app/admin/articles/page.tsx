@@ -1,17 +1,17 @@
 // app/admin/articles/page.tsx
 import { createClient } from '@/lib/supabase/server';
-import { Article, Collection } from '@/types/dictation';
+import { Article, Assignment } from '@/types/dictation';
 import Link from 'next/link';
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ collection_id?: string; user_id?: string }>;
+  searchParams: Promise<{ assignment_id?: string; user_id?: string }>;
 };
 
 export default async function Page(props: PageProps) {
   await props.params; // 未使用でも await
   const sp = await props.searchParams;
-  const { collection_id: colId, user_id: userId } = sp;
+  const { assignment_id: colId, user_id: userId } = sp;
 
   const supabase = await createClient();
 
@@ -20,7 +20,7 @@ export default async function Page(props: PageProps) {
       <div className='space-y-6'>
         <h1 className='text-xl font-semibold'>課題文章一覧</h1>
         <p className='text-sm text-muted-foreground'>
-          collection_id が指定されていません。課題一覧から選択してください。
+          assignment_id が指定されていません。課題一覧から選択してください。
         </p>
         <Link
           href='/admin/collections'
@@ -34,10 +34,10 @@ export default async function Page(props: PageProps) {
 
   // collection
   const { data: col, error: colErr } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .select('id, title')
     .eq('id', colId)
-    .maybeSingle<Pick<Collection, 'id' | 'title'>>();
+    .maybeSingle<Pick<Assignment, 'id' | 'title'>>();
 
   if (colErr) throw new Error(colErr.message);
 
@@ -60,7 +60,7 @@ export default async function Page(props: PageProps) {
   const { data: articlesRaw, error: artErr } = await supabase
     .from('dictation_articles')
     .select('id, subtitle, created_at, seq')
-    .eq('collection_id', col.id)
+    .eq('assignment_id', col.id)
     .order('seq', { ascending: true });
 
   if (artErr) throw new Error(artErr.message);
@@ -83,7 +83,7 @@ export default async function Page(props: PageProps) {
           </Link>
 
           <Link
-            href={`/admin/articles/new?collection_id=${encodeURIComponent(
+            href={`/admin/articles/new?assignment_id=${encodeURIComponent(
               col.id
             )}`}
             className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'

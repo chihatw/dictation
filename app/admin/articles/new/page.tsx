@@ -12,16 +12,16 @@ type PageProps = {
 export default async function Page(props: PageProps) {
   await props.params;
   const sp = await props.searchParams;
-  const collectionId =
-    typeof sp.collection_id === 'string' ? sp.collection_id : '';
+  const assignmentId =
+    typeof sp.assignment_id === 'string' ? sp.assignment_id : '';
 
-  if (!collectionId) return notFound();
+  if (!assignmentId) return notFound();
 
   const supabase = await createClient();
   const { data: col, error } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .select('id, title')
-    .eq('id', collectionId)
+    .eq('id', assignmentId)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
@@ -32,13 +32,13 @@ export default async function Page(props: PageProps) {
       <div className='flex items-center justify-between'>
         <h1 className='text-xl font-semibold'>{col.title} Article 新規作成</h1>
         <Link
-          href={`/admin/articles?collection_id=${col.id}`}
+          href={`/admin/articles?assignment_id=${col.id}`}
           className='text-sm underline hover:no-underline'
         >
           戻る
         </Link>
       </div>
-      <ArticleCreateForm collectionId={col.id} />
+      <ArticleCreateForm assignmentId={col.id} />
     </div>
   );
 }

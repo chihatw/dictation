@@ -23,7 +23,7 @@ export default async function Page() {
   } = await supabase.auth.getUser();
 
   const { data: cols } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .select('id, title, created_at')
     .eq('user_id', user!.id)
     .order('created_at', { ascending: false });

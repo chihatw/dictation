@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createArticle } from '../actions';
 
-export function ArticleCreateForm({ collectionId }: { collectionId: string }) {
+export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
   const router = useRouter();
 
   const [subtitle, setSubtitle] = useState('');
@@ -27,7 +27,7 @@ export function ArticleCreateForm({ collectionId }: { collectionId: string }) {
   const previewText = splitIntoSentences(body).join(' ');
 
   const canSubmit =
-    collectionId &&
+    assignmentId &&
     subtitle.trim().length > 0 &&
     body.trim().length > 0 &&
     VOICES.includes(voice) &&
@@ -39,7 +39,7 @@ export function ArticleCreateForm({ collectionId }: { collectionId: string }) {
     setSubmitting(true);
 
     const res = await createArticle({
-      collectionId,
+      assignmentId,
       subtitle: subtitle.trim(),
       body,
       ttsVoiceName: voice,
@@ -47,7 +47,7 @@ export function ArticleCreateForm({ collectionId }: { collectionId: string }) {
     });
 
     if (res.ok) {
-      router.push(`/admin/articles?collection_id=${collectionId}`);
+      router.push(`/admin/articles?assignment_id=${assignmentId}`);
     } else {
       setSubmitting(false);
       alert(res.error ?? '作成に失敗しました');

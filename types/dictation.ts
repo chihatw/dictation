@@ -3,7 +3,7 @@
 import { Tables } from './supabase';
 
 type UserDb = Tables<'users'>;
-type CollectionDb = Tables<'dictation_article_collections'>;
+type AssignmentDb = Tables<'dictation_assignments'>;
 type ArticleDb = Tables<'dictation_articles'>;
 type SentenceDb = Tables<'dictation_sentences'>;
 type SubmissionDb = Tables<'dictation_submissions'>;
@@ -17,7 +17,7 @@ type User = UserDb;
 type Tag = TagDb;
 type TagMaster = TagMasterDb;
 
-export type Collection = CollectionDb;
+export type Assignment = AssignmentDb;
 export type Article = ArticleDb;
 type Sentence = SentenceDb;
 type Submission = SubmissionDb;
@@ -27,7 +27,7 @@ export type Release = ReleasDb;
 // JOIN 用の外部キーを外したもの
 type SubmissionCore = Omit<Submission, 'sentence_id'>;
 type SentenceCore = Omit<Sentence, 'article_id'>;
-type ReleaseCore = Omit<Release, 'user_id' | 'collection_id' | 'created_at'>;
+type ReleaseCore = Omit<Release, 'user_id' | 'assignment_id' | 'created_at'>;
 export type UserCore = Omit<User, 'created_at'>;
 
 export type TagWithLabel = Tag & Pick<TagMaster, 'label'>;
@@ -43,23 +43,23 @@ export type SubmissionWithSubmissionAndArticle = SentenceWithSubmission & {
 };
 
 export type ArticleWithSentences = Article &
-  Pick<Collection, 'user_id' | 'title'> & {
+  Pick<Assignment, 'user_id' | 'title'> & {
     sentences: SentenceWithSubmission[];
   };
 
 export type SubmissionWithContext = Submission &
-  Pick<Collection, 'user_id' | 'title'> &
+  Pick<Assignment, 'user_id' | 'title'> &
   Pick<User, 'display'> &
   Pick<Sentence, 'content' | 'seq' | 'article_id'> &
   Pick<Article, 'subtitle'>;
 
 export type ReleaseWithContext = ReleaseCore &
   Pick<User, 'display'> &
-  Pick<Collection, 'title'>;
+  Pick<Assignment, 'title'>;
 
 export type ArticleWithTagsAndJournal = Omit<
   Article,
-  'audio_full_path' | 'collection_id'
+  'audio_full_path' | 'assignment_id'
 > & {
   tags: string[];
   journal_body: string | null;

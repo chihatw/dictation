@@ -16,7 +16,7 @@ export default async function Page(props: PageProps) {
   const supabase = await createClient();
   const { data: art, error } = await supabase
     .from('dictation_articles')
-    .select('id, subtitle, collection_id')
+    .select('id, subtitle, assignment_id')
     .eq('id', id)
     .maybeSingle();
 
@@ -27,7 +27,7 @@ export default async function Page(props: PageProps) {
     <div className='space-y-6'>
       <div>
         <Link
-          href={`/admin/articles?collection_id=${art.collection_id}`}
+          href={`/admin/articles?assignment_id=${art.assignment_id}`}
           className='underline hover:opacity-80'
         >
           コレクションの記事一覧に戻る
@@ -37,7 +37,7 @@ export default async function Page(props: PageProps) {
       <EditSubtitleForm
         id={art.id}
         defaultSubtitle={art.subtitle}
-        collectionId={art.collection_id}
+        assignmentId={art.assignment_id}
       />
     </div>
   );

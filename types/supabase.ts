@@ -128,7 +128,42 @@ export type Database = {
         }
         Relationships: []
       }
-      dictation_article_collections: {
+      dictation_articles: {
+        Row: {
+          assignment_id: string
+          audio_path_full: string | null
+          created_at: string
+          id: string
+          seq: number
+          subtitle: string
+        }
+        Insert: {
+          assignment_id: string
+          audio_path_full?: string | null
+          created_at?: string
+          id?: string
+          seq: number
+          subtitle?: string
+        }
+        Update: {
+          assignment_id?: string
+          audio_path_full?: string | null
+          created_at?: string
+          id?: string
+          seq?: number
+          subtitle?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_articles_collection_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dictation_assignments: {
         Row: {
           created_at: string
           id: string
@@ -148,41 +183,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      dictation_articles: {
-        Row: {
-          audio_path_full: string | null
-          collection_id: string
-          created_at: string
-          id: string
-          seq: number
-          subtitle: string
-        }
-        Insert: {
-          audio_path_full?: string | null
-          collection_id: string
-          created_at?: string
-          id?: string
-          seq: number
-          subtitle?: string
-        }
-        Update: {
-          audio_path_full?: string | null
-          collection_id?: string
-          created_at?: string
-          id?: string
-          seq?: number
-          subtitle?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_articles_collection_fkey"
-            columns: ["collection_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_article_collections"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       dictation_journals: {
         Row: {
@@ -218,7 +218,7 @@ export type Database = {
       }
       dictation_releases: {
         Row: {
-          collection_id: string
+          assignment_id: string
           created_at: string
           due_at: string
           id: string
@@ -226,7 +226,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          collection_id: string
+          assignment_id: string
           created_at?: string
           due_at: string
           id?: string
@@ -234,7 +234,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          collection_id?: string
+          assignment_id?: string
           created_at?: string
           due_at?: string
           id?: string
@@ -244,9 +244,9 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "dictation_releases_collection_id_fkey"
-            columns: ["collection_id"]
+            columns: ["assignment_id"]
             isOneToOne: false
-            referencedRelation: "dictation_article_collections"
+            referencedRelation: "dictation_assignments"
             referencedColumns: ["id"]
           },
           {
@@ -775,7 +775,7 @@ export type Database = {
       get_admin_releases_by_user: {
         Args: { p_user_id: string }
         Returns: {
-          collection_id: string
+          assignment_id: string
           created_at: string
           display: string
           due_at: string
@@ -798,7 +798,7 @@ export type Database = {
         Returns: Json
       }
       get_collection_article_tags: {
-        Args: { p_collection_id: string }
+        Args: { p_assignment_id: string }
         Returns: {
           created_at: string
           id: string
@@ -816,8 +816,7 @@ export type Database = {
       get_home_next_task: {
         Args: { p_uid: string }
         Returns: {
-          collection_id: string
-          collection_title: string
+          assignment_id: string
           done_count: number
           due_at: string
           end_at: string
@@ -828,6 +827,7 @@ export type Database = {
           start_at: string
           subtitle: string
           time_progress_pct: number
+          title: string
           total_count: number
         }[]
       }
@@ -902,7 +902,7 @@ export type Database = {
         Returns: string
       }
       insert_article_with_next_seq: {
-        Args: { p_collection_id: string; p_subtitle: string }
+        Args: { p_assignment_id: string; p_subtitle: string }
         Returns: {
           id: string
           seq: number

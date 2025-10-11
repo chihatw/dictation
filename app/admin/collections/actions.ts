@@ -14,7 +14,7 @@ export async function createCollection(formData: FormData) {
   if (!user_id) throw new Error('user_id is required');
 
   const { error } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .insert({ title, user_id });
 
   if (error) throw new Error(error.message);
@@ -35,7 +35,7 @@ export async function updateCollection(formData: FormData) {
   if (!user_id) throw new Error('user_id is required');
 
   const { error } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .update({ title, user_id })
     .eq('id', id);
 
@@ -52,7 +52,7 @@ export async function deleteCollection(formData: FormData) {
   if (!id) throw new Error('id is required');
 
   const { error } = await supabase
-    .from('dictation_article_collections')
+    .from('dictation_assignments')
     .delete()
     .eq('id', id);
 
