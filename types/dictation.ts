@@ -71,3 +71,9 @@ export type Weather = {
   desc?: string;
   main?: string; // Clear, Clouds, Rain, etc.
 };
+
+export type JournalPage = {
+  items: Journal[];
+  next_before: string | null;
+  has_more: boolean;
+};

@@ -5,12 +5,11 @@ import TodayPanel from '@/components/home/TodayPanel';
 
 import { createClient } from '@/lib/supabase/server';
 import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
-import { LinkIcon } from 'lucide-react';
 
+import { HomeJournals } from '@/components/home/HomeJornals';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import { Journal } from '@/types/dictation';
 import Link from 'next/link';
-import { Vote } from './journals/Vote';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -36,10 +35,8 @@ export default async function Home() {
   const timeProgress =
     typeof row?.time_progress_pct === 'number' ? row.time_progress_pct : 0;
 
-  const journals: Journal[] = Array.isArray(row?.journals)
-    ? (row!.journals as Journal[])
-    : [];
-
+  const initialJournals = (row?.journals ?? []) as Journal[];
+  const initialBefore = initialJournals.at(-1)?.created_at ?? null;
   return (
     <div className='min-h-screen p-6'>
       <main className='mx-auto max-w-2xl space-y-6'>
@@ -99,80 +96,11 @@ export default async function Home() {
           )}
         </section>
 
-        {/* 向過去的自己說聲謝謝 */}
-        <section className='rounded-xl border p-5 bg-white space-y-4'>
-          <h2 className='text-lg font-semibold'>向過去的自己說聲謝謝</h2>
-
-          <div className='text-sm text-slate-700 space-y-0'>
-            <p>
-              <span className='font-extrabold'>過去的你</span>
-              在忙碌之中把握每一點空檔學習，
-              <span className='font-extrabold'>
-                為了今天的你，留下這本學習日誌
-              </span>
-              。
-            </p>
-            <p>
-              如果覺得這些記錄<span className='font-extrabold'>有幫助</span>，
-              <span className='font-bold'>請按「👍Good」</span>
-              向過去的自己<span className='font-extrabold'>說聲謝謝</span>。
-            </p>
-            <p>
-              若你覺得<span className='font-extrabold'>「這在寫什麼？」</span>或
-              <span className='font-extrabold'>「這樣的筆記完全幫不上忙」</span>
-              ，<span className='font-extrabold'>請按「👎Bad」</span>
-              提醒過去的自己<span className='font-extrabold'>需要改進</span>。
-            </p>
-            <p>
-              <span className='font-extrabold'>
-                給自己的感謝，或對自己的督促，都是讓你持續成長的力量
-              </span>
-              。
-            </p>
-            <p className='pt-2 text-xs font-extralight'>
-              「👍 Good」和「👎 Bad」都可以按很多次，想按幾次都沒問題喔。
-            </p>
-          </div>
-
-          <ul className='space-y-4'>
-            {journals.map((j) => (
-              <li key={j.id} className='rounded border p-3 bg-slate-50'>
-                <Link href={`/articles/${j.article_id}`} className='block'>
-                  <div className='flex items-center hover:underline gap-x-1'>
-                    <time className='font-bold '>
-                      {new Date(j.created_at).toLocaleString('ja-JP', {
-                        year: 'numeric',
-                        month: 'numeric',
-                        day: 'numeric',
-                        timeZone: 'Asia/Taipei',
-                      })}
-                    </time>
-                    <time className='font-light text-slate-500 text-sm'>
-                      {new Date(j.created_at).toLocaleString('ja-JP', {
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        timeZone: 'Asia/Taipei',
-                      })}
-                    </time>
-                    <LinkIcon className='w-3 h-3 text-slate-500' />
-                  </div>
-                </Link>
-
-                <div className='mt-1 text-sm text-gray-700'>
-                  {j.body.split('\n').map((line, i) => (
-                    <div key={i}>{line}</div>
-                  ))}
-                </div>
-
-                <Vote
-                  id={j.id}
-                  initialScore={j.rating_score}
-                  createdAt={j.created_at}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <HomeJournals
+          initialBefore={initialBefore}
+          initialItems={initialJournals}
+          userId={user.id}
+        />
       </main>
     </div>
   );

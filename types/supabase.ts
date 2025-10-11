@@ -809,6 +809,10 @@ export type Database = {
           tags: string[]
         }[]
       }
+      get_home_more_journals: {
+        Args: { p_before: string; p_limit?: number; p_uid: string }
+        Returns: Json
+      }
       get_home_next_task: {
         Args: { p_uid: string }
         Returns: {
