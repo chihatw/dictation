@@ -16,7 +16,7 @@ type Props = {
 
 export function AdminTeacherFeedbackClient({ submission }: Props) {
   const [teacherFeedback, setTeacherFeedback] = useState(
-    submission.teacher_feedback ?? ''
+    submission.teacher_feedback_md ?? ''
   );
   const [tags, setTags] = useState(submission.tags ?? []);
   const [, startTransition] = useTransition();

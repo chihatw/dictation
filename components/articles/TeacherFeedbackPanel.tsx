@@ -10,7 +10,7 @@ export function TeacherFeedbackPanel({
 }: {
   submission: SubmissionWithTags | null;
 }) {
-  const teacherFeedback = submission?.teacher_feedback;
+  const teacherFeedback = submission?.teacher_feedback_md;
   const tags = submission?.tags || [];
   const hasFeedback = !!teacherFeedback?.trim();
   const hasTags = tags.length > 0;

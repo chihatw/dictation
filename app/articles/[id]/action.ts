@@ -61,7 +61,7 @@ export async function createFeedbackAndLogAction(input: unknown) {
     .rpc('create_feedback_and_log', {
       p_sentence_id: sentenceId,
       p_answer: userAnswer,
-      p_feedback_md: feedbackMarkdown,
+      p_ai_feedback_md: feedbackMarkdown,
       p_plays_count: playsCount,
       p_elapsed_ms_since_item_view: elapsedMsSinceItemView,
       p_elapsed_ms_since_first_play: elapsedMsSinceFirstPlay,

@@ -10,7 +10,7 @@ export async function setSubmissionTeacherFeedback(
   const supabase = await createClientAction();
   const { error } = await supabase
     .from('dictation_submissions')
-    .update({ teacher_feedback: note_md })
+    .update({ teacher_feedback_md: note_md })
     .eq('id', submissionId);
   if (error) throw new Error(error.message);
 }

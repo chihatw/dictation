@@ -17,7 +17,7 @@ function AIFeedbackPanelBase({
 }: AIFeedbackPanelProps) {
   if (!show) return null;
 
-  const aiFeedback = sentence.submission?.feedback_md ?? '';
+  const aiFeedback = sentence.submission?.ai_feedback_md ?? '';
 
   // 表示用マップ
   const compMap: Record<number, string> = {

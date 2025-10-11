@@ -295,40 +295,40 @@ export type Database = {
       }
       dictation_submissions: {
         Row: {
+          ai_feedback_md: string | null
           answer: string
           created_at: string
           elapsed_ms_since_first_play: number
           elapsed_ms_since_item_view: number
-          feedback_md: string | null
           id: string
           plays_count: number
           self_assessed_comprehension: number
           sentence_id: string
-          teacher_feedback: string | null
+          teacher_feedback_md: string | null
         }
         Insert: {
+          ai_feedback_md?: string | null
           answer: string
           created_at?: string
           elapsed_ms_since_first_play?: number
           elapsed_ms_since_item_view?: number
-          feedback_md?: string | null
           id?: string
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id: string
-          teacher_feedback?: string | null
+          teacher_feedback_md?: string | null
         }
         Update: {
+          ai_feedback_md?: string | null
           answer?: string
           created_at?: string
           elapsed_ms_since_first_play?: number
           elapsed_ms_since_item_view?: number
-          feedback_md?: string | null
           id?: string
           plays_count?: number
           self_assessed_comprehension?: number
           sentence_id?: string
-          teacher_feedback?: string | null
+          teacher_feedback_md?: string | null
         }
         Relationships: [
           {
@@ -753,10 +753,10 @@ export type Database = {
     Functions: {
       create_feedback_and_log: {
         Args: {
+          p_ai_feedback_md: string
           p_answer: string
           p_elapsed_ms_since_first_play: number
           p_elapsed_ms_since_item_view: number
-          p_feedback_md: string
           p_plays_count: number
           p_self_comp: number
           p_sentence_id: string

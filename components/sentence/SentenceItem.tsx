@@ -120,7 +120,7 @@ function SentenceItemBase({
       </div>
 
       <AIFeedbackPanel
-        show={isSubmitted && !!sentence.submission?.feedback_md}
+        show={isSubmitted && !!sentence.submission?.ai_feedback_md}
         sentence={sentence}
         selfAssessedComprehension={displaySac}
       />
