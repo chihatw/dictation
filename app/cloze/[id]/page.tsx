@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { Journal } from '@/types/dictation';
 import ClozeMaker from './ClozeMaker';
 
 type Props = {
@@ -20,7 +21,7 @@ const Page = async (props: Props) => {
 
   return (
     <div className='max-w-2xl mx-auto my-10 mb-96'>
-      <ClozeMaker journal={data} />
+      <ClozeMaker journal={data as Journal} />
     </div>
   );
 };

@@ -9,7 +9,7 @@ type SentenceDb = Tables<'dictation_sentences'>;
 type SubmissionDb = Tables<'dictation_submissions'>;
 type TagDb = Tables<'dictation_teacher_feedback_tags'>;
 type TagMasterDb = Tables<'dictation_tag_master'>;
-type JournalDb = Tables<'dictation_journals'>;
+type JournalDb = Tables<'dictation_journals'> & { cloze_spans: number[][] };
 type ReleasDb = Tables<'dictation_releases'>;
 
 // 将来的には スネーク を キャメル に

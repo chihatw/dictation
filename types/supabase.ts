@@ -188,6 +188,7 @@ export type Database = {
         Row: {
           article_id: string
           body: string
+          cloze_spans: Json
           created_at: string
           id: string
           rating_score: number
@@ -195,6 +196,7 @@ export type Database = {
         Insert: {
           article_id: string
           body: string
+          cloze_spans?: Json
           created_at?: string
           id?: string
           rating_score?: number
@@ -202,6 +204,7 @@ export type Database = {
         Update: {
           article_id?: string
           body?: string
+          cloze_spans?: Json
           created_at?: string
           id?: string
           rating_score?: number
