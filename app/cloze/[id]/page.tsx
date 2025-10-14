@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import ClozeMaker from './ClozeMaker';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -10,13 +11,16 @@ const Page = async (props: Props) => {
   const { data, error } = await supabase
     .from('dictation_journals')
     .select('*')
-    .eq('id', id);
+    .eq('id', id)
+    .single();
 
   if (error) console.log(error.message);
 
+  if (!data) return <div>no data</div>;
+
   return (
-    <div className='max-w-2xl mx-auto my-10'>
-      <pre className='text-sm font-light'>{JSON.stringify(data, null, 2)}</pre>
+    <div className='max-w-2xl mx-auto my-10 mb-96'>
+      <ClozeMaker journal={data} />
     </div>
   );
 };

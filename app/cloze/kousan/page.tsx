@@ -1,9 +1,9 @@
-import { ClozeParts } from '@/types/dictation';
+import { ClozeLine } from '@/types/dictation';
 import ArticleCloze from '../ArticleCloze';
 
 const CLOZE: {
   title: string;
-  lines: ClozeParts[][];
+  lines: ClozeLine[];
 }[] = [
   {
     title: '合菜N5',

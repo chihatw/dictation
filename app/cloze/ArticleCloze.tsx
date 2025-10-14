@@ -1,13 +1,7 @@
-import { ClozeParts } from '@/types/dictation';
+import { ClozeLine } from '@/types/dictation';
 import ClozeRow from './ClozeRow';
 
-function ArticleCloze({
-  title,
-  lines,
-}: {
-  title: string;
-  lines: ClozeParts[][];
-}) {
+function ArticleCloze({ title, lines }: { title: string; lines: ClozeLine[] }) {
   return (
     <section className='w-full rounded-lg border bg-white py-3 px-4 flex flex-col gap-2'>
       <header>
@@ -15,9 +9,9 @@ function ArticleCloze({
       </header>
 
       <div className='flex flex-col gap-2'>
-        {lines.map((parts, idx) => (
+        {lines.map((line, idx) => (
           <div key={idx}>
-            <ClozeRow parts={parts} />
+            <ClozeRow line={line} />
           </div>
         ))}
       </div>

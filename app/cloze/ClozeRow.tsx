@@ -1,14 +1,14 @@
 'use client';
-import { ClozeParts } from '@/types/dictation';
+import { ClozeLine } from '@/types/dictation';
 import { Eye, EyeClosed } from 'lucide-react';
 import { useState } from 'react';
 
 type Props = {
-  parts: ClozeParts[];
+  line: ClozeLine;
 };
 
-const ClozeRow = ({ parts }: Props) => {
-  const blankCount = parts.filter((pt) => pt.t !== 'text').length;
+const ClozeRow = ({ line }: Props) => {
+  const blankCount = line.filter((pt) => pt.t !== 'text').length;
   const [visibleList, setVisibleList] = useState<boolean[]>(
     Array(blankCount).fill(false)
   );
@@ -22,7 +22,7 @@ const ClozeRow = ({ parts }: Props) => {
   return (
     <div className='grid grid-cols-[1fr_auto] gap-1'>
       <p>
-        {parts.map((part, i) => {
+        {line.map((part, i) => {
           if (part.t === 'text') return <span key={i}>{part.v}</span>;
           const bIndex = ++bi;
           return (

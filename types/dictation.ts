@@ -78,6 +78,8 @@ export type JournalPage = {
   has_more: boolean;
 };
 
-export type ClozeParts = { t: 'text' | 'blank'; v: string };
+type ClozePart = { t: 'text' | 'blank'; v: string };
+
+export type ClozeLine = ClozePart[];
 
 export type ClozeSpan = [number, number]; // todo あとで一括で ClozeSpan に

@@ -1,26 +1,28 @@
-import { ClozeParts, ClozeSpan } from '@/types/dictation';
+import { ClozeLine, ClozeSpan } from '@/types/dictation';
 
-export function parseCloze(line: string): ClozeParts[] {
-  const parts: ClozeParts[] = [];
+// こ[[ん]]にちは -> ClozeLine Obj
+export function parseCloze(text: string): ClozeLine {
+  const line: ClozeLine = [];
   const re = /\[\[(.+?)\]\]/g;
   let idx = 0;
   let m: RegExpExecArray | null;
 
-  while ((m = re.exec(line))) {
-    if (m.index > idx) parts.push({ t: 'text', v: line.slice(idx, m.index) });
-    parts.push({ t: 'blank', v: m[1] });
+  while ((m = re.exec(text))) {
+    if (m.index > idx) line.push({ t: 'text', v: text.slice(idx, m.index) });
+    line.push({ t: 'blank', v: m[1] });
     idx = re.lastIndex;
   }
-  const tail = line.slice(idx);
-  if (tail) parts.push({ t: 'text', v: tail });
+  const tail = text.slice(idx);
+  if (tail) line.push({ t: 'text', v: tail });
 
-  return parts;
+  return line;
 }
 
-export function stringifyCloze(parts: ClozeParts[]): string {
+// ClozeLine Obj -> こ[[ん]]にちは
+export function stringifyCloze(line: ClozeLine): string {
   const texts: string[] = [];
 
-  for (const part of parts) {
+  for (const part of line) {
     if (part.t === 'blank') {
       texts.push(`[[${part.v}]]`);
     } else {
@@ -33,6 +35,7 @@ export function stringifyCloze(parts: ClozeParts[]): string {
 const cps = (s: string) => Array.from(s);
 const normalizeEol = (s: string) => s.replace(/\r\n?/g, '\n');
 
+// こんにちは, [[1,1]] -> こ[[ん]]にちは
 export function makeClozeText(body: string, spans: ClozeSpan[]): string {
   const arr = cps(body);
   let out = '';
@@ -47,6 +50,7 @@ export function makeClozeText(body: string, spans: ClozeSpan[]): string {
   return out;
 }
 
+// こんにちは, こ[[ん]]にちは -> [[1,1]]
 export function parseSpansFromCloze(
   body: string,
   clozeText: string
