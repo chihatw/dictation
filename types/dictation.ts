@@ -77,3 +77,7 @@ export type JournalPage = {
   next_before: string | null;
   has_more: boolean;
 };
+
+export type ClozeParts = { t: 'text' | 'blank'; v: string };
+
+export type ClozeSpan = [number, number]; // todo あとで一括で ClozeSpan に
