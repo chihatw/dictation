@@ -1,9 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
-type Props = {};
-
-const Page = async (props: Props) => {
+const Page = async () => {
   const supabase = await createClient();
 
   const { data, error } = await supabase
