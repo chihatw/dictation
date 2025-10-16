@@ -1,7 +1,7 @@
+import ArticleCloze from '@/components/cloze/ArticleCloze';
 import { createClient } from '@/lib/supabase/server';
 import { ClozeObjLine, ClozeSpan } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
-import ArticleCloze from '../ArticleCloze';
 
 const ASSIGNMENT_ID = 'e310a909-43e1-4e36-b3f2-ffe551d78e98';
 

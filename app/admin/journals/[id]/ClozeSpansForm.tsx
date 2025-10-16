@@ -14,7 +14,8 @@ import {
   useState,
   useTransition,
 } from 'react';
-import ClozeRow from '../../../cloze/ClozeRow';
+
+import ClozeRow from '@/components/cloze/ClozeRow';
 import { updateJournalClozeSpans } from './actions';
 
 type Props = { journal: Journal };
