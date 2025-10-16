@@ -5,7 +5,15 @@ import {
   parseCloze,
   parseSpansFromCloze,
 } from '@/utils/cloze/converter';
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { LoaderCircle } from 'lucide-react';
+import {
+  ChangeEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import ClozeRow from '../../../cloze/ClozeRow';
 import { updateJournalClozeSpans } from './actions';
 
@@ -26,6 +34,8 @@ const ClozeSpansForm = ({ journal }: Props) => {
   const [clozeObjLines, setClozeObjLines] = useState<ClozeObjLine[]>([]);
 
   const [parseError, setParseError] = useState('');
+
+  const [isPending, startTransition] = useTransition();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -73,15 +83,21 @@ const ClozeSpansForm = ({ journal }: Props) => {
     await updateJournalClozeSpans({ id: journal.id, spans });
   }
 
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {
+      await action(formData);
+    });
+  };
+
   const canSubmit =
     !parseError &&
-    JSON.stringify(journal.cloze_spans) !== JSON.stringify(clozeSpans);
+    JSON.stringify(journal.cloze_spans) !== JSON.stringify(clozeSpans) &&
+    !isPending;
 
   return (
     <div className='flex flex-col gap-8'>
       <div>
-        <h2 className='font-bold mb-2'>Body</h2>
-        <div className='p-4 rounded-lg border'>
+        <div className='p-4 rounded-lg border opacity-50'>
           {JOURNAL_BODY.split('\n').map((line, index) => (
             <div key={index}>{line}</div>
           ))}
@@ -93,10 +109,12 @@ const ClozeSpansForm = ({ journal }: Props) => {
         <h2 className='font-bold mb-2'>Cloze Spans</h2>
 
         <div className='p-4 rounded-lg border'>
-          <pre>{JSON.stringify(clozeSpans)}</pre>
+          <div className='whitespace-pre-wrap'>
+            {JSON.stringify(clozeSpans)}
+          </div>
         </div>
         <div className='mt-2 h-10 overflow-hidden'>
-          <form action={action}>
+          <form action={handleSubmit}>
             <input
               type='hidden'
               name='spans'
@@ -104,10 +122,11 @@ const ClozeSpansForm = ({ journal }: Props) => {
             />
             <button
               type='submit'
-              className='bg-slate-900 text-white rounded-lg w-full px-3 py-2 disabled:opacity-50'
+              className='bg-slate-900 text-white rounded-lg w-full px-3 py-2 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1'
               disabled={!canSubmit}
             >
-              送信
+              <span>送信</span>
+              {isPending && <LoaderCircle className='h-4 w-4 animate-spin' />}
             </button>
           </form>
         </div>

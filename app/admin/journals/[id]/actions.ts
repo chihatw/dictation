@@ -2,6 +2,7 @@
 
 import { createClientAction } from '@/lib/supabase/server-action';
 import { ClozeSpan } from '@/types/dictation';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 const SpansSchema = z.array(z.tuple([z.number(), z.number()]));
@@ -28,6 +29,6 @@ export async function updateJournalClozeSpans(params: {
 
   if (error) return { ok: false as const, error: error.message };
 
-  // revalidatePath()
+  revalidatePath(`/admin/journals/${params.id}`);
   return { ok: true as const };
 }
