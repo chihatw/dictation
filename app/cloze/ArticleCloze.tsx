@@ -1,7 +1,13 @@
-import { ClozeLine } from '@/types/dictation';
+import { ClozeObjLine } from '@/types/dictation';
 import ClozeRow from './ClozeRow';
 
-function ArticleCloze({ title, lines }: { title: string; lines: ClozeLine[] }) {
+function ArticleCloze({
+  title,
+  lines,
+}: {
+  title: string;
+  lines: ClozeObjLine[];
+}) {
   return (
     <section className='w-full rounded-lg border bg-white py-3 px-4 flex flex-col gap-2'>
       <header>

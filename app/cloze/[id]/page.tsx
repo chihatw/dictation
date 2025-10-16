@@ -21,6 +21,7 @@ const Page = async (props: Props) => {
 
   return (
     <div className='max-w-2xl mx-auto my-10 mb-96'>
+      <h1 className='text-4xl font-extrabold mb-4'>Cloze Spans 編集</h1>
       <ClozeMaker journal={data as Journal} />
     </div>
   );

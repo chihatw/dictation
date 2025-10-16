@@ -1,26 +1,48 @@
 'use client';
-import { ClozeLine, ClozeSpan, Journal } from '@/types/dictation';
-import { parseCloze, parseSpansFromCloze } from '@/utils/cloze/converter';
+import { ClozeObjLine, ClozeSpan, Journal } from '@/types/dictation';
+import {
+  makeClozeText,
+  parseCloze,
+  parseSpansFromCloze,
+} from '@/utils/cloze/converter';
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import ClozeRow from '../ClozeRow';
+import { updateJournalClozeSpans } from './actions';
 
 type Props = { journal: Journal };
 
+// todo コード完成してから ClozeSpansMaker にリネーム
 const ClozeMaker = ({ journal }: Props) => {
-  const journalBody = useMemo(() => journal.body, [journal]);
-  const [clozeText, setClozeText] = useState(journalBody.trim());
+  const JOURNAL_BODY = useMemo(() => journal.body, [journal]);
+  const CLOZE_OBJ_LINES = useMemo(() => {
+    const _clozeText = makeClozeText(journal.body, journal.cloze_spans);
+    return _clozeText
+      .split('\n')
+      .filter(Boolean)
+      .map((clozeText) => parseCloze(clozeText));
+  }, [journal]);
+
+  const [clozeText, setClozeText] = useState('');
   const [clozeSpans, setClozeSpans] = useState<ClozeSpan[]>([]);
+  const [clozeObjLines, setClozeObjLines] = useState<ClozeObjLine[]>([]);
 
   const [parseError, setParseError] = useState('');
-  const [clozeLines, setClozeLines] = useState<ClozeLine[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // clozeParts の初期化
+  // clozeText, clozeSpans, clozeParts の初期化
   useEffect(() => {
-    const lines = journalBody.trim().split('\n').map(parseCloze);
-    setClozeLines(lines);
-  }, [journalBody]);
+    const _clozeText = makeClozeText(journal.body, journal.cloze_spans);
+
+    const _clozeObjLines = _clozeText
+      .split('\n')
+      .filter(Boolean)
+      .map((clozeText) => parseCloze(clozeText));
+
+    setClozeText(_clozeText);
+    setClozeSpans(journal.cloze_spans);
+    setClozeObjLines(_clozeObjLines);
+  }, [journal]);
 
   // テキストエリアの高さ調節
   useEffect(() => {
@@ -33,34 +55,73 @@ const ClozeMaker = ({ journal }: Props) => {
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const next = e.target.value;
     setParseError('');
+    setClozeSpans([]);
     setClozeText(next);
     try {
-      const spans = parseSpansFromCloze(journalBody, next);
+      const spans = parseSpansFromCloze(JOURNAL_BODY, next);
       setClozeSpans(spans);
 
       const lines = next.trim().split('\n').map(parseCloze);
-      setClozeLines(lines);
+      setClozeObjLines(lines);
     } catch (err) {
       setParseError(err instanceof Error ? err.message : String(err));
     }
   };
 
+  async function action(formData: FormData) {
+    const raw = formData.get('spans') as string;
+    const spans = JSON.parse(raw) as ClozeSpan[];
+    await updateJournalClozeSpans({ id: journal.id, spans });
+  }
+
+  const canSubmit =
+    !parseError &&
+    JSON.stringify(journal.cloze_spans) !== JSON.stringify(clozeSpans);
+
   return (
     <div className='flex flex-col gap-8'>
       <div>
-        <h2 className='font-bold mb-2'>學習日誌</h2>
+        <h2 className='font-bold mb-2'>Body</h2>
         <div className='p-4 rounded-lg border'>
-          {journalBody.split('\n').map((line, index) => (
+          {JOURNAL_BODY.split('\n').map((line, index) => (
             <div key={index}>{line}</div>
           ))}
         </div>
       </div>
-      <div className='flex flex-col'>
-        <h2 className='font-bold mb-2'>穴埋め問題作成</h2>
-        <div className='mb-2 font-light text-sm text-slate-700 leading-tight'>
-          <div>空欄にしたいところを[[...]]で囲んでください。</div>
-          <div>それ以外の文字の変更はできません。</div>
+
+      {/* Cloze Spans */}
+      <div>
+        <h2 className='font-bold mb-2'>Cloze Spans</h2>
+
+        <div className='p-4 rounded-lg border'>
+          <pre>{JSON.stringify(clozeSpans)}</pre>
         </div>
+        <div className='mt-2 h-10 overflow-hidden'>
+          <form action={action}>
+            <input
+              type='hidden'
+              name='spans'
+              value={JSON.stringify(clozeSpans)}
+            />
+            <button
+              type='submit'
+              className='bg-slate-900 text-white rounded-lg w-full px-3 py-2 disabled:opacity-50'
+              disabled={!canSubmit}
+            >
+              送信
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Cloze Text */}
+      <div className='flex flex-col'>
+        <h2 className='font-bold mb-2'>
+          Cloze Text
+          <span className='ml-2 font-light text-sm text-slate-500'>
+            Body with [[ ]]
+          </span>
+        </h2>
         <textarea
           ref={textareaRef}
           className='border rounded p-4 h-auto resize-none overflow-hidden bg-white focus:outline-0'
@@ -68,30 +129,22 @@ const ClozeMaker = ({ journal }: Props) => {
           onChange={handleChange}
         />
       </div>
+
+      {/* Cloze Obj Lines */}
       <div>
-        <h2 className='font-bold mb-2'>Cloze Spans</h2>
-        {!!parseError && (
-          <div className='text-red-500 text-sm mb-2'>
-            {JSON.stringify(parseError)}
-          </div>
-        )}
-        <div className='p-4 rounded-lg border'>
-          <pre>{JSON.stringify(clozeSpans)}</pre>
-        </div>
-      </div>
-      <div>
-        <h2 className='font-bold mb-2'>結果</h2>
+        <h2 className='font-bold mb-2'>Cloze Obj Lines</h2>
 
         <div className='p-4 rounded-lg border'>
-          {!parseError && (
-            <div className='flex flex-col gap-2'>
-              {clozeLines.map((line, index) => (
+          <div className='flex flex-col gap-2'>
+            {(() => {
+              const objlines = !parseError ? clozeObjLines : CLOZE_OBJ_LINES;
+              return objlines.map((line, index) => (
                 <div key={index}>
                   <ClozeRow line={line} />
                 </div>
-              ))}
-            </div>
-          )}
+              ));
+            })()}
+          </div>
         </div>
       </div>
       <div className='h-24' />

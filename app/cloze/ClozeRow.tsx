@@ -1,10 +1,10 @@
 'use client';
-import { ClozeLine } from '@/types/dictation';
+import { ClozeObjLine } from '@/types/dictation';
 import { Eye, EyeClosed } from 'lucide-react';
 import { useState } from 'react';
 
 type Props = {
-  line: ClozeLine;
+  line: ClozeObjLine;
 };
 
 const ClozeRow = ({ line }: Props) => {

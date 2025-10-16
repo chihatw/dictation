@@ -16,7 +16,7 @@ const Page = async () => {
   return (
     <div className='max-w-2xl mx-auto py-10 flex flex-col gap-4'>
       <h1 className='font-bold text-2xl flex gap-2 items-center'>
-        <span>Temp: 學習日誌リスト</span>
+        <span>【Temp】學習日誌リスト</span>
         <span className='font-extralight text-black/60 text-lg'>
           link to /cloze/[id]
         </span>

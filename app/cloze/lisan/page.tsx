@@ -1,9 +1,9 @@
-import { ClozeLine } from '@/types/dictation';
+import { ClozeObjLine } from '@/types/dictation';
 import ArticleCloze from '../ArticleCloze';
 
 const CLOZE: {
   title: string;
-  lines: ClozeLine[];
+  lines: ClozeObjLine[];
 }[] = [
   {
     title: '合菜N5 超簡單版',

@@ -1,8 +1,8 @@
-import { ClozeLine, ClozeSpan } from '@/types/dictation';
+import { ClozeObjLine, ClozeSpan } from '@/types/dictation';
 
-// こ[[ん]]にちは -> ClozeLine Obj
-export function parseCloze(text: string): ClozeLine {
-  const line: ClozeLine = [];
+// こ[[ん]]にちは -> ClozeObjLine Obj
+export function parseCloze(text: string): ClozeObjLine {
+  const line: ClozeObjLine = [];
   const re = /\[\[(.+?)\]\]/g;
   let idx = 0;
   let m: RegExpExecArray | null;
@@ -18,8 +18,8 @@ export function parseCloze(text: string): ClozeLine {
   return line;
 }
 
-// ClozeLine Obj -> こ[[ん]]にちは
-export function stringifyCloze(line: ClozeLine): string {
+// ClozeObjLine Obj -> こ[[ん]]にちは
+export function stringifyCloze(line: ClozeObjLine): string {
   const texts: string[] = [];
 
   for (const part of line) {

@@ -9,7 +9,7 @@ type SentenceDb = Tables<'dictation_sentences'>;
 type SubmissionDb = Tables<'dictation_submissions'>;
 type TagDb = Tables<'dictation_teacher_feedback_tags'>;
 type TagMasterDb = Tables<'dictation_tag_master'>;
-type JournalDb = Tables<'dictation_journals'> & { cloze_spans: number[][] };
+type JournalDb = Tables<'dictation_journals'> & { cloze_spans: ClozeSpan[] };
 type ReleasDb = Tables<'dictation_releases'>;
 
 // 将来的には スネーク を キャメル に
@@ -78,8 +78,8 @@ export type JournalPage = {
   has_more: boolean;
 };
 
-type ClozePart = { t: 'text' | 'blank'; v: string };
+type ClozeObj = { t: 'text' | 'blank'; v: string };
 
-export type ClozeLine = ClozePart[];
+export type ClozeObjLine = ClozeObj[];
 
-export type ClozeSpan = [number, number]; // todo あとで一括で ClozeSpan に
+export type ClozeSpan = [number, number];
