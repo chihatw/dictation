@@ -50,7 +50,7 @@ const Page = async () => {
             </div>
 
             <div className='truncate underline hover:cursor-pointer hover:font-bold'>
-              <Link href={`/cloze/${row.id}`}>{row.body}</Link>
+              <Link href={`/admin/journals/${row.id}`}>{row.body}</Link>
             </div>
             <div className='w-8 text-right font-extralight text-sm'>
               {row.body.length}

@@ -6,13 +6,12 @@ import {
   parseSpansFromCloze,
 } from '@/utils/cloze/converter';
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
-import ClozeRow from '../ClozeRow';
+import ClozeRow from '../../../cloze/ClozeRow';
 import { updateJournalClozeSpans } from './actions';
 
 type Props = { journal: Journal };
 
-// todo コード完成してから ClozeSpansMaker にリネーム
-const ClozeMaker = ({ journal }: Props) => {
+const ClozeSpansForm = ({ journal }: Props) => {
   const JOURNAL_BODY = useMemo(() => journal.body, [journal]);
   const CLOZE_OBJ_LINES = useMemo(() => {
     const _clozeText = makeClozeText(journal.body, journal.cloze_spans);
@@ -152,4 +151,4 @@ const ClozeMaker = ({ journal }: Props) => {
   );
 };
 
-export default ClozeMaker;
+export default ClozeSpansForm;
