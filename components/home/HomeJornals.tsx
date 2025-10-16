@@ -3,9 +3,11 @@
 import { fetchMoreJournals } from '@/app/actions/fetchMoreJournals';
 import { Vote } from '@/app/journals/Vote';
 import { Journal } from '@/types/dictation';
+import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
 import { LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
+import ClozeRow from '../cloze/ClozeRow';
 
 export function HomeJournals({
   initialItems,
@@ -72,42 +74,36 @@ export function HomeJournals({
       </div>
       <div>
         <ul className='space-y-4'>
-          {items.map((j) => (
-            <li key={j.id} className='rounded border p-3 bg-slate-50'>
-              <Link href={`/articles/${j.article_id}`} className='block'>
-                <div className='flex items-center hover:underline gap-x-1'>
-                  <time className='font-bold '>
-                    {new Date(j.created_at).toLocaleString('ja-JP', {
-                      year: 'numeric',
-                      month: 'numeric',
-                      day: 'numeric',
-                      timeZone: 'Asia/Taipei',
-                    })}
-                  </time>
-                  <time className='font-light text-slate-500 text-sm'>
-                    {new Date(j.created_at).toLocaleString('ja-JP', {
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      timeZone: 'Asia/Taipei',
-                    })}
-                  </time>
-                  <LinkIcon className='w-3 h-3 text-slate-500' />
+          {items.map((j) => {
+            const clozeText = makeClozeText(j.body.trim(), j.cloze_spans);
+            return (
+              <li key={j.id} className='rounded border p-3 bg-slate-50'>
+                <div className='flex justify-between pr-2'>
+                  <JournalLinkHeader
+                    articleId={j.article_id}
+                    createdAt={j.created_at}
+                  />
                 </div>
-              </Link>
 
-              <div className='mt-1 text-sm text-gray-700'>
-                {j.body.split('\n').map((line, i) => (
-                  <div key={i}>{line}</div>
-                ))}
-              </div>
+                <div className='mt-1 text-sm text-gray-700 space-y-1'>
+                  {clozeText.split('\n').map((text, i) => {
+                    const clozeObjLine = parseCloze(text);
+                    return (
+                      <div key={i}>
+                        <ClozeRow objs={clozeObjLine} />
+                      </div>
+                    );
+                  })}
+                </div>
 
-              <Vote
-                id={j.id}
-                initialScore={j.rating_score}
-                createdAt={j.created_at}
-              />
-            </li>
-          ))}
+                <Vote
+                  id={j.id}
+                  initialScore={j.rating_score}
+                  createdAt={j.created_at}
+                />
+              </li>
+            );
+          })}
         </ul>
         {hasMore && (
           <button
@@ -122,3 +118,35 @@ export function HomeJournals({
     </section>
   );
 }
+
+const JournalLinkHeader = ({
+  articleId,
+  createdAt,
+}: {
+  articleId: string;
+  createdAt: string;
+}) => {
+  const date = new Date(createdAt);
+  return (
+    <Link href={`/articles/${articleId}`} className='block'>
+      <div className='flex items-center hover:underline gap-x-1'>
+        <time className='font-bold '>
+          {date.toLocaleString('ja-JP', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            timeZone: 'Asia/Taipei',
+          })}
+        </time>
+        <time className='font-light text-slate-500 text-sm'>
+          {date.toLocaleString('ja-JP', {
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZone: 'Asia/Taipei',
+          })}
+        </time>
+        <LinkIcon className='w-3 h-3 text-slate-500' />
+      </div>
+    </Link>
+  );
+};

@@ -1,14 +1,14 @@
 'use client';
-import { ClozeObjLine } from '@/types/dictation';
+import { ClozeObj } from '@/types/dictation';
 import { Eye, EyeClosed } from 'lucide-react';
 import { useState } from 'react';
 
 type Props = {
-  line: ClozeObjLine;
+  objs: ClozeObj[];
 };
 
-const ClozeRow = ({ line }: Props) => {
-  const blankCount = line.filter((pt) => pt.t !== 'text').length;
+const ClozeRow = ({ objs }: Props) => {
+  const blankCount = objs.filter((pt) => pt.t !== 'text').length;
   const [visibleList, setVisibleList] = useState<boolean[]>(
     Array(blankCount).fill(false)
   );
@@ -22,13 +22,13 @@ const ClozeRow = ({ line }: Props) => {
   return (
     <div className='grid grid-cols-[1fr_auto] gap-1'>
       <p>
-        {line.map((part, i) => {
-          if (part.t === 'text') return <span key={i}>{part.v}</span>;
+        {objs.map((obj, i) => {
+          if (obj.t === 'text') return <span key={i}>{obj.v}</span>;
           const bIndex = ++bi;
           return (
             <Blank
               key={i}
-              v={part.v}
+              v={obj.v}
               visible={visibleList[bIndex]}
               onToggle={() =>
                 setVisibleList((prev) =>
@@ -39,18 +39,19 @@ const ClozeRow = ({ line }: Props) => {
           );
         })}
       </p>
-
-      <button
-        onClick={toggleAll}
-        className='align-baseline px-2 py-0.5 cursor-pointer hover:bg-gray-100 rounded-sm'
-        aria-label={allVisible ? 'hide all' : 'show all'}
-      >
-        {allVisible ? (
-          <Eye className='text-gray-500 w-5 h-5' />
-        ) : (
-          <EyeClosed className='text-gray-500 w-5 h-5' />
-        )}
-      </button>
+      {!(objs.length === 1 && objs[0].t === 'text') && (
+        <button
+          onClick={toggleAll}
+          className='align-baseline px-2 py-0.5 cursor-pointer hover:bg-gray-100 rounded-sm'
+          aria-label={allVisible ? 'hide all' : 'show all'}
+        >
+          {allVisible ? (
+            <Eye className='text-gray-500 w-5 h-5' />
+          ) : (
+            <EyeClosed className='text-gray-500 w-5 h-5' />
+          )}
+        </button>
+      )}
     </div>
   );
 };

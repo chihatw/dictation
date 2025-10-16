@@ -17,7 +17,7 @@ function ArticleCloze({
       <div className='flex flex-col gap-2'>
         {lines.map((line, idx) => (
           <div key={idx}>
-            <ClozeRow line={line} />
+            <ClozeRow objs={line} />
           </div>
         ))}
       </div>

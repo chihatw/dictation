@@ -157,9 +157,9 @@ const ClozeSpansForm = ({ journal }: Props) => {
           <div className='flex flex-col gap-2'>
             {(() => {
               const objlines = !parseError ? clozeObjLines : CLOZE_OBJ_LINES;
-              return objlines.map((line, index) => (
+              return objlines.map((objs, index) => (
                 <div key={index}>
-                  <ClozeRow line={line} />
+                  <ClozeRow objs={objs} />
                 </div>
               ));
             })()}

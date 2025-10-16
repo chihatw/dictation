@@ -78,7 +78,7 @@ export type JournalPage = {
   has_more: boolean;
 };
 
-type ClozeObj = { t: 'text' | 'blank'; v: string };
+export type ClozeObj = { t: 'text' | 'blank'; v: string };
 
 export type ClozeObjLine = ClozeObj[];
 
