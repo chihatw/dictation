@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import AssignmentForm from '../_AssignmentForm';
+import AssignmentForm from '../AssignmentForm';
 import { updateAssignment } from '../actions';
 
 export default async function Page({
@@ -25,7 +25,7 @@ export default async function Page({
       supabase.from('users').select('uid, display').eq('uid', user_id).single(),
       supabase
         .from('dictation_assignments')
-        .select('id, title, user_id')
+        .select('id, title, user_id, due_at')
         .eq('id', id)
         .maybeSingle(),
     ]);
@@ -43,10 +43,15 @@ export default async function Page({
         <ChevronLeft className='h-4 w-4' />
         <span>課題一覧</span>
       </Link>
-      <h2 className='text-xl font-medium'>課題タイトル編集</h2>
+      <h2 className='text-xl font-medium'>課題 due_at 編集</h2>
       <AssignmentForm
         userDisplay={user.display}
-        defaultValues={{ id: col.id, title: col.title, user_id: col.user_id }}
+        defaultValues={{
+          id: col.id,
+          title: col.title,
+          user_id: col.user_id,
+          due_at: col.due_at,
+        }}
         action={updateAssignment}
         submitLabel='保存'
       />

@@ -4,7 +4,6 @@ import Link from 'next/link';
 export default function AdminHomePage() {
   const links = [
     { href: '/admin/assignments', label: '課題一覧' },
-    { href: '/admin/releases', label: '公開管理' },
     { href: '/admin/logs', label: 'ログ一覧' },
     { href: '/admin/users', label: '管理者設定' },
   ];

@@ -166,23 +166,37 @@ export type Database = {
       dictation_assignments: {
         Row: {
           created_at: string
+          due_at: string | null
           id: string
+          published_at: string | null
           title: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          due_at?: string | null
           id?: string
+          published_at?: string | null
           title: string
           user_id: string
         }
         Update: {
           created_at?: string
+          due_at?: string | null
           id?: string
+          published_at?: string | null
           title?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
+          },
+        ]
       }
       dictation_journals: {
         Row: {
@@ -216,48 +230,6 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "dictation_articles"
             referencedColumns: ["id"]
-          },
-        ]
-      }
-      dictation_releases: {
-        Row: {
-          assignment_id: string
-          created_at: string
-          due_at: string
-          id: string
-          published_at: string | null
-          user_id: string
-        }
-        Insert: {
-          assignment_id: string
-          created_at?: string
-          due_at: string
-          id?: string
-          published_at?: string | null
-          user_id: string
-        }
-        Update: {
-          assignment_id?: string
-          created_at?: string
-          due_at?: string
-          id?: string
-          published_at?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_releases_assignment_id_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_releases_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
           },
         ]
       }
@@ -775,19 +747,6 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
-      get_admin_releases_by_user: {
-        Args: { p_user_id: string }
-        Returns: {
-          assignment_id: string
-          created_at: string
-          display: string
-          due_at: string
-          id: string
-          published_at: string
-          title: string
-          user_id: string
-        }[]
-      }
       get_article_answers_for_modal: {
         Args: { p_article_id: string }
         Returns: {
@@ -812,6 +771,22 @@ export type Database = {
           tags: string[]
         }[]
       }
+      get_assignment_counts: {
+        Args: { p_assignment_id: string }
+        Returns: {
+          done_count: number
+          total_count: number
+        }[]
+      }
+      get_assignment_next_sentence: {
+        Args: { p_assignment_id: string }
+        Returns: {
+          article_id: string
+          next_sentence_id: string
+          sentence_seq: number
+          subtitle: string
+        }[]
+      }
       get_home_more_journals: {
         Args: { p_before: string; p_limit?: number; p_uid: string }
         Returns: Json
@@ -834,22 +809,22 @@ export type Database = {
           total_count: number
         }[]
       }
+      get_latest_release: {
+        Args: { p_uid: string }
+        Returns: {
+          assignment_id: string
+          due_at: string
+          end_at: string
+          start_at: string
+        }[]
+      }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
         Returns: string
       }
-      get_release_article_tags: {
-        Args: { p_uid: string }
-        Returns: {
-          created_at: string
-          id: string
-          journal_body: string
-          journal_created_at: string
-          pos: number
-          subtitle: string
-          tags: string[]
-          title: string
-        }[]
+      get_recent_journals_for_assignments: {
+        Args: { p_assignment_ids: string[] }
+        Returns: Json
       }
       get_submission_by_id: {
         Args: { p_submission_id: string }
@@ -878,6 +853,15 @@ export type Database = {
           subtitle: string
           title: string
           user_id: string
+        }[]
+      }
+      get_user_top_releases: {
+        Args: { p_limit?: number; p_uid: string }
+        Returns: {
+          assignment_id: string
+          due_at: string
+          end_at: string
+          start_at: string
         }[]
       }
       gtrgm_compress: {
@@ -946,6 +930,10 @@ export type Database = {
       show_trgm: {
         Args: { "": string }
         Returns: string[]
+      }
+      time_progress_5pct: {
+        Args: { p_end: string; p_start: string }
+        Returns: number
       }
       unaccent: {
         Args: { "": string }

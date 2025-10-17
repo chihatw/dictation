@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { EditSubtitleForm } from '../../_components/EditSubtitleForm';
+import { EditSubtitleForm } from '../../components/EditSubtitleForm';
 
 type PageProps = {
   params: Promise<{ id: string }>;

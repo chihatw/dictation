@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import AssignmentForm from '../_AssignmentForm';
+import AssignmentForm from '../AssignmentForm';
 import { createAssignment } from '../actions';
 
 export default async function Page(props: {

@@ -2,7 +2,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArticleCreateForm } from '../_components/ArticleCreateForm';
+import { ArticleCreateForm } from '../components/ArticleCreateForm';
 
 type PageProps = {
   params: Promise<Record<string, string>>;

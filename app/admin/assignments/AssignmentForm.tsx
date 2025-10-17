@@ -1,6 +1,32 @@
 'use client';
 
-type DefaultValues = { id?: string; title?: string; user_id?: string };
+type DefaultValues = {
+  id?: string;
+  title?: string;
+  user_id?: string;
+  due_at?: string | null; // ISO(UTC) or null
+};
+
+function toInputValueFromUTC(iso?: string | null) {
+  if (!iso) return '';
+  const d = new Date(iso); // UTC基準
+  // UTCに+9hして「JST時刻」を作る
+  const t = new Date(
+    Date.UTC(
+      d.getUTCFullYear(),
+      d.getUTCMonth(),
+      d.getUTCDate(),
+      d.getUTCHours() + 9,
+      d.getUTCMinutes(),
+      0,
+      0
+    )
+  );
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(
+    t.getUTCDate()
+  )}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
+}
 
 export default function AssignmentForm({
   defaultValues,
@@ -18,8 +44,6 @@ export default function AssignmentForm({
       {defaultValues?.id && (
         <input type='hidden' name='id' defaultValue={defaultValues.id} />
       )}
-
-      {/* user_id は hidden */}
       {defaultValues?.user_id && (
         <input
           type='hidden'
@@ -44,6 +68,18 @@ export default function AssignmentForm({
           className='w-full rounded-md border px-3 py-2'
           placeholder='課題名'
         />
+      </div>
+
+      <div className='space-y-1'>
+        <label className='text-sm font-medium'>期限（日本時間）</label>
+        <input
+          type='datetime-local'
+          name='due_at_jst'
+          // JST表示用に整形
+          defaultValue={toInputValueFromUTC(defaultValues?.due_at ?? null)}
+          className='w-full rounded-md border px-3 py-2'
+        />
+        <p className='text-xs text-gray-500'>未入力なら期限なし</p>
       </div>
 
       <div className='pt-2'>
