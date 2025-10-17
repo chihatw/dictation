@@ -21,7 +21,7 @@ const ClozeRow = ({ objs }: Props) => {
 
   return (
     <div className='grid grid-cols-[1fr_auto] gap-1'>
-      <p>
+      <p className='leading-loose'>
         {objs.map((obj, i) => {
           if (obj.t === 'text') return <span key={i}>{obj.v}</span>;
           const bIndex = ++bi;
@@ -69,7 +69,7 @@ function Blank({
   return (
     <button
       onClick={onToggle}
-      className='mx-1 inline-block rounded-sm border px-2 py-0.5 align-baseline transition hover:bg-gray-100 focus:outline-none cursor-pointer'
+      className='mx-1 inline-block align-baseline py-1 px-2 rounded-sm border transition hover:bg-gray-100 focus:outline-none cursor-pointer leading-tight'
       aria-pressed={visible}
     >
       {visible ? (
