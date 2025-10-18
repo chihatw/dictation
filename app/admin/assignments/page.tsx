@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
 import { Assignment } from '@/types/dictation';
-import { UserSelect } from '../_components/UserSelect';
+import { UserSelect } from '../components/UserSelect';
 import {
   deleteAssignment,
   publishAssignment,
