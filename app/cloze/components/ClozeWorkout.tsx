@@ -1,19 +1,12 @@
 'use client';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from '@/components/ui/carousel';
+import { type CarouselApi } from '@/components/ui/carousel';
 import { Progress } from '@/components/ui/progress';
 import { makeClozeText } from '@/utils/cloze/converter';
 import { useEffect, useState } from 'react';
 
 import { Journal } from '@/types/dictation';
+import ClozeCarousel from './ClozeCarousel';
 import ClozeCarouselController from './ClozeCarouselController';
-import JournalCarouselItem from './JournalCarouselItem';
-import LineCarouselItem from './LineCarouselItem';
 
 type Unit = 'journal' | 'line';
 type Order = 'seq' | 'rand';
@@ -36,7 +29,7 @@ type JournalItem = {
   journal: Journal;
 };
 
-type Item = LineItem | JournalItem;
+export type ClozeCarouselItem = LineItem | JournalItem;
 
 const shuffle = <T,>(arr: T[]) => {
   const a = arr.slice();
@@ -56,10 +49,10 @@ const ClozeWorkout = ({
   const [index, setIndex] = useState(1);
   const [unit, setUnit] = useState<Unit>(defaultUnit);
   const [order, setOrder] = useState<Order>(defaultOrder);
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<ClozeCarouselItem[]>([]);
 
   useEffect(() => {
-    const genItems = (): Item[] => {
+    const genItems = (): ClozeCarouselItem[] => {
       if (unit === 'journal') {
         return journals.map((j) => ({ type: 'journal', journal: j }));
       }
@@ -133,30 +126,7 @@ const ClozeWorkout = ({
         </div>
 
         {/* 本体 */}
-        <Carousel
-          className='w-full'
-          opts={{ loop: false, align: 'start' }}
-          setApi={setApi}
-        >
-          <CarouselContent>
-            {items.map((it, i) =>
-              it.type === 'journal' ? (
-                <JournalCarouselItem
-                  key={`j-${it.journal.id}-${i}`}
-                  journal={it.journal}
-                />
-              ) : (
-                <LineCarouselItem
-                  key={`l-${it.journal.id}-${it.lineIndex}-${i}`}
-                  journal={it.journal}
-                  lineText={it.lineText}
-                />
-              )
-            )}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
+        <ClozeCarousel items={items} setApi={setApi} />
       </div>
     </div>
   );
