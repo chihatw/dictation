@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { ClozeSpan, Journal } from '@/types/dictation';
-import ClozeWorkout from './ClozeWorkout';
+import ClozeWorkout from './components/ClozeWorkout';
 
 type Props = {
   searchParams: Promise<{

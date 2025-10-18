@@ -13,8 +13,8 @@ import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
 import { RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Vote } from '../journals/Vote';
-import { ClozeWorkoutJournal } from './page';
+import { Vote } from '../../journals/Vote';
+import { ClozeWorkoutJournal } from '../page';
 
 type Unit = 'journal' | 'line';
 type Order = 'seq' | 'rand';
