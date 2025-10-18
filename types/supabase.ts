@@ -839,6 +839,7 @@ export type Database = {
       get_article_answers_for_modal: {
         Args: { p_article_id: string }
         Returns: {
+          ai_feedback_md: string
           answer: string
           content: string
           seq: number
