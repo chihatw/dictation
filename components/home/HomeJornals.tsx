@@ -6,7 +6,7 @@ import { Journal } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
 import { LinkIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import ClozeRow from '../cloze/ClozeRow';
 
 export function HomeJournals({
@@ -22,6 +22,11 @@ export function HomeJournals({
   const [before, setBefore] = useState<string | null>(initialBefore);
   const [hasMore, setHasMore] = useState(true);
   const [pending, start] = useTransition();
+
+  // 暫定処理
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
 
   const onMore = () =>
     start(async () => {

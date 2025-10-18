@@ -1,8 +1,12 @@
 'use client';
 
-import { saveDictationJournalAction } from '@/app/actions/saveDictationJournal';
+import {
+  saveDictationJournalAction,
+  saveDictationJournalFromHome,
+} from '@/app/actions/saveDictationJournal';
 import { MarkdownRenderer } from '@/components/shared/MarkdownRenderer';
 import { supabase } from '@/lib/supabase/browser';
+import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
@@ -64,7 +68,10 @@ function getRandomPlaceholders(n: number) {
   return a.slice(0, n).join('\n');
 }
 
-export function useJournalModal() {
+export function useJournalModal(opts?: { isFromHome?: boolean }) {
+  const router = useRouter(); // 暫定処理
+  const isFromHome = opts?.isFromHome ?? false; // 暫定処理
+
   const [open, setOpen] = useState(false);
   const [articleId, setArticleId] = useState<string | null>(null);
 
@@ -132,11 +139,15 @@ export function useJournalModal() {
     if (!articleId || !body.trim() || loading) return;
     startTransition(async () => {
       try {
-        await saveDictationJournalAction(articleId, body.trim());
-        close(); // 成功時は閉じる
-      } catch {
-        // 失敗時は何もしない（必要ならトーストへ差し替え）
-      }
+        // 暫定処理
+        if (isFromHome) {
+          await saveDictationJournalFromHome(articleId, body.trim()); // 暫定処理
+          router.refresh();
+        } else {
+          await saveDictationJournalAction(articleId, body.trim());
+        }
+        close();
+      } catch {}
     });
   }, [articleId, body, loading, close]);
 

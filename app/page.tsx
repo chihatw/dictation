@@ -7,9 +7,17 @@ import { createClient } from '@/lib/supabase/server';
 import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
 
 import { HomeJournals } from '@/components/home/HomeJornals';
+import JournalQuickWriteButton from '@/components/home/JournalQuickWriteButton';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import { Journal } from '@/types/dictation';
 import Link from 'next/link';
+
+const TEMP = {
+  user_id: 'b2d7045a-bfb9-4aa2-88ed-fdfbac324e72',
+  article_id: 'e81e64c6-6c20-4b18-a021-a84f729b0907',
+  title: '臺灣的教師節禮物',
+  subtitle: 'N5',
+};
 
 export default async function Home() {
   const supabase = await createClient();
@@ -18,10 +26,16 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('unauthorized');
 
-  const [{ data, error }, { yunlin, hyogo }] = await Promise.all([
-    supabase.rpc('get_home_next_task', { p_uid: user.id }),
-    fetchMultiWeather(),
-  ]);
+  const [{ data, error }, { yunlin, hyogo }, { data: temp }] =
+    await Promise.all([
+      supabase.rpc('get_home_next_task', { p_uid: user.id }),
+      fetchMultiWeather(),
+      supabase // 暫定処理
+        .from('dictation_journals')
+        .select('*')
+        .eq('article_id', TEMP.article_id)
+        .maybeSingle(),
+    ]);
   if (error) throw new Error(error.message);
 
   const row = Array.isArray(data) ? data[0] : data;
@@ -71,6 +85,16 @@ export default async function Home() {
               語言學習重在習慣。 與其一天做很多，不如盡量每天都做一點。
             </div>
           </div>
+
+          {user.id === TEMP.user_id && !temp && (
+            <div>
+              <JournalQuickWriteButton
+                articleId={TEMP.article_id}
+                label={`寫「${TEMP.title} ${TEMP.subtitle}」的學習日誌`}
+                enabled={user.id === TEMP.user_id && !temp}
+              />
+            </div>
+          )}
 
           {nextArticleId ? (
             <Link

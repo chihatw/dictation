@@ -20,3 +20,19 @@ export async function saveDictationJournalAction(
   revalidatePath('/');
   redirect('/');
 }
+
+export async function saveDictationJournalFromHome(
+  articleId: string,
+  body: string
+) {
+  if (!articleId || !body.trim()) return { ok: false };
+
+  const supabase = await createClientAction();
+  const { error } = await supabase.rpc('save_dictation_journal', {
+    p_article_id: articleId,
+    p_body: body,
+  });
+  if (error) throw new Error(error.message);
+
+  return { ok: true };
+}
