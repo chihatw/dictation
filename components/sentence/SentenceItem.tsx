@@ -14,6 +14,7 @@ import { SubmitButton } from './parts/SubmitButton';
 type SentenceItemProps = {
   sentence: SentenceWithSubmission;
   value: string;
+  aiFeedback: string;
   isSubmitted: boolean;
   submitting: boolean;
   onChange: (v: string) => void;
@@ -29,6 +30,7 @@ type SentenceItemProps = {
 function SentenceItemBase({
   sentence,
   value,
+  aiFeedback,
   isSubmitted,
   onChange,
   onSubmit,
@@ -120,9 +122,12 @@ function SentenceItemBase({
       </div>
 
       <AIFeedbackPanel
-        show={isSubmitted && !!sentence.submission?.ai_feedback_md}
+        show={
+          isSubmitted && (!!sentence.submission?.ai_feedback_md || !!aiFeedback)
+        }
         sentence={sentence}
         selfAssessedComprehension={displaySac}
+        aiFeedback={aiFeedback}
       />
       <div className='mt-3'>
         <TeacherFeedbackPanel submission={sentence.submission || null} />

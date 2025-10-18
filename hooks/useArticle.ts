@@ -18,8 +18,9 @@ export function useArticle(articleId: string | undefined) {
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
-
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+
+  const [aiFeedbacks, setAiFeedbacks] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!articleId) return;
@@ -41,17 +42,20 @@ export function useArticle(articleId: string | undefined) {
       setArticle(data.article);
       setJournal(data.journal);
 
-      // 既存回答を状態へ
       const nextAnswers: Record<string, string> = {};
       const nextSubmitted: Record<string, boolean> = {};
+      const nextAi: Record<string, string> = {};
 
       for (const s of data.article.sentences ?? []) {
         const one = s.submission ?? null;
         nextAnswers[s.id] = one?.answer ?? '';
         nextSubmitted[s.id] = !!one;
+
+        if (one?.ai_feedback_md) nextAi[s.id] = one.ai_feedback_md as string;
       }
       setAnswers(nextAnswers);
       setSubmitted(nextSubmitted);
+      setAiFeedbacks(nextAi);
 
       setLoading(false);
     })();
@@ -95,7 +99,12 @@ export function useArticle(articleId: string | undefined) {
           setSubmitted((o) => ({ ...o, [s.id]: false }));
           alert(res.error ?? '保存に失敗しました。');
         } else {
-          return { completed: res.completed, articleId: res.articleId };
+          setAiFeedbacks((o) => ({ ...o, [s.id]: res.aiFeedback || '' }));
+          return {
+            completed: res.completed,
+            articleId: res.articleId,
+            aiFeedback: res.aiFeedback || '',
+          };
         }
       } finally {
         setLoadingMap((o) => ({ ...o, [s.id]: false }));
@@ -117,6 +126,7 @@ export function useArticle(articleId: string | undefined) {
     setAnswers,
     submitted,
     loadingMap,
+    aiFeedbacks,
     // 動作
     submitOne,
   };

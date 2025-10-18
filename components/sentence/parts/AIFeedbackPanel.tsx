@@ -8,16 +8,18 @@ type AIFeedbackPanelProps = {
   show: boolean;
   sentence: SentenceWithSubmission;
   selfAssessedComprehension: number;
+  aiFeedback: string;
 };
 
 function AIFeedbackPanelBase({
   show,
   sentence,
+  aiFeedback: _aiFeedback,
   selfAssessedComprehension,
 }: AIFeedbackPanelProps) {
   if (!show) return null;
 
-  const aiFeedback = sentence.submission?.ai_feedback_md ?? '';
+  const aiFeedback = _aiFeedback ?? sentence.submission?.ai_feedback_md ?? '';
 
   // 表示用マップ
   const compMap: Record<number, string> = {

@@ -41,7 +41,7 @@ export async function createFeedbackAndLogAction(input: unknown) {
   const { data: _data } = await supabase.auth.getUser();
   if (!_data.user?.id) return { ok: false as const, error: '未認証です。' };
 
-  let feedbackMarkdown = '';
+  let aiFeedback = '';
   try {
     const prompt =
       '你是一位日語老師。台灣的中學生正嘗試聽寫（日文音聲）。' +
@@ -52,16 +52,16 @@ export async function createFeedbackAndLogAction(input: unknown) {
       '使用 Markdown 與 emoji，最多 5 行。' +
       `音聲原文：${sentenceScript}\n學生答案：${userAnswer}\n`;
     const ai = await chat([{ role: 'user', content: prompt }]);
-    feedbackMarkdown = ai.content ?? '';
+    aiFeedback = ai.content ?? '';
   } catch {
-    feedbackMarkdown = '（系統忙碌，稍後自動補上老師回饋）';
+    aiFeedback = '（系統忙碌，稍後自動補上老師回饋）';
   }
 
   const { data, error } = await supabase
     .rpc('create_feedback_and_log', {
       p_sentence_id: sentenceId,
       p_answer: userAnswer,
-      p_ai_feedback_md: feedbackMarkdown,
+      p_ai_feedback_md: aiFeedback,
       p_plays_count: playsCount,
       p_elapsed_ms_since_item_view: elapsedMsSinceItemView,
       p_elapsed_ms_since_first_play: elapsedMsSinceFirstPlay,
@@ -72,7 +72,7 @@ export async function createFeedbackAndLogAction(input: unknown) {
   if (error) return { ok: false as const, error: '保存に失敗しました。' };
   return {
     ok: true as const,
-    feedbackMarkdown,
+    aiFeedback,
     completed: data.completed,
     articleId: data.article_id,
   };

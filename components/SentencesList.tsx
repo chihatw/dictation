@@ -18,6 +18,7 @@ type Props = {
     selfAssessedComprehension: number
   ) => void;
   isAdmin: boolean;
+  aiFeedbacks?: Record<string, string>;
 };
 
 export default function SentencesList({
@@ -28,6 +29,7 @@ export default function SentencesList({
   onChangeAnswer,
   onSubmitOne,
   isAdmin,
+  aiFeedbacks,
 }: Props) {
   return (
     <div className='space-y-5'>
@@ -41,6 +43,7 @@ export default function SentencesList({
               onChange={(val) => onChangeAnswer(s.id, val)}
               onSubmit={onSubmitOne}
               submitting={loadingMap[s.id] ?? false}
+              aiFeedback={aiFeedbacks?.[s.id] ?? ''}
             />
             {isAdmin && (
               <div className='flex justify-end'>

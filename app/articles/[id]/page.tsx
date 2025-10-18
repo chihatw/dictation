@@ -32,6 +32,7 @@ export default function ArticlePage() {
     submitted,
     loadingMap,
     submitOne,
+    aiFeedbacks,
   } = useArticle(id);
 
   const { openJournalModal, JournalModalElement } = useJournalModal();
@@ -117,6 +118,7 @@ export default function ArticlePage() {
           }
           onSubmitOne={handleSubmitOne}
           isAdmin={isAdmin}
+          aiFeedbacks={aiFeedbacks}
         />
 
         <div className='mt-8 text-center text-sm text-gray-600'>
