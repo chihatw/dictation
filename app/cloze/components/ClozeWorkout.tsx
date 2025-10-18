@@ -1,40 +1,39 @@
 'use client';
-import ClozeRow from '@/components/cloze/ClozeRow';
 import {
   Carousel,
   CarouselContent,
-  CarouselItem,
   CarouselNext,
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
 import { Progress } from '@/components/ui/progress';
-import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
-import { RotateCcw } from 'lucide-react';
-import Link from 'next/link';
+import { makeClozeText } from '@/utils/cloze/converter';
 import { useEffect, useState } from 'react';
-import { Vote } from '../../journals/Vote';
-import { ClozeWorkoutJournal } from '../page';
+
+import { Journal } from '@/types/dictation';
+import ClozeCarouselController from './ClozeCarouselController';
+import JournalCarouselItem from './JournalCarouselItem';
+import LineCarouselItem from './LineCarouselItem';
 
 type Unit = 'journal' | 'line';
 type Order = 'seq' | 'rand';
 
 type Props = {
-  journals: ClozeWorkoutJournal[];
+  journals: Journal[];
   defaultUnit?: Unit; // from searchParams
   defaultOrder?: Order; // from searchParams
 };
 
 type LineItem = {
   type: 'line';
-  journal: ClozeWorkoutJournal;
+  journal: Journal;
   lineText: string;
   lineIndex: number;
 };
 
 type JournalItem = {
   type: 'journal';
-  journal: ClozeWorkoutJournal;
+  journal: Journal;
 };
 
 type Item = LineItem | JournalItem;
@@ -115,65 +114,15 @@ const ClozeWorkout = ({
     <div>
       <div className='w-full space-y-3'>
         {/* 操作列 */}
-        <div className='flex items-center justify-between gap-2'>
-          <div className='flex items-center gap-2'>
-            {/* 単位切替 */}
-            <div className='inline-flex rounded-lg border p-1'>
-              <button
-                className={`px-3 py-1 rounded-md text-sm ${
-                  unit === 'journal'
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-700'
-                }`}
-                onClick={() => setUnit('journal')}
-              >
-                以日誌顯示
-              </button>
-              <button
-                className={`px-3 py-1 rounded-md text-sm ${
-                  unit === 'line' ? 'bg-slate-900 text-white' : 'text-slate-700'
-                }`}
-                onClick={() => setUnit('line')}
-              >
-                以行顯示
-              </button>
-            </div>
-            {/* 並び切替（行単位時のみ） */}
-            {unit === 'line' && (
-              <div className='inline-flex rounded-lg border p-1'>
-                <button
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    order === 'seq'
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-700'
-                  }`}
-                  onClick={() => setOrder('seq')}
-                >
-                  依序播放
-                </button>
-                <button
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    order === 'rand'
-                      ? 'bg-slate-900 text-white'
-                      : 'text-slate-700'
-                  }`}
-                  onClick={() => setOrder('rand')}
-                >
-                  隨機播放
-                </button>
-              </div>
-            )}
-          </div>
-
-          <button
-            className='bg-white rounded p-2 border hover:bg-slate-50 cursor-pointer'
-            onClick={handleReset}
-            aria-label='最初に戻る'
-            title='最初に戻る'
-          >
-            <RotateCcw className='h-4 w-4' />
-          </button>
-        </div>
+        <ClozeCarouselController
+          isJournalUnit={unit === 'journal'}
+          isSeqOrder={order === 'seq'}
+          handleReset={handleReset}
+          setJournalUnit={() => setUnit('journal')}
+          setLineUnit={() => setUnit('line')}
+          setSeqOrder={() => setOrder('seq')}
+          setRandomOrder={() => setOrder('rand')}
+        />
 
         {/* 進捗バー */}
         <div className='flex items-center gap-3'>
@@ -190,64 +139,20 @@ const ClozeWorkout = ({
           setApi={setApi}
         >
           <CarouselContent>
-            {items.map((it, i) => {
-              if (it.type === 'journal') {
-                const j = it.journal;
-                const clozeText = makeClozeText(j.body.trim(), j.cloze_spans);
-                return (
-                  <CarouselItem key={`j-${j.id}-${i}`} className='basis-full'>
-                    <section className='bg-white rounded-lg py-3 px-4 border'>
-                      <ClozeCarouselHeader
-                        articleId={j.article_id}
-                        createdAt={j.created_at}
-                      />
-                      <div className='flex flex-col gap-2 mb-4'>
-                        {clozeText
-                          .split('\n')
-                          .filter(Boolean)
-                          .map((text, li) => {
-                            const objs = parseCloze(text);
-                            return (
-                              <div key={li}>
-                                <ClozeRow objs={objs} />
-                              </div>
-                            );
-                          })}
-                      </div>
-                      <Vote
-                        id={j.id}
-                        initialScore={j.rating_score}
-                        createdAt={j.created_at}
-                      />
-                    </section>
-                  </CarouselItem>
-                );
-              } else {
-                const { journal: j, lineText, lineIndex } = it;
-                const objs = parseCloze(lineText);
-                return (
-                  <CarouselItem
-                    key={`l-${j.id}-${lineIndex}-${i}`}
-                    className='basis-full'
-                  >
-                    <section className='bg-white rounded-lg py-3 px-4 border'>
-                      <ClozeCarouselHeader
-                        articleId={j.article_id}
-                        createdAt={j.created_at}
-                      />
-                      <div className='mb-4'>
-                        <ClozeRow objs={objs} />
-                      </div>
-                      <Vote
-                        id={j.id}
-                        initialScore={j.rating_score}
-                        createdAt={j.created_at}
-                      />
-                    </section>
-                  </CarouselItem>
-                );
-              }
-            })}
+            {items.map((it, i) =>
+              it.type === 'journal' ? (
+                <JournalCarouselItem
+                  key={`j-${it.journal.id}-${i}`}
+                  journal={it.journal}
+                />
+              ) : (
+                <LineCarouselItem
+                  key={`l-${it.journal.id}-${it.lineIndex}-${i}`}
+                  journal={it.journal}
+                  lineText={it.lineText}
+                />
+              )
+            )}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
@@ -258,36 +163,3 @@ const ClozeWorkout = ({
 };
 
 export default ClozeWorkout;
-
-const ClozeCarouselHeader = ({
-  articleId,
-  createdAt,
-}: {
-  articleId: string;
-  createdAt: string;
-}) => {
-  const date = new Date(createdAt);
-  return (
-    <header className='flex mb-2'>
-      <Link href={`/articles/${articleId}`}>
-        <h2 className='flex items-baseline hover:underline'>
-          <time className='font-bold pr-1'>
-            {date.toLocaleDateString('ja-JP', {
-              year: 'numeric',
-              month: 'numeric',
-              day: 'numeric',
-              timeZone: 'Asia/Taipei',
-            })}
-          </time>
-          <time className='font-light text-slate-500 text-sm'>
-            {date.toLocaleString('ja-JP', {
-              hour: 'numeric',
-              minute: 'numeric',
-              timeZone: 'Asia/Taipei',
-            })}
-          </time>
-        </h2>
-      </Link>
-    </header>
-  );
-};

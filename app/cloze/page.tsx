@@ -10,8 +10,6 @@ type Props = {
   }>;
 };
 
-export type ClozeWorkoutJournal = Journal;
-
 const Page = async ({ searchParams }: Props) => {
   const sp = await searchParams;
   const { assignment_id } = sp;
@@ -24,7 +22,7 @@ const Page = async ({ searchParams }: Props) => {
     sp.order === 'rand' || sp.order === 'seq' ? sp.order : 'seq'
   ) as 'seq' | 'rand';
 
-  let journals: ClozeWorkoutJournal[] = [];
+  let journals: Journal[] = [];
   const supabase = await createClient();
 
   if (assignment_id) {
