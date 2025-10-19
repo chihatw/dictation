@@ -130,10 +130,14 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
   }, [open, articleId]);
 
   useLayoutEffect(() => {
-    if (!open || loading || rows.length === 0) return;
+    if (!open || loading) return;
     const el = listRef.current;
-    if (el) el.scrollTop = el.scrollHeight; // 行追加後に下端へ
-  }, [open, loading, rows.length]);
+    if (!el) return;
+
+    if (isFromHome) return;
+
+    if (rows.length > 0) el.scrollTop = el.scrollHeight;
+  }, [open, loading, rows.length, isFromHome]);
 
   const save = useCallback(() => {
     if (!articleId || !body.trim() || loading) return;
