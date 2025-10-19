@@ -320,6 +320,13 @@ export type Database = {
             referencedRelation: "dictation_sentences"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dictation_submissions_sentence_id_fkey"
+            columns: ["sentence_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_sentences_view"
+            referencedColumns: ["sentence_id"]
+          },
         ]
       }
       dictation_tag_master: {
@@ -363,6 +370,13 @@ export type Database = {
           tag_master_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "dictation_teacher_feedback_tags_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_sentences_view"
+            referencedColumns: ["submission_id"]
+          },
           {
             foreignKeyName: "dictation_teacher_feedback_tags_submission_id_fkey"
             columns: ["submission_id"]
@@ -803,6 +817,45 @@ export type Database = {
           },
         ]
       }
+      dictation_sentences_view: {
+        Row: {
+          article_id: string | null
+          article_seq: number | null
+          assignment_id: string | null
+          audio_path: string | null
+          content: string | null
+          created_at: string | null
+          full_title: string | null
+          sentence_id: string | null
+          sentence_seq: number | null
+          submission_id: string | null
+          subtitle: string | null
+          title: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_articles_assignment_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_articles_assignment_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_sentences_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sentences_view: {
         Row: {
           articleId: number | null
@@ -921,6 +974,7 @@ export type Database = {
           sentence_seq: number
           subtitle: string
           title: string
+          top_assignment_ids: string[]
           total_count: number
         }[]
       }

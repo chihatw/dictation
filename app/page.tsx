@@ -50,6 +50,7 @@ export default async function Home() {
     ? Math.round((row.done_count / row.total_count) * 100)
     : 0;
   const timeProgress = timeProgress5pct(startAt, endAt);
+  const topAssignmentIds = row?.top_assignment_ids;
 
   const initialJournals = (row?.journals ?? []) as Journal[];
   const initialBefore = initialJournals.at(-1)?.created_at ?? null;
@@ -126,6 +127,7 @@ export default async function Home() {
           initialBefore={initialBefore}
           initialItems={initialJournals}
           userId={user.id}
+          topAssignmentIds={topAssignmentIds}
         />
       </main>
     </div>

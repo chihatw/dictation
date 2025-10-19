@@ -13,10 +13,12 @@ export function HomeJournals({
   initialItems,
   initialBefore,
   userId,
+  topAssignmentIds, // todo useSWRInfinite
 }: {
   initialItems: Journal[];
   initialBefore: string | null;
   userId: string;
+  topAssignmentIds: string[];
 }) {
   const [items, setItems] = useState(initialItems);
   const [before, setBefore] = useState<string | null>(initialBefore);
