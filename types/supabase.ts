@@ -693,6 +693,34 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_assignment_counts_view: {
+        Row: {
+          created_at: string | null
+          done_count: number | null
+          due_at: string | null
+          id: string | null
+          published_at: string | null
+          title: string | null
+          total_count: number | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_articles_assignment_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_articles_assignment_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dictation_assignments_view: {
         Row: {
           due_at: string | null
@@ -859,13 +887,6 @@ export type Database = {
           seq: number
           subtitle: string
           tags: string[]
-        }[]
-      }
-      get_assignment_counts: {
-        Args: { p_assignment_id: string }
-        Returns: {
-          done_count: number
-          total_count: number
         }[]
       }
       get_assignment_next_sentence: {
