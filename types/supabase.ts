@@ -908,7 +908,6 @@ export type Database = {
         Returns: {
           assignment_id: string
           due_at: string
-          end_at: string
           start_at: string
         }[]
       }
@@ -954,7 +953,6 @@ export type Database = {
         Returns: {
           assignment_id: string
           due_at: string
-          end_at: string
           start_at: string
         }[]
       }
@@ -1024,10 +1022,6 @@ export type Database = {
       show_trgm: {
         Args: { "": string }
         Returns: string[]
-      }
-      time_progress_5pct: {
-        Args: { p_end: string; p_start: string }
-        Returns: number
       }
       unaccent: {
         Args: { "": string }
