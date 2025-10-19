@@ -896,8 +896,8 @@ export type Database = {
           journals: Json
           next_article_id: string
           next_sentence_id: string
+          published_at: string
           sentence_seq: number
-          start_at: string
           subtitle: string
           title: string
           total_count: number
@@ -908,7 +908,7 @@ export type Database = {
         Returns: {
           assignment_id: string
           due_at: string
-          start_at: string
+          published_at: string
         }[]
       }
       get_or_create_dictation_tag: {
@@ -953,7 +953,7 @@ export type Database = {
         Returns: {
           assignment_id: string
           due_at: string
-          start_at: string
+          published_at: string
         }[]
       }
       gtrgm_compress: {

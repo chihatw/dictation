@@ -40,7 +40,7 @@ export default async function Home() {
   if (error) throw new Error(error.message);
 
   const row = Array.isArray(data) ? data[0] : data;
-  const startAt = row?.start_at as string | null | undefined;
+  const startAt = row?.published_at as string | null | undefined;
   const dueAt = row?.due_at as string | null | undefined;
   const endAt = dueAt ? dueDayStartUtc(dueAt).toISOString() : null;
   const nextArticleId = row?.next_article_id as string | null | undefined;
