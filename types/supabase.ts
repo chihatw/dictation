@@ -903,14 +903,6 @@ export type Database = {
           total_count: number
         }[]
       }
-      get_latest_release: {
-        Args: { p_uid: string }
-        Returns: {
-          assignment_id: string
-          due_at: string
-          published_at: string
-        }[]
-      }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
         Returns: string
@@ -946,14 +938,6 @@ export type Database = {
           subtitle: string
           title: string
           user_id: string
-        }[]
-      }
-      get_user_top_releases: {
-        Args: { p_limit?: number; p_uid: string }
-        Returns: {
-          assignment_id: string
-          due_at: string
-          published_at: string
         }[]
       }
       gtrgm_compress: {
