@@ -10,6 +10,7 @@ import { HomeJournals } from '@/components/home/HomeJornals';
 import JournalQuickWriteButton from '@/components/home/JournalQuickWriteButton';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import { Journal } from '@/types/dictation';
+import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 import Link from 'next/link';
 
 const TEMP = {
@@ -18,6 +19,41 @@ const TEMP = {
   title: '臺灣的教師節禮物',
   subtitle: 'N5',
 };
+
+const TZ = 'Asia/Taipei';
+
+// due_at の「当日 0:00（TZ）」を UTC に変換
+function dueDayStartUtc(dueAtISO: string, tz = TZ): Date {
+  const dueZoned = toZonedTime(new Date(dueAtISO), tz);
+  const midnightLocal = new Date(
+    dueZoned.getFullYear(),
+    dueZoned.getMonth(),
+    dueZoned.getDate(), // 00:00
+    0,
+    0,
+    0,
+    0
+  );
+  return fromZonedTime(midnightLocal, tz);
+}
+
+// 5%刻みで丸め。
+function timeProgress5pct(
+  startAtISO: string | null | undefined,
+  endAtISO: string | null | undefined,
+  now: Date = new Date()
+): number {
+  if (!startAtISO || !endAtISO) return 0;
+  const start = new Date(startAtISO).getTime();
+  const end = new Date(endAtISO).getTime();
+  const t = now.getTime();
+  if (!isFinite(start) || !isFinite(end) || end <= start) return 0;
+  if (t <= start) return 0;
+  if (t >= end) return 100;
+  const raw = ((t - start) / (end - start)) * 100;
+  const snapped = 5 * Math.round(raw / 5);
+  return Math.max(0, Math.min(100, snapped));
+}
 
 export default async function Home() {
   const supabase = await createClient();
@@ -39,15 +75,16 @@ export default async function Home() {
   if (error) throw new Error(error.message);
 
   const row = Array.isArray(data) ? data[0] : data;
+  const startAt = row?.start_at as string | null | undefined;
   const dueAt = row?.due_at as string | null | undefined;
+  const endAt = dueAt ? dueDayStartUtc(dueAt).toISOString() : null;
   const nextArticleId = row?.next_article_id as string | null | undefined;
   const dueStr = formatDueTW(dueAt);
   const todayStr = formatTodayTW();
   const pct = row?.total_count
     ? Math.round((row.done_count / row.total_count) * 100)
     : 0;
-  const timeProgress =
-    typeof row?.time_progress_pct === 'number' ? row.time_progress_pct : 0;
+  const timeProgress = timeProgress5pct(startAt, endAt);
 
   const initialJournals = (row?.journals ?? []) as Journal[];
   const initialBefore = initialJournals.at(-1)?.created_at ?? null;
