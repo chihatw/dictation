@@ -13,13 +13,6 @@ import { Journal } from '@/types/dictation';
 import { dueDayStartUtc, timeProgress5pct } from '@/utils/timeProgress';
 import Link from 'next/link';
 
-const TEMP = {
-  user_id: 'b2d7045a-bfb9-4aa2-88ed-fdfbac324e72',
-  article_id: 'e81e64c6-6c20-4b18-a021-a84f729b0907',
-  title: '臺灣的教師節禮物',
-  subtitle: 'N5',
-};
-
 export default async function Home() {
   const supabase = await createClient();
   const {
@@ -27,16 +20,10 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('unauthorized');
 
-  const [{ data, error }, { yunlin, hyogo }, { data: temp }] =
-    await Promise.all([
-      supabase.rpc('get_home_next_task', { p_uid: user.id }),
-      fetchMultiWeather(),
-      supabase // 暫定処理
-        .from('dictation_journals')
-        .select('*')
-        .eq('article_id', TEMP.article_id)
-        .maybeSingle(),
-    ]);
+  const [{ data, error }, { yunlin, hyogo }] = await Promise.all([
+    supabase.rpc('get_home_next_task', { p_uid: user.id }),
+    fetchMultiWeather(),
+  ]);
   if (error) throw new Error(error.message);
 
   const row = Array.isArray(data) ? data[0] : data;
@@ -89,15 +76,7 @@ export default async function Home() {
             </div>
           </div>
 
-          {user.id === TEMP.user_id && !temp && (
-            <div>
-              <JournalQuickWriteButton
-                articleId={TEMP.article_id}
-                label={`寫「${TEMP.title} ${TEMP.subtitle}」的學習日誌`}
-                enabled={user.id === TEMP.user_id && !temp}
-              />
-            </div>
-          )}
+          <JournalQuickWriteButton assignment_id={row.assignment_id} />
 
           {nextArticleId ? (
             <Link

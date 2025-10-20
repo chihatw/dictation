@@ -709,6 +709,7 @@ export type Database = {
       }
       dictation_article_journal_status_view: {
         Row: {
+          all_done: boolean | null
           article_id: string | null
           assignment_id: string | null
           done_count: number | null

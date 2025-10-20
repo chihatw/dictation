@@ -69,8 +69,8 @@ function getRandomPlaceholders(n: number) {
 }
 
 export function useJournalModal(opts?: { isFromHome?: boolean }) {
-  const router = useRouter(); // 暫定処理
-  const isFromHome = opts?.isFromHome ?? false; // 暫定処理
+  const router = useRouter();
+  const isFromHome = opts?.isFromHome ?? false;
 
   const [open, setOpen] = useState(false);
   const [articleId, setArticleId] = useState<string | null>(null);
@@ -143,9 +143,8 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
     if (!articleId || !body.trim() || loading) return;
     startTransition(async () => {
       try {
-        // 暫定処理
         if (isFromHome) {
-          await saveDictationJournalFromHome(articleId, body.trim()); // 暫定処理
+          await saveDictationJournalFromHome(articleId, body.trim());
           router.refresh();
         } else {
           await saveDictationJournalAction(articleId, body.trim());
