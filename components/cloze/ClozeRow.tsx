@@ -19,6 +19,8 @@ const ClozeRow = ({ objs }: Props) => {
 
   let bi = -1; // 空所カウンタ
 
+  console.log({ objs });
+
   return (
     <div className='grid grid-cols-[1fr_auto] gap-1'>
       <p className='leading-loose'>
@@ -39,7 +41,7 @@ const ClozeRow = ({ objs }: Props) => {
           );
         })}
       </p>
-      {!(objs.length === 1 && objs[0].t === 'text') && (
+      {(objs.length > 1 || (objs.length === 1 && objs[0].t !== 'text')) && (
         <button
           onClick={toggleAll}
           className='align-baseline px-2 py-0.5 cursor-pointer hover:bg-gray-100 rounded-sm'
