@@ -707,6 +707,28 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_article_journal_status_view: {
+        Row: {
+          article_id: string | null
+          assignment_id: string | null
+          done_count: number | null
+          full_title: string | null
+          has_journal: boolean | null
+          seq: number | null
+          subtitle: string | null
+          title: string | null
+          total_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_sentences_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dictation_assignment_counts_view: {
         Row: {
           created_at: string | null
@@ -942,15 +964,6 @@ export type Database = {
           tags: string[]
         }[]
       }
-      get_assignment_next_sentence: {
-        Args: { p_assignment_id: string }
-        Returns: {
-          article_id: string
-          next_sentence_id: string
-          sentence_seq: number
-          subtitle: string
-        }[]
-      }
       get_distinct_due_ym_keys: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -969,10 +982,10 @@ export type Database = {
           due_at: string
           journals: Json
           next_article_id: string
+          next_full_title: string
           next_sentence_id: string
+          next_sentence_seq: number
           published_at: string
-          sentence_seq: number
-          subtitle: string
           title: string
           top_assignment_ids: string[]
           total_count: number
