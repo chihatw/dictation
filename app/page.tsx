@@ -14,6 +14,8 @@ import { Journal } from '@/types/dictation';
 import { dueDayStartUtc, timeProgress5pct } from '@/utils/timeProgress';
 import Link from 'next/link';
 
+// debug これは　vercel に retry するためだけのコメント
+
 export default async function Home() {
   const supabase = await createClient();
   const {
