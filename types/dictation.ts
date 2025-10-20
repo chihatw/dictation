@@ -1,6 +1,6 @@
 // types/dictation.ts
 
-import { Tables } from './supabase';
+import { Database, Tables } from './supabase';
 
 type UserDb = Tables<'users'>;
 type AssignmentDb = Tables<'dictation_assignments'>;
@@ -10,6 +10,8 @@ type SubmissionDb = Tables<'dictation_submissions'>;
 type TagDb = Tables<'dictation_teacher_feedback_tags'>;
 type TagMasterDb = Tables<'dictation_tag_master'>;
 type JournalDb = Tables<'dictation_journals'> & { cloze_spans: ClozeSpan[] };
+type JournalViewDb =
+  Database['public']['Views']['dictation_journals_view']['Row'];
 
 // 将来的には スネーク を キャメル に
 type User = UserDb;
@@ -21,6 +23,7 @@ export type Article = ArticleDb;
 type Sentence = SentenceDb;
 type Submission = SubmissionDb;
 export type Journal = JournalDb;
+export type JournalView = JournalViewDb;
 
 // JOIN 用の外部キーを外したもの
 type SubmissionCore = Omit<Submission, 'sentence_id'>;

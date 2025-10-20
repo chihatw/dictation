@@ -6,6 +6,7 @@ import TodayPanel from '@/components/home/TodayPanel';
 import { createClient } from '@/lib/supabase/server';
 import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
 
+import HomeCloze from '@/components/home/HomeCloze';
 import { HomeJournals } from '@/components/home/HomeJornals';
 import JournalQuickWriteButton from '@/components/home/JournalQuickWriteButton';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
@@ -20,11 +21,17 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('unauthorized');
 
-  const [{ data, error }, { yunlin, hyogo }] = await Promise.all([
+  const [
+    { data, error },
+    { data: journal, error: error_j },
+    { yunlin, hyogo },
+  ] = await Promise.all([
     supabase.rpc('get_home_next_task', { p_uid: user.id }),
+    supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
     fetchMultiWeather(),
   ]);
   if (error) throw new Error(error.message);
+  if (error_j) throw new Error(error_j.message);
 
   const row = Array.isArray(data) ? data[0] : data;
   const startAt = row?.published_at as string | null | undefined;
@@ -101,6 +108,8 @@ export default async function Home() {
             </div>
           )}
         </section>
+
+        {journal[0] && <HomeCloze journal={journal[0]} />}
 
         <HomeJournals
           initialBefore={initialBefore}

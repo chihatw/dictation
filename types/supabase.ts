@@ -815,6 +815,7 @@ export type Database = {
           created_at: string | null
           id: string | null
           rating_score: number | null
+          user_id: string | null
         }
         Relationships: [
           {
@@ -830,6 +831,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
           },
           {
             foreignKeyName: "dictation_journals_article_id_fkey"
@@ -1078,6 +1086,20 @@ export type Database = {
           created_at: string
           id: string
           rating_score: number
+        }[]
+      }
+      pick_random_cloze_journal_fast: {
+        Args: { p_uid: string }
+        Returns: {
+          article_id: string | null
+          article_seq: number | null
+          assignment_id: string | null
+          body: string | null
+          cloze_spans: Json | null
+          created_at: string | null
+          id: string | null
+          rating_score: number | null
+          user_id: string | null
         }[]
       }
       save_dictation_journal: {
