@@ -169,10 +169,7 @@ export function HomeJournals({
             return (
               <li key={j.id} className='rounded border p-3 bg-slate-50'>
                 <div className='flex justify-between pr-2'>
-                  <JournalLinkHeader
-                    articleId={j.article_id}
-                    createdAt={j.created_at}
-                  />
+                  <JournalLinkHeader journal={j} />
                 </div>
 
                 <div className='mt-1 text-sm text-gray-700 space-y-1'>
@@ -209,34 +206,38 @@ export function HomeJournals({
   );
 }
 
-const JournalLinkHeader = ({
-  articleId,
-  createdAt,
-}: {
-  articleId: string;
-  createdAt: string;
-}) => {
-  const date = new Date(createdAt);
+const JournalLinkHeader = ({ journal }: { journal: Journal }) => {
+  const date = new Date(journal.created_at);
   return (
-    <Link href={`/articles/${articleId}`} className='block'>
-      <div className='flex items-center hover:underline gap-x-1'>
-        <time className='font-bold '>
-          {date.toLocaleString('ja-JP', {
-            year: 'numeric',
-            month: 'numeric',
-            day: 'numeric',
-            timeZone: 'Asia/Taipei',
-          })}
-        </time>
-        <time className='font-light text-slate-500 text-sm'>
-          {date.toLocaleString('ja-JP', {
-            hour: 'numeric',
-            minute: 'numeric',
-            timeZone: 'Asia/Taipei',
-          })}
-        </time>
-        <LinkIcon className='w-3 h-3 text-slate-500' />
-      </div>
-    </Link>
+    <div className='flex items-center justify-between w-full'>
+      <Link href={`/articles/${journal.article_id}`} className='block'>
+        <div className='flex items-center hover:underline gap-x-1'>
+          <time className='font-bold '>
+            {date.toLocaleString('ja-JP', {
+              year: 'numeric',
+              month: 'numeric',
+              day: 'numeric',
+              timeZone: 'Asia/Taipei',
+            })}
+          </time>
+          <time className='font-light text-slate-500 text-sm'>
+            {date.toLocaleString('ja-JP', {
+              hour: 'numeric',
+              minute: 'numeric',
+              timeZone: 'Asia/Taipei',
+            })}
+          </time>
+          <LinkIcon className='w-3 h-3 text-slate-500' />
+        </div>
+      </Link>
+      {!journal.locked && (
+        <Link
+          href={`/cloze/${journal.id}/edit`}
+          className='text-xs rounded border px-2 py-1 text-slate-500 cursor-pointer hover:bg-slate-200'
+        >
+          {!journal.cloze_spans.length ? `建立填空題` : `修改填空題`}
+        </Link>
+      )}
+    </div>
   );
 };

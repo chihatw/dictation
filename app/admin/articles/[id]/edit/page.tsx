@@ -6,12 +6,10 @@ import { EditSubtitleForm } from '../../components/EditSubtitleForm';
 
 type PageProps = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<Record<string, string | string[]>>;
 };
 
 export default async function Page(props: PageProps) {
   const { id } = await props.params;
-  await props.searchParams;
 
   const supabase = await createClient();
   const { data: art, error } = await supabase
