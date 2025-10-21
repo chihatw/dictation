@@ -1007,10 +1007,6 @@ export type Database = {
         Args: { p_label: string }
         Returns: string
       }
-      get_recent_journals_for_assignments: {
-        Args: { p_assignment_ids: string[] }
-        Returns: Json
-      }
       get_submission_by_id: {
         Args: { p_submission_id: string }
         Returns: Json
