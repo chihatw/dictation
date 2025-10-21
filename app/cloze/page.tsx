@@ -67,7 +67,17 @@ const Page = async ({ searchParams }: Props) => {
     const { data: _journals, error: jErr } = await supabase
       .from('dictation_journals_view')
       .select(
-        'id, created_at, article_id, body, rating_score, cloze_spans, assignment_id, article_seq'
+        `
+        id, 
+        created_at, 
+        article_id, 
+        body, 
+        rating_score, 
+        cloze_spans, 
+        assignment_id, 
+        article_seq, 
+        locked
+      `
       )
       .eq('assignment_id', assignment_id)
       .order('created_at', { ascending: true });
@@ -76,12 +86,13 @@ const Page = async ({ searchParams }: Props) => {
     const base = _journals ?? [];
     allJournals =
       _journals?.map((j) => ({
-        id: j.id!,
-        created_at: j.created_at!,
-        article_id: j.article_id!,
-        body: j.body!,
+        id: j.id as string,
+        created_at: j.created_at as string,
+        article_id: j.article_id as string,
+        body: j.body as string,
         cloze_spans: j.cloze_spans! as ClozeSpan[],
-        rating_score: j.rating_score!,
+        rating_score: j.rating_score as number,
+        locked: j.locked as boolean,
       })) ?? [];
 
     const pick = (() => {

@@ -52,6 +52,7 @@ const HomeCloze = ({ journal }: Props) => {
             created_at: journal.created_at as string,
             id: journal.id as string,
             rating_score: journal.rating_score as number,
+            locked: journal.locked as boolean,
           },
           lineText,
           lineIndex: i,

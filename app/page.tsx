@@ -10,11 +10,8 @@ import HomeCloze from '@/components/home/HomeCloze';
 import { HomeJournals } from '@/components/home/HomeJornals';
 import JournalQuickWriteButton from '@/components/home/JournalQuickWriteButton';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
-import { Journal } from '@/types/dictation';
 import { dueDayStartUtc, timeProgress5pct } from '@/utils/timeProgress';
 import Link from 'next/link';
-
-// debug これは　vercel に retry するためだけのコメント
 
 export default async function Home() {
   const supabase = await createClient();
@@ -48,8 +45,6 @@ export default async function Home() {
   const timeProgress = timeProgress5pct(startAt, endAt);
   const topAssignmentIds = row?.top_assignment_ids;
 
-  const initialJournals = (row?.journals ?? []) as Journal[];
-  const initialBefore = initialJournals.at(-1)?.created_at ?? null;
   return (
     <div className='min-h-screen p-6'>
       <main className='mx-auto max-w-2xl space-y-6'>
@@ -113,12 +108,7 @@ export default async function Home() {
 
         {journal[0] && <HomeCloze journal={journal[0]} />}
 
-        <HomeJournals
-          initialBefore={initialBefore}
-          initialItems={initialJournals}
-          userId={user.id}
-          topAssignmentIds={topAssignmentIds}
-        />
+        <HomeJournals userId={user.id} topAssignmentIds={topAssignmentIds} />
       </main>
     </div>
   );

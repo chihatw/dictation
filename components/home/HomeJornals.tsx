@@ -2,33 +2,116 @@
 'use client';
 import { fetchMoreJournals } from '@/app/actions/fetchMoreJournals';
 import { Vote } from '@/app/journals/Vote';
-import { Journal } from '@/types/dictation';
+import { supabase } from '@/lib/supabase/browser';
+import { ClozeSpan, Journal } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
 import { LinkIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import ClozeRow from '../cloze/ClozeRow';
 
 export function HomeJournals({
-  initialItems,
-  initialBefore,
   userId,
   topAssignmentIds, // todo useSWRInfinite
 }: {
-  initialItems: Journal[];
-  initialBefore: string | null;
   userId: string;
   topAssignmentIds: string[];
 }) {
-  const [items, setItems] = useState(initialItems);
-  const [before, setBefore] = useState<string | null>(initialBefore);
+  const [items, setItems] = useState<Journal[]>([]);
+  const [before, setBefore] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [pending, start] = useTransition();
 
-  // 暫定処理
-  useEffect(() => {
+  const fetchItems = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('dictation_journals_view')
+      .select(
+        `
+        id,
+        assignment_id,
+        created_at, 
+        article_id, 
+        body, 
+        rating_score, 
+        cloze_spans, 
+        locked
+        `
+      )
+      .in('assignment_id', topAssignmentIds)
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error(error.message);
+      setItems([]);
+      return;
+    }
+    const initialItems: Journal[] = (data ?? []).map((i) => ({
+      id: i.id as string,
+      created_at: i.created_at as string,
+      article_id: i.article_id as string,
+      body: i.body as string,
+      rating_score: i.rating_score as number,
+      cloze_spans: i.cloze_spans as ClozeSpan[],
+      locked: i.locked as boolean,
+    }));
+
+    const initialBefore = initialItems.at(-1)?.created_at ?? null;
+
     setItems(initialItems);
-  }, [initialItems]);
+    setBefore(initialBefore);
+  }, [topAssignmentIds]);
+
+  // 初期値設定
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  // dictation_journals の追加を監視
+  // 追加された場合、items の先頭に追加
+  useEffect(() => {
+    const ch = supabase
+      .channel('journals-insert')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'dictation_journals',
+        },
+        async (payload) => {
+          const id = (payload.new as { id: string }).id;
+          const { data, error } = await supabase
+            .from('dictation_journals_view')
+            .select(
+              `
+          id, assignment_id, created_at, article_id, body, rating_score, cloze_spans, locked
+        `
+            )
+            .eq('id', id)
+            .single();
+          if (error || !data) return;
+          if (!topAssignmentIds.includes(data.assignment_id as string)) return;
+
+          const j = {
+            id: data.id as string,
+            created_at: data.created_at as string,
+            article_id: data.article_id as string,
+            body: data.body as string,
+            rating_score: data.rating_score as number,
+            cloze_spans: data.cloze_spans as ClozeSpan[],
+            locked: data.locked as boolean,
+          } satisfies Journal;
+
+          setItems((prev) => [j, ...prev]);
+          // ページネーション用の before は必要なら再計算
+          setBefore((prev) => prev ?? j.created_at);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [topAssignmentIds]);
 
   const onMore = () =>
     start(async () => {

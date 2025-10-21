@@ -212,6 +212,7 @@ export type Database = {
           cloze_spans: Json
           created_at: string
           id: string
+          locked: boolean
           rating_score: number
         }
         Insert: {
@@ -220,6 +221,7 @@ export type Database = {
           cloze_spans?: Json
           created_at?: string
           id?: string
+          locked?: boolean
           rating_score?: number
         }
         Update: {
@@ -228,6 +230,7 @@ export type Database = {
           cloze_spans?: Json
           created_at?: string
           id?: string
+          locked?: boolean
           rating_score?: number
         }
         Relationships: [
@@ -814,6 +817,7 @@ export type Database = {
           cloze_spans: Json | null
           created_at: string | null
           id: string | null
+          locked: boolean | null
           rating_score: number | null
           user_id: string | null
         }
@@ -1098,6 +1102,7 @@ export type Database = {
           cloze_spans: Json | null
           created_at: string | null
           id: string | null
+          locked: boolean | null
           rating_score: number | null
           user_id: string | null
         }[]
