@@ -6,11 +6,8 @@ import Link from 'next/link';
 
 import { Assignment } from '@/types/dictation';
 import { UserSelect } from '../components/UserSelect';
-import {
-  deleteAssignment,
-  publishAssignment,
-  unpublishAssignment,
-} from './actions';
+import { publishAssignment, unpublishAssignment } from './actions';
+import { ConfirmDeleteForm } from './ConfirmDeleteForm';
 
 export default async function Page(props: {
   searchParams: Promise<{ user_id?: string }>;
@@ -123,15 +120,7 @@ export default async function Page(props: {
                     文章一覧
                   </Link>
 
-                  <form action={deleteAssignment}>
-                    <input type='hidden' name='id' value={col.id} />
-                    <button
-                      type='submit'
-                      className='rounded-md border border-red-300 px-2 py-1 text-sm text-red-600 hover:bg-red-50'
-                    >
-                      削除
-                    </button>
-                  </form>
+                  <ConfirmDeleteForm id={col.id} />
                 </div>
               </div>
             ))
