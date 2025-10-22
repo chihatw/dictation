@@ -717,7 +717,9 @@ export type Database = {
           assignment_id: string | null
           done_count: number | null
           full_title: string | null
+          has_cloze_spans: boolean | null
           has_journal: boolean | null
+          journal_id: string | null
           seq: number | null
           subtitle: string | null
           title: string | null

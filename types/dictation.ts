@@ -12,6 +12,8 @@ type TagMasterDb = Tables<'dictation_tag_master'>;
 type JournalDb = Tables<'dictation_journals'> & { cloze_spans: ClozeSpan[] };
 type JournalViewDb =
   Database['public']['Views']['dictation_journals_view']['Row'];
+type ArticleViewDb =
+  Database['public']['Views']['dictation_article_journal_status_view']['Row'];
 
 // 将来的には スネーク を キャメル に
 type User = UserDb;
@@ -24,6 +26,7 @@ type Sentence = SentenceDb;
 type Submission = SubmissionDb;
 export type Journal = JournalDb;
 export type JournalView = JournalViewDb;
+export type ArticleView = ArticleViewDb;
 
 // JOIN 用の外部キーを外したもの
 type SubmissionCore = Omit<Submission, 'sentence_id'>;

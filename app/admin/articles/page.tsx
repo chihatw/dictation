@@ -1,6 +1,6 @@
 // app/admin/articles/page.tsx
 import { createClient } from '@/lib/supabase/server';
-import { Article, Assignment } from '@/types/dictation';
+import { ArticleView, Assignment } from '@/types/dictation';
 import Link from 'next/link';
 
 type PageProps = {
@@ -9,7 +9,6 @@ type PageProps = {
 };
 
 export default async function Page(props: PageProps) {
-  await props.params; // 未使用でも await
   const sp = await props.searchParams;
   const { assignment_id: colId, user_id: userId } = sp;
 
@@ -34,9 +33,9 @@ export default async function Page(props: PageProps) {
 
   const { data: col, error: colErr } = await supabase
     .from('dictation_assignments')
-    .select('id, title')
+    .select('id, title, due_at')
     .eq('id', colId)
-    .maybeSingle<Pick<Assignment, 'id' | 'title'>>();
+    .maybeSingle<Pick<Assignment, 'id' | 'title' | 'due_at'>>();
 
   if (colErr) throw new Error(colErr.message);
 
@@ -57,23 +56,29 @@ export default async function Page(props: PageProps) {
 
   // articles
   const { data: articlesRaw, error: artErr } = await supabase
-    .from('dictation_articles')
-    .select('id, subtitle, created_at, seq')
+    .from('dictation_article_journal_status_view')
+    .select('article_id, subtitle, seq, journal_id, has_cloze_spans')
     .eq('assignment_id', col.id)
     .order('seq', { ascending: true });
 
   if (artErr) throw new Error(artErr.message);
-  const articles: Pick<Article, 'id' | 'subtitle' | 'created_at' | 'seq'>[] =
-    Array.isArray(articlesRaw) ? articlesRaw : [];
+  const articles: Pick<
+    ArticleView,
+    'article_id' | 'subtitle' | 'seq' | 'journal_id' | 'has_cloze_spans'
+  >[] = Array.isArray(articlesRaw) ? articlesRaw : [];
+
+  const dueAt = new Date(col.due_at!);
 
   return (
     <div className='space-y-6'>
       <div className='flex items-start gap-3'>
         <div>
-          <h1 className='text-xl font-semibold'>{`${col.title}`}</h1>
+          <h1 className='text-xl font-semibold'>
+            <span className='mr-2'>{dueAt.toLocaleDateString()}</span>
+            <span>{`${col.title}`}</span>
+          </h1>
         </div>
         <div className='ml-auto flex items-center gap-2'>
-          {/* 追加: 戻るボタン */}
           <Link
             href={`/admin/assignments?user_id=${userId}`}
             className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
@@ -98,32 +103,35 @@ export default async function Page(props: PageProps) {
             <tr className='text-left'>
               <th className='px-2 py-1'>順</th>
               <th className='px-2 py-1'>サブタイトル</th>
-              <th className='px-2 py-1'>created_at</th>
+
               <th className='px-2 py-1'>操作</th>
             </tr>
           </thead>
           <tbody>
             {(articles ?? []).map((a) => (
-              <tr key={a.id} className='border-t'>
+              <tr key={a.article_id} className='border-t'>
                 <td className='px-2 py-1'>{a.seq}</td>
-                <td className='px-2 py-1'>{a.subtitle}</td>
                 <td className='px-2 py-1'>
-                  {new Date(a.created_at).toLocaleString('ja-JP')}
+                  {a.subtitle} {a.has_cloze_spans ? '*' : ''}
                 </td>
                 <td className='px-2 py-1 space-x-2'>
-                  <div className='flex gap-x-2'>
+                  <div className='flex gap-x-2 items-center'>
                     <Link
-                      href={`/articles/${a.id}`}
+                      href={`/articles/${a.article_id}`}
                       className='rounded-md border px-2 py-1'
                     >
                       Article ページ
                     </Link>
-                    <Link
-                      href={`/admin/articles/${a.id}/edit`}
-                      className='rounded-md border px-2 py-1'
-                    >
-                      サブタイトル編集
-                    </Link>
+                    {a.journal_id ? (
+                      <Link
+                        href={`/admin/journals/${a.journal_id}?assignment_id=${colId}&user_id=${userId}`}
+                        className='rounded-md border px-2 py-1'
+                      >
+                        編輯填空題
+                      </Link>
+                    ) : (
+                      <div className='ml-2 text-slate-400'>学習日誌なし</div>
+                    )}
                   </div>
                 </td>
               </tr>

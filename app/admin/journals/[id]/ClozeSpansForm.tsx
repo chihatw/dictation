@@ -6,6 +6,7 @@ import {
   parseSpansFromCloze,
 } from '@/utils/cloze/converter';
 import { LoaderCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import {
   ChangeEvent,
   useEffect,
@@ -18,9 +19,10 @@ import {
 import ClozeRow from '@/components/cloze/ClozeRow';
 import { updateJournalClozeSpans } from './actions';
 
-type Props = { journal: Journal };
+type Props = { journal: Journal; assignmentId?: string; userId?: string };
 
-const ClozeSpansForm = ({ journal }: Props) => {
+const ClozeSpansForm = ({ journal, assignmentId, userId }: Props) => {
+  const router = useRouter();
   const JOURNAL_BODY = useMemo(() => journal.body, [journal]);
   const CLOZE_OBJ_LINES = useMemo(() => {
     const _clozeText = makeClozeText(journal.body, journal.cloze_spans);
@@ -86,7 +88,18 @@ const ClozeSpansForm = ({ journal }: Props) => {
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      await action(formData);
+      try {
+        await action(formData);
+        if (assignmentId && userId) {
+          router.push(
+            `/admin/articles?assignment_id=${encodeURIComponent(
+              assignmentId
+            )}&user_id=${encodeURIComponent(userId)}`
+          );
+        }
+      } catch (e) {
+        console.error(e);
+      }
     });
   };
 
