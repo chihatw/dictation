@@ -37,8 +37,8 @@ const ClozeCarousel = ({ items, setApi }: Props) => {
           )
         )}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className='absolute -left-10 top-16 z-10' />
+      <CarouselNext className='absolute -right-10 top-16 z-10' />
     </Carousel>
   );
 };
