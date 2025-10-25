@@ -7,7 +7,7 @@ import { createMiddlewareClient, withCookies } from './lib/supabase/middleware';
  * 未ログイン時は /signin へリダイレクト
  * サインインページはログイン済みなら / へリダイレクト
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { supabase, response } = createMiddlewareClient(request);
   const {
     data: { user },
