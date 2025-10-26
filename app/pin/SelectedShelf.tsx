@@ -18,6 +18,7 @@ function Placeholder({ text }: { text: string }) {
 type Props = {
   bestId: string | null;
   hmIds: string[];
+  labelsById: Record<string, string>;
   onClearBest: () => void;
   onToggleHM: (id: string) => void;
   onSubmit: () => void;
@@ -26,6 +27,7 @@ type Props = {
 export function SelectedShelf({
   bestId,
   hmIds,
+  labelsById,
   onClearBest,
   onToggleHM,
   onSubmit,
@@ -35,13 +37,13 @@ export function SelectedShelf({
       <div className='flex items-center gap-3'>
         <div className='flex-1 overflow-hidden'>
           <div
-            className='flex gap-2 overflow-x-auto items-center min-h-9 pr-1'
+            className='flex flex-wrap gap-2 items-center min-h-9'
             aria-live='polite'
           >
             {bestId ? (
               <Badge
                 id={bestId}
-                label='最佳作品'
+                label={labelsById[bestId] ?? '最佳作品'}
                 color='gold'
                 onClear={onClearBest}
               />
@@ -53,7 +55,7 @@ export function SelectedShelf({
                 <Badge
                   key={id}
                   id={id}
-                  label='佳作'
+                  label={labelsById[id] ?? '佳作'}
                   color='silver'
                   onClear={() => onToggleHM(id)}
                 />

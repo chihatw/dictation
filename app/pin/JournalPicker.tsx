@@ -3,6 +3,11 @@ import { useMemo, useState } from 'react';
 import { JournalCard } from './JournalCard';
 import { SelectedShelf } from './SelectedShelf';
 
+const toLabel = (body: string) => {
+  const first = (body.split('\n')[0] || '').trim();
+  return first.length > 10 ? first.slice(0, 10) + '…' : first || '（無標題）';
+};
+
 type Journal = {
   id: string;
   created_at: string; // ISO
@@ -57,12 +62,19 @@ export function JournalPicker({ items }: { items: Journal[] }) {
     }
   }, [items, sort]);
 
+  const labelsById = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const it of items) m[it.id] = toLabel(it.body);
+    return m;
+  }, [items]);
+
   return (
     <main className='mx-auto max-w-6xl px-4 py-6'>
       {/* 選出棚 */}
       <SelectedShelf
         bestId={bestId}
         hmIds={hmIds}
+        labelsById={labelsById}
         onClearBest={() => setBestId(null)}
         onToggleHM={toggleHM}
         onSubmit={submit}

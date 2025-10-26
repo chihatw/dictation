@@ -24,7 +24,6 @@ export function Badge({
       ].join(' ')}
     >
       <span>{label}</span>
-      <span className='text-gray-600'>#{id}</span>
       <button
         onClick={onClear}
         aria-label={`${label}から外す`}
