@@ -21,6 +21,13 @@ const fmtDate = (iso: string) =>
     day: 'numeric',
   }).format(new Date(iso));
 
+const fmtTime = (iso: string) =>
+  new Date(iso).toLocaleString('ja-JP', {
+    hour: 'numeric',
+    minute: 'numeric',
+    timeZone: 'Asia/Taipei',
+  });
+
 export function JournalPicker({ items }: { items: Journal[] }) {
   const [bestId, setBestId] = useState<string | null>(null);
   const [hmIds, setHmIds] = useState<string[]>([]);
@@ -133,8 +140,11 @@ export function JournalPicker({ items }: { items: Journal[] }) {
                   ✓ 佳作
                 </button>
               </div>
-              <h3 className='mb-1 text-base font-semibold'>
-                {fmtDate(j.created_at)}
+              <h3 className='mb-1 text-base font-semibold flex items-center gap-1'>
+                <span>{fmtDate(j.created_at)}</span>
+                <span className='font-light text-slate-500 text-sm'>
+                  {fmtTime(j.created_at)}
+                </span>
               </h3>
               <div className='text-sm leading-6 text-gray-700 line-clamp-6 overflow-auto space-y-1.5'>
                 {j.body.split('\n').map((line, idx) => (
