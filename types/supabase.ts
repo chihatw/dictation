@@ -214,6 +214,7 @@ export type Database = {
           id: string
           locked: boolean
           rating_score: number
+          self_award: Database["public"]["Enums"]["self_award_t"]
         }
         Insert: {
           article_id: string
@@ -223,6 +224,7 @@ export type Database = {
           id?: string
           locked?: boolean
           rating_score?: number
+          self_award?: Database["public"]["Enums"]["self_award_t"]
         }
         Update: {
           article_id?: string
@@ -232,6 +234,7 @@ export type Database = {
           id?: string
           locked?: boolean
           rating_score?: number
+          self_award?: Database["public"]["Enums"]["self_award_t"]
         }
         Relationships: [
           {
@@ -821,6 +824,7 @@ export type Database = {
           id: string | null
           locked: boolean | null
           rating_score: number | null
+          self_award: Database["public"]["Enums"]["self_award_t"] | null
           user_id: string | null
         }
         Relationships: [
@@ -963,10 +967,7 @@ export type Database = {
           seq: number
         }[]
       }
-      get_article_page: {
-        Args: { p_article_id: string }
-        Returns: Json
-      }
+      get_article_page: { Args: { p_article_id: string }; Returns: Json }
       get_assignment_article_tags: {
         Args: { p_assignment_id: string }
         Returns: {
@@ -980,7 +981,7 @@ export type Database = {
         }[]
       }
       get_distinct_due_ym_keys: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           due_ym_key: string
         }[]
@@ -1009,10 +1010,7 @@ export type Database = {
         Args: { p_label: string }
         Returns: string
       }
-      get_submission_by_id: {
-        Args: { p_submission_id: string }
-        Returns: Json
-      }
+      get_submission_by_id: { Args: { p_submission_id: string }; Returns: Json }
       get_submission_latest: {
         Args: {
           p_article_id?: string
@@ -1038,30 +1036,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      gtrgm_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_options: {
-        Args: { "": unknown }
-        Returns: undefined
-      }
-      gtrgm_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      immutable_unaccent: {
-        Args: { "": string }
-        Returns: string
-      }
+      immutable_unaccent: { Args: { "": string }; Returns: string }
       insert_article_with_next_seq: {
         Args: { p_assignment_id: string; p_subtitle: string }
         Returns: {
@@ -1080,7 +1055,7 @@ export type Database = {
         Returns: undefined
       }
       list_journals_for_me: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           article_id: string
           body: string
@@ -1101,36 +1076,27 @@ export type Database = {
           id: string | null
           locked: boolean | null
           rating_score: number | null
+          self_award: Database["public"]["Enums"]["self_award_t"] | null
           user_id: string | null
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "dictation_journals_view"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       save_dictation_journal: {
         Args: { p_article_id: string; p_body: string }
         Returns: undefined
       }
-      set_limit: {
-        Args: { "": number }
-        Returns: number
-      }
-      show_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      show_trgm: {
-        Args: { "": string }
-        Returns: string[]
-      }
-      unaccent: {
-        Args: { "": string }
-        Returns: string
-      }
-      unaccent_init: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
+      unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {
       chat_role: "system" | "user" | "assistant"
+      self_award_t: "none" | "mbest" | "mhm" | "hbest" | "hhm" | "ybest" | "yhm"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1259,6 +1225,7 @@ export const Constants = {
   public: {
     Enums: {
       chat_role: ["system", "user", "assistant"],
+      self_award_t: ["none", "mbest", "mhm", "hbest", "hhm", "ybest", "yhm"],
     },
   },
 } as const

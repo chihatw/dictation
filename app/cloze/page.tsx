@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { ClozeSpan, Journal } from '@/types/dictation';
+import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -76,7 +76,8 @@ const Page = async ({ searchParams }: Props) => {
         cloze_spans, 
         assignment_id, 
         article_seq, 
-        locked
+        locked,
+        self_award
       `
       )
       .eq('assignment_id', assignment_id)
@@ -93,6 +94,7 @@ const Page = async ({ searchParams }: Props) => {
         cloze_spans: j.cloze_spans! as ClozeSpan[],
         rating_score: j.rating_score as number,
         locked: j.locked as boolean,
+        self_award: j.self_award as SelfAward,
       })) ?? [];
 
     const pick = (() => {

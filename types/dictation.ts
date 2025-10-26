@@ -15,6 +15,8 @@ type JournalViewDb =
 type ArticleViewDb =
   Database['public']['Views']['dictation_article_journal_status_view']['Row'];
 
+export type SelfAward = Database['public']['Enums']['self_award_t'];
+
 // 将来的には スネーク を キャメル に
 type User = UserDb;
 type Tag = TagDb;

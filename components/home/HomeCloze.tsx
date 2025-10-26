@@ -1,7 +1,7 @@
 'use client';
 
 import ClozeCarousel from '@/app/cloze/components/ClozeCarousel';
-import { ClozeSpan, Journal, JournalView } from '@/types/dictation';
+import { ClozeSpan, Journal, JournalView, SelfAward } from '@/types/dictation';
 import { makeClozeText } from '@/utils/cloze/converter';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -53,6 +53,7 @@ const HomeCloze = ({ journal }: Props) => {
             id: journal.id as string,
             rating_score: journal.rating_score as number,
             locked: journal.locked as boolean,
+            self_award: journal.self_award as SelfAward,
           },
           lineText,
           lineIndex: i,

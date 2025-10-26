@@ -3,7 +3,7 @@
 import { fetchMoreJournals } from '@/app/actions/fetchMoreJournals';
 import { Vote } from '@/app/journals/Vote';
 import { supabase } from '@/lib/supabase/browser';
-import { ClozeSpan, Journal } from '@/types/dictation';
+import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
 import { LinkIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -34,7 +34,8 @@ export function HomeJournals({
         body, 
         rating_score, 
         cloze_spans, 
-        locked
+        locked,
+        self_award
         `
       )
       .in('assignment_id', topAssignmentIds)
@@ -52,6 +53,7 @@ export function HomeJournals({
       rating_score: i.rating_score as number,
       cloze_spans: i.cloze_spans as ClozeSpan[],
       locked: i.locked as boolean,
+      self_award: i.self_award as SelfAward,
     }));
 
     const initialBefore = initialItems.at(-1)?.created_at ?? null;
@@ -83,7 +85,7 @@ export function HomeJournals({
             .from('dictation_journals_view')
             .select(
               `
-          id, assignment_id, created_at, article_id, body, rating_score, cloze_spans, locked
+          id, assignment_id, created_at, article_id, body, rating_score, cloze_spans, locked, self_award
         `
             )
             .eq('id', id)
@@ -99,6 +101,7 @@ export function HomeJournals({
             rating_score: data.rating_score as number,
             cloze_spans: data.cloze_spans as ClozeSpan[],
             locked: data.locked as boolean,
+            self_award: data.self_award as SelfAward,
           } satisfies Journal;
 
           setItems((prev) => [j, ...prev]);
