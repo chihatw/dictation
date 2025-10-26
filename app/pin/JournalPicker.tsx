@@ -85,12 +85,11 @@ export function JournalPicker({ items }: { items: Journal[] }) {
         </div>
       </section>
 
-      {/* 一覧：左→右優先の擬似マソンリ */}
+      {/* 一覧：固定 */}
       <section
         className='
           grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
           gap-4
-          [masonry-auto-flow:next]
         '
       >
         {items.map((j) => {
@@ -100,7 +99,7 @@ export function JournalPicker({ items }: { items: Journal[] }) {
             <article
               key={j.id}
               className={[
-                'break-inside-avoid rounded-xl border p-4 shadow-sm',
+                'rounded-xl border p-4 shadow-sm',
                 isBest
                   ? ['bg-amber-50', bestShadow].join(' ')
                   : isHM
@@ -137,9 +136,11 @@ export function JournalPicker({ items }: { items: Journal[] }) {
               <h3 className='mb-1 text-base font-semibold'>
                 {fmtDate(j.created_at)}
               </h3>
-              <p className='text-sm leading-6 text-gray-700 line-clamp-6'>
-                {j.body}
-              </p>
+              <div className='text-sm leading-6 text-gray-700 line-clamp-6 overflow-auto space-y-1.5'>
+                {j.body.split('\n').map((line, idx) => (
+                  <div key={idx}>{line}</div>
+                ))}
+              </div>
             </article>
           );
         })}
