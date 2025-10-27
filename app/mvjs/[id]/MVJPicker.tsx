@@ -1,6 +1,6 @@
 'use client';
 import { Journal } from '@/types/dictation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { JournalCard } from './JournalCard';
 import { SelectedShelf } from './SelectedShelf';
 
@@ -17,80 +17,56 @@ type Props = {
 
 export function MVJPicker({ items: initialItems }: Props) {
   const [items, setItems] = useState<Journal[]>(initialItems);
-  const [bestId, setBestId] = useState<string | null>(null);
-  const [hmIds, setHmIds] = useState<string[]>([]);
+  // 導出
+  const bestId = useMemo(
+    () => items.find((j) => j.self_award === 'mbest')?.id ?? null,
+    [items]
+  );
+  const hmIds = useMemo(
+    () => items.filter((j) => j.self_award === 'mhm').map((j) => j.id),
+    [items]
+  );
   const [sort, setSort] = useState<SortKey>('rating_desc');
 
-  useEffect(() => {
-    const mbests = initialItems.filter((j) => j.self_award === 'mbest');
-    const mhms = initialItems.filter((j) => j.self_award === 'mhm');
-
-    if (mbests.length > 1) {
-      console.error('初期データに mbest が複数あります。1件にしてください。');
-      // 何もセットしないで終了
-      return;
-    }
-
-    const nextBest = mbests[0]?.id ?? null;
-    // best と重複しない hm を作る
-    const nextHms = mhms
-      .map((j) => j.id)
-      .filter((id, i, arr) => arr.indexOf(id) === i) // 重複除去
-      .filter((id) => id !== nextBest); // best と衝突回避
-
-    setBestId(nextBest);
-    setHmIds(nextHms);
-  }, [initialItems]);
-
+  // スコア更新
   const applyScore = (id: string, score: number) =>
     setItems((prev) =>
       prev.map((it) => (it.id === id ? { ...it, rating_score: score } : it))
     );
-
-  // 現状は同一処理
   const optimisticScore = applyScore;
 
-  const recomputeAwards = (best: string | null, hms: string[]) => {
-    setItems((prev) =>
-      prev.map((it) => ({
-        ...it,
-        self_award:
-          best === it.id ? 'mbest' : hms.includes(it.id) ? 'mhm' : 'none',
-      }))
-    );
-  };
-
+  // トグル（SSOT: items）
   const toggleBest = (id: string) =>
-    setBestId((prevBest) => {
-      const nextBest = prevBest === id ? null : id;
-      // best と hm の衝突を排除しつつ同期
-      setHmIds((prevHms) => {
-        const nextHms = prevHms.filter((x) => x !== id);
-        recomputeAwards(nextBest, nextHms);
-        return nextHms;
+    setItems((prev) => {
+      const isBest = prev.some((j) => j.id === id && j.self_award === 'mbest');
+      return prev.map((j) => {
+        if (j.id === id) return { ...j, self_award: isBest ? 'none' : 'mbest' };
+        // best は一意。別の mbest は none に。
+        if (!isBest && j.self_award === 'mbest')
+          return { ...j, self_award: 'none' };
+        // HM との衝突排除
+        if (!isBest && j.id === id && j.self_award === 'mhm')
+          return { ...j, self_award: 'mbest' };
+        return j;
       });
-      return nextBest;
     });
 
   const toggleHM = (id: string) =>
-    setHmIds((prevHms) => {
-      const included = prevHms.includes(id);
-      const nextHms = included
-        ? prevHms.filter((x) => x !== id)
-        : [...prevHms, id];
-
-      // 追加時に best と衝突するなら best を外す
-      const nextBest = !included && bestId === id ? null : bestId;
-      if (nextBest !== bestId) setBestId(nextBest);
-
-      recomputeAwards(nextBest, nextHms);
-      return nextHms;
-    });
+    setItems((prev) =>
+      prev.map((j) => {
+        if (j.id !== id) return j;
+        if (j.self_award === 'mhm') return { ...j, self_award: 'none' };
+        // best と衝突しないように
+        if (j.self_award === 'mbest') return { ...j, self_award: 'none' };
+        return { ...j, self_award: 'mhm' };
+      })
+    );
 
   const submit = () => {
     // submit(bestId, hmIds)
   };
 
+  // 並び替えビュー
   const view = useMemo(() => {
     const arr = [...items];
     switch (sort) {
@@ -104,7 +80,6 @@ export function MVJPicker({ items: initialItems }: Props) {
             b.rating_score - a.rating_score ||
             +new Date(b.created_at) - +new Date(a.created_at)
         );
-      case 'created_desc':
       default:
         return arr.sort(
           (a, b) => +new Date(b.created_at) - +new Date(a.created_at)
@@ -125,7 +100,7 @@ export function MVJPicker({ items: initialItems }: Props) {
         bestId={bestId}
         hmIds={hmIds}
         labelsById={labelsById}
-        onClearBest={() => setBestId(null)}
+        onClearBest={() => toggleBest(bestId!)}
         onToggleHM={toggleHM}
         onSubmit={submit}
       />
