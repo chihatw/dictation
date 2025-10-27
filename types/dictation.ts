@@ -10,12 +10,15 @@ type SubmissionDb = Tables<'dictation_submissions'>;
 type TagDb = Tables<'dictation_teacher_feedback_tags'>;
 type TagMasterDb = Tables<'dictation_tag_master'>;
 type JournalDb = Tables<'dictation_journals'> & { cloze_spans: ClozeSpan[] };
+type MVJDb = Tables<'dictation_mvjs'>;
+
 type JournalViewDb =
   Database['public']['Views']['dictation_journals_view']['Row'];
 type ArticleViewDb =
   Database['public']['Views']['dictation_article_journal_status_view']['Row'];
 
 export type SelfAward = Database['public']['Enums']['self_award_t'];
+export type MVJScope = Database['public']['Enums']['mvj_scope_t'];
 
 // 将来的には スネーク を キャメル に
 type User = UserDb;
@@ -27,6 +30,8 @@ export type Article = ArticleDb;
 type Sentence = SentenceDb;
 type Submission = SubmissionDb;
 export type Journal = JournalDb;
+export type MVJ = MVJDb;
+
 export type JournalView = JournalViewDb;
 export type ArticleView = ArticleViewDb;
 

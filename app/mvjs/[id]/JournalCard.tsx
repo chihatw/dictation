@@ -2,6 +2,7 @@
 
 import { Vote } from '@/components/journal/Vote';
 import { ClozeSpan, Journal } from '@/types/dictation';
+import { Award } from 'lucide-react';
 
 const bestShadow = 'shadow-[inset_0_0_0_2px_theme(colors.yellow.500)]';
 const silverShadow = 'shadow-[inset_0_0_0_2px_theme(colors.zinc.500)]';
@@ -78,7 +79,17 @@ export function JournalCard({
         </button>
       </div>
       <div>
-        <h3 className='mb-1 text-base font-semibold flex items-center gap-1'>
+        <h3 className='mb-1 font-semibold flex items-baseline gap-1 h-6'>
+          {['mbest'].includes(j.self_award) && (
+            <span>
+              <Award className='w-5 h-5 text-yellow-500' fill='currentColor' />
+            </span>
+          )}
+          {['mhm'].includes(j.self_award) && (
+            <span>
+              <Award className='w-5 h-5 text-gray-400' fill='currentColor' />
+            </span>
+          )}
           <span>{fmtDate(j.created_at)}</span>
           <span className='font-light text-slate-500 text-sm'>
             {fmtTime(j.created_at)}

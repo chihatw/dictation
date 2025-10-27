@@ -1,6 +1,6 @@
 'use client';
 import { Journal } from '@/types/dictation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { JournalCard } from './JournalCard';
 import { SelectedShelf } from './SelectedShelf';
 
@@ -21,6 +21,27 @@ export function MVJPicker({ items: initialItems }: Props) {
   const [hmIds, setHmIds] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>('rating_desc');
 
+  useEffect(() => {
+    const mbests = initialItems.filter((j) => j.self_award === 'mbest');
+    const mhms = initialItems.filter((j) => j.self_award === 'mhm');
+
+    if (mbests.length > 1) {
+      console.error('初期データに mbest が複数あります。1件にしてください。');
+      // 何もセットしないで終了
+      return;
+    }
+
+    const nextBest = mbests[0]?.id ?? null;
+    // best と重複しない hm を作る
+    const nextHms = mhms
+      .map((j) => j.id)
+      .filter((id, i, arr) => arr.indexOf(id) === i) // 重複除去
+      .filter((id) => id !== nextBest); // best と衝突回避
+
+    setBestId(nextBest);
+    setHmIds(nextHms);
+  }, [initialItems]);
+
   const applyScore = (id: string, score: number) =>
     setItems((prev) =>
       prev.map((it) => (it.id === id ? { ...it, rating_score: score } : it))
@@ -29,18 +50,41 @@ export function MVJPicker({ items: initialItems }: Props) {
   // 現状は同一処理
   const optimisticScore = applyScore;
 
+  const recomputeAwards = (best: string | null, hms: string[]) => {
+    setItems((prev) =>
+      prev.map((it) => ({
+        ...it,
+        self_award:
+          best === it.id ? 'mbest' : hms.includes(it.id) ? 'mhm' : 'none',
+      }))
+    );
+  };
+
   const toggleBest = (id: string) =>
-    setBestId((prev) => {
-      const next = prev === id ? null : id;
-      setHmIds((h) => h.filter((x) => x !== id));
-      return next;
+    setBestId((prevBest) => {
+      const nextBest = prevBest === id ? null : id;
+      // best と hm の衝突を排除しつつ同期
+      setHmIds((prevHms) => {
+        const nextHms = prevHms.filter((x) => x !== id);
+        recomputeAwards(nextBest, nextHms);
+        return nextHms;
+      });
+      return nextBest;
     });
 
   const toggleHM = (id: string) =>
-    setHmIds((prev) => {
-      const included = prev.includes(id);
-      if (!included && bestId === id) setBestId(null);
-      return included ? prev.filter((x) => x !== id) : [...prev, id];
+    setHmIds((prevHms) => {
+      const included = prevHms.includes(id);
+      const nextHms = included
+        ? prevHms.filter((x) => x !== id)
+        : [...prevHms, id];
+
+      // 追加時に best と衝突するなら best を外す
+      const nextBest = !included && bestId === id ? null : bestId;
+      if (nextBest !== bestId) setBestId(nextBest);
+
+      recomputeAwards(nextBest, nextHms);
+      return nextHms;
     });
 
   const submit = () => {

@@ -1,10 +1,16 @@
-export const MVJ_DUMMY = {
+import { MVJ } from '@/types/dictation';
+
+export const MVJ_DUMMY: MVJ = {
   id: '8d0a394d-a8b4-447c-8e58-a27e2bed8eb0',
   window_start: '2025-08-31T15:00:00+00:00',
   window_end: '2025-10-31T15:00:00+00:00',
   user_id: 'b2d7045a-bfb9-4aa2-88ed-fdfbac324e72',
   title: '2025年9-10月月度最有價值日誌',
   due_at: '2025-11-11T16:00:00+00:00',
+  created_at: 'dummy',
+  published_at: 'dummy',
+  reason: 'dummy',
+  scope: 'monthly',
 };
 
 export const JOURNALS_DUMMY = [
@@ -160,7 +166,7 @@ export const JOURNALS_DUMMY = [
     article_id: '8f01ad3b-945f-4001-9c6f-949e80ae1885',
     body: '1.～が広がります\n土を掘り起こすと、強い臭いが広がります。\n2.かき混ぜる：攪拌\n3.動詞普通形＋と、〜：表示前一件事發生後，緊接著發生後一件事。\nこの薬を飲むと、眠くなります。',
     rating_score: 3,
-    self_award: 'none',
+    self_award: 'mhm',
     cloze_spans: [
       [4, 3],
       [24, 3],
@@ -201,7 +207,7 @@ export const JOURNALS_DUMMY = [
     article_id: '4134cc8d-bf8f-4965-b140-07e1a030cc09',
     body: '1.〜が切れる：斷掉/用完/忍耐到極限\n怒りがきれた。\n2.〜に挑戦してみた：試著挑戰…了\n3.ふわりと広がり：輕輕地散開／飄開／擴散開來\n比ふわっと更具詩意\n4.強張ったからだ：僵硬的身體／緊繃的身體\n5. ほぐれていく：慢慢放鬆／逐漸舒展／慢慢解開\n肩のこりがマッサージでほぐれていく。\n6.ぼんやり眺める：發呆地看著／茫然地望著\n窓の外をぼんやり眺める\n7.心強い味方：令人安心的盟友\n',
     rating_score: 3,
-    self_award: 'none',
+    self_award: 'mbest',
     cloze_spans: [
       [4, 3],
       [23, 3],

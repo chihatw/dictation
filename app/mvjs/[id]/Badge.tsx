@@ -1,3 +1,6 @@
+import { cn } from '@/lib/utils';
+import { Award } from 'lucide-react';
+
 export function Badge({
   id,
   label,
@@ -18,11 +21,18 @@ export function Badge({
   return (
     <div
       className={[
-        'flex items-center gap-2 rounded-lg border px-2 py-1 text-xs whitespace-nowrap',
+        'flex items-center gap-1 rounded-lg border px-2 py-1 text-xs whitespace-nowrap',
         bgTint,
         colorShadow,
       ].join(' ')}
     >
+      <Award
+        className={cn(
+          color === 'gold' ? 'text-yellow-500' : 'text-gray-400',
+          'h-3 w-3'
+        )}
+        fill='currentColor'
+      />
       <span>{label}</span>
       <button
         onClick={onClear}
