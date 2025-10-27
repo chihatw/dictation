@@ -246,6 +246,45 @@ export type Database = {
           },
         ]
       }
+      dictation_mvjs: {
+        Row: {
+          created_at: string
+          due_at: string
+          id: string
+          published_at: string | null
+          reason: string | null
+          scope: Database["public"]["Enums"]["mvj_scope_t"]
+          title: string
+          user_id: string
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          created_at?: string
+          due_at: string
+          id?: string
+          published_at?: string | null
+          reason?: string | null
+          scope?: Database["public"]["Enums"]["mvj_scope_t"]
+          title: string
+          user_id: string
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          created_at?: string
+          due_at?: string
+          id?: string
+          published_at?: string | null
+          reason?: string | null
+          scope?: Database["public"]["Enums"]["mvj_scope_t"]
+          title?: string
+          user_id?: string
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       dictation_sentences: {
         Row: {
           article_id: string
@@ -821,6 +860,7 @@ export type Database = {
           body: string | null
           cloze_spans: Json | null
           created_at: string | null
+          due_at: string | null
           id: string | null
           locked: boolean | null
           rating_score: number | null
@@ -996,6 +1036,7 @@ export type Database = {
           assignment_id: string
           done_count: number
           due_at: string
+          mvj_id: string
           next_article_id: string
           next_full_title: string
           next_sentence_id: string
@@ -1054,16 +1095,6 @@ export type Database = {
         Args: { p_delta: number; p_id: string }
         Returns: undefined
       }
-      list_journals_for_me: {
-        Args: never
-        Returns: {
-          article_id: string
-          body: string
-          created_at: string
-          id: string
-          rating_score: number
-        }[]
-      }
       pick_random_cloze_journal_fast: {
         Args: { p_uid: string }
         Returns: {
@@ -1073,6 +1104,7 @@ export type Database = {
           body: string | null
           cloze_spans: Json | null
           created_at: string | null
+          due_at: string | null
           id: string | null
           locked: boolean | null
           rating_score: number | null
@@ -1096,6 +1128,7 @@ export type Database = {
     }
     Enums: {
       chat_role: "system" | "user" | "assistant"
+      mvj_scope_t: "monthly" | "half" | "yearly"
       self_award_t: "none" | "mbest" | "mhm" | "hbest" | "hhm" | "ybest" | "yhm"
     }
     CompositeTypes: {
@@ -1225,6 +1258,7 @@ export const Constants = {
   public: {
     Enums: {
       chat_role: ["system", "user", "assistant"],
+      mvj_scope_t: ["monthly", "half", "yearly"],
       self_award_t: ["none", "mbest", "mhm", "hbest", "hhm", "ybest", "yhm"],
     },
   },

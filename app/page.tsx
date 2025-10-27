@@ -12,6 +12,9 @@ import JournalQuickWriteButton from '@/components/home/JournalQuickWriteButton';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import { dueDayStartUtc, timeProgress5pct } from '@/utils/timeProgress';
 import Link from 'next/link';
+import { journals, nextTask, weather } from './dummy';
+
+const DEBUG = process.env.NEXT_PUBLIC_DEBUG === 'true';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -20,17 +23,29 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('unauthorized');
 
+  const fetchHomeBundle = DEBUG
+    ? async () => {
+        console.log('no fetch');
+        return [nextTask, journals, weather] as const;
+      }
+    : async () => {
+        const [a, b, c] = await Promise.all([
+          supabase.rpc('get_home_next_task', { p_uid: user.id }),
+          supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
+          fetchMultiWeather(),
+        ]);
+        return [a, b, c] as const;
+      };
+
   const [
     { data, error },
     { data: journal, error: error_j },
     { yunlin, hyogo },
-  ] = await Promise.all([
-    supabase.rpc('get_home_next_task', { p_uid: user.id }),
-    supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
-    fetchMultiWeather(),
-  ]);
-  if (error) throw new Error(error.message);
-  if (error_j) throw new Error(error_j.message);
+  ] = await fetchHomeBundle();
+
+  if (error) throw new Error((error as { message: string }).message);
+  if (error_j) throw new Error((error_j as { message: string }).message);
+  if (!data) throw new Error('no data');
 
   const row = Array.isArray(data) ? data[0] : data;
   const startAt = row?.published_at as string | null | undefined;
@@ -44,6 +59,7 @@ export default async function Home() {
     : 0;
   const timeProgress = timeProgress5pct(startAt, endAt);
   const topAssignmentIds = row?.top_assignment_ids;
+  const mvjId = row?.mvj_id;
 
   return (
     <div className='min-h-screen p-6'>
@@ -106,7 +122,20 @@ export default async function Home() {
           )}
         </section>
 
-        {journal[0] && <HomeCloze journal={journal[0]} />}
+        {mvjId && (
+          <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>
+            <Link
+              href={`/mvjs/${mvjId}`}
+              className='text-center hover:underline'
+            >
+              <span className='font-bold text-2xl text-slate-900 text-shadow-2xs'>
+                🏆 選出本月最有價值日誌 🏆
+              </span>
+            </Link>
+          </section>
+        )}
+
+        {journal && journal[0] && <HomeCloze journal={journal[0]} />}
 
         <HomeJournals userId={user.id} topAssignmentIds={topAssignmentIds} />
       </main>

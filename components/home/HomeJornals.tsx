@@ -1,7 +1,7 @@
 // components/HomeJournals.tsx ("use client")
 'use client';
 import { fetchMoreJournals } from '@/app/actions/fetchMoreJournals';
-import { Vote } from '@/app/journals/Vote';
+import { Vote } from '@/components/journal/Vote';
 import { supabase } from '@/lib/supabase/browser';
 import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';

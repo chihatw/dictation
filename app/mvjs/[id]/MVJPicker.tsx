@@ -1,4 +1,5 @@
 'use client';
+import { Journal } from '@/types/dictation';
 import { useMemo, useState } from 'react';
 import { JournalCard } from './JournalCard';
 import { SelectedShelf } from './SelectedShelf';
@@ -8,20 +9,36 @@ const toLabel = (body: string) => {
   return first.length > 10 ? first.slice(0, 10) + '…' : first || '（無標題）';
 };
 
-type Journal = {
-  id: string;
-  created_at: string; // ISO
-  article_id: string;
-  body: string;
-  rating_score: number;
-};
-
 type SortKey = 'created_desc' | 'created_asc' | 'rating_desc';
 
-export function JournalPicker({ items }: { items: Journal[] }) {
+type MVJJournal = Pick<
+  Journal,
+  | 'id'
+  | 'created_at'
+  | 'article_id'
+  | 'body'
+  | 'rating_score'
+  | 'self_award'
+  | 'cloze_spans'
+>;
+
+type Props = {
+  items: MVJJournal[];
+};
+
+export function MVJPicker({ items: initialItems }: Props) {
+  const [items, setItems] = useState<MVJJournal[]>(initialItems);
   const [bestId, setBestId] = useState<string | null>(null);
   const [hmIds, setHmIds] = useState<string[]>([]);
-  const [sort, setSort] = useState<SortKey>('created_desc');
+  const [sort, setSort] = useState<SortKey>('rating_desc');
+
+  const applyScore = (id: string, score: number) =>
+    setItems((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, rating_score: score } : it))
+    );
+
+  // 現状は同一処理
+  const optimisticScore = applyScore;
 
   const toggleBest = (id: string) =>
     setBestId((prev) => {
@@ -86,6 +103,19 @@ export function JournalPicker({ items }: { items: Journal[] }) {
         <div className='inline-flex overflow-hidden rounded-lg border bg-white shadow-sm'>
           <button
             type='button'
+            aria-pressed={sort === 'rating_desc'}
+            onClick={() => setSort('rating_desc')}
+            className={[
+              'border-l px-3 py-1.5 text-sm',
+              sort === 'rating_desc'
+                ? 'bg-zinc-900 text-white'
+                : 'hover:bg-zinc-50',
+            ].join(' ')}
+          >
+            評分高優先
+          </button>
+          <button
+            type='button'
             aria-pressed={sort === 'created_desc'}
             onClick={() => setSort('created_desc')}
             className={[
@@ -110,24 +140,11 @@ export function JournalPicker({ items }: { items: Journal[] }) {
           >
             由舊到新
           </button>
-          <button
-            type='button'
-            aria-pressed={sort === 'rating_desc'}
-            onClick={() => setSort('rating_desc')}
-            className={[
-              'border-l px-3 py-1.5 text-sm',
-              sort === 'rating_desc'
-                ? 'bg-zinc-900 text-white'
-                : 'hover:bg-zinc-50',
-            ].join(' ')}
-          >
-            評分高優先
-          </button>
         </div>
       </div>
 
       {/* 一覧 */}
-      <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
+      <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'>
         {view.map((j) => (
           <JournalCard
             key={j.id}
@@ -136,6 +153,8 @@ export function JournalPicker({ items }: { items: Journal[] }) {
             isHM={hmIds.includes(j.id)}
             onToggleBest={toggleBest}
             onToggleHM={toggleHM}
+            onScoreOptimistic={(score) => optimisticScore(j.id, score)}
+            onScoreSettled={(score) => applyScore(j.id, score)}
           />
         ))}
       </section>

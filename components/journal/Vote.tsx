@@ -1,9 +1,9 @@
 // app/journals/Vote.tsx
 'use client';
 
+import { voteAction } from '@/app/actions/vote';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useActionState, useEffect, useMemo, useState } from 'react';
-import { voteAction } from './actions';
+import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
 
 function pad(n: number) {
   return n < 10 ? `0${n}` : String(n);
@@ -12,11 +12,15 @@ function pad(n: number) {
 export function Vote({
   id,
   initialScore,
-  createdAt, // 追加
+  createdAt,
+  onOptimistic,
+  onSettled,
 }: {
   id: string;
   initialScore: number;
   createdAt: string;
+  onOptimistic?: (score: number) => void;
+  onSettled?: (score: number) => void;
 }) {
   const [state, formAction, isPending] = useActionState(voteAction, {
     score: initialScore,
@@ -37,6 +41,15 @@ export function Vote({
   const msLeft = unlockAt.getTime() - now.getTime();
   const canVote = msLeft <= 0;
 
+  // アクション確定後に親へ“確定値”を通知して差分修正
+  const prevScoreRef = useRef(state.score);
+  useEffect(() => {
+    if (state.score !== prevScoreRef.current) {
+      prevScoreRef.current = state.score;
+      onSettled?.(state.score);
+    }
+  }, [state.score, onSettled]);
+
   // サーバー側ガードに引っかかった場合のフォールバック
   const blocked = state.error === 'not_yet';
 
@@ -51,6 +64,14 @@ export function Vote({
     );
   }
 
+  const submit =
+    (delta: 1 | -1) => (e: React.MouseEvent<HTMLButtonElement>) => {
+      // 楽観的反映
+      onOptimistic?.(state.score + delta);
+      // そのままサーバー送信
+      // formAction は <button formAction> 経由で呼ぶのでここでは何もしない
+    };
+
   return (
     <div className='mt-2 flex gap-x-2 items-center justify-end'>
       <div className='text-slate-900 font-bold w-16 whitespace-nowrap'>
@@ -63,6 +84,7 @@ export function Vote({
         <input type='hidden' name='delta' value='1' />
         <button
           formAction={formAction}
+          onClick={submit(1)}
           disabled={isPending}
           className='rounded-full px-2 py-1 text-xs bg-slate-900 hover:bg-slate-700 disabled:opacity-50'
         >
@@ -78,6 +100,7 @@ export function Vote({
         <input type='hidden' name='delta' value='-1' />
         <button
           formAction={formAction}
+          onClick={submit(-1)}
           disabled={isPending}
           className='rounded-full px-2 py-1 text-xs bg-slate-900 hover:bg-slate-700 disabled:opacity-50'
         >

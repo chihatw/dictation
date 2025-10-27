@@ -1,5 +1,5 @@
-import { Vote } from '@/app/journals/Vote';
 import ClozeRow from '@/components/cloze/ClozeRow';
+import { Vote } from '@/components/journal/Vote';
 import { CarouselItem } from '@/components/ui/carousel';
 import { Journal } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
