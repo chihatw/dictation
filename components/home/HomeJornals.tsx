@@ -186,11 +186,7 @@ export function HomeJournals({
                   })}
                 </div>
 
-                <Vote
-                  id={j.id}
-                  initialScore={j.rating_score}
-                  createdAt={j.created_at}
-                />
+                <Vote journal={j} />
               </li>
             );
           })}

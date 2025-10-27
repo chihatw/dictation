@@ -22,16 +22,7 @@ const fmtTime = (iso: string) =>
   });
 
 type Props = {
-  journal: Pick<
-    Journal,
-    | 'id'
-    | 'article_id'
-    | 'body'
-    | 'created_at'
-    | 'rating_score'
-    | 'self_award'
-    | 'cloze_spans'
-  >;
+  journal: Journal;
   isBest: boolean;
   isHM: boolean;
   onToggleBest: (id: string) => void;
@@ -97,9 +88,7 @@ export function JournalCard({
       <EmphasizedBody body={j.body} spans={j.cloze_spans} />
       <div className='mt-2'>
         <Vote
-          id={j.id}
-          createdAt={j.created_at}
-          initialScore={j.rating_score}
+          journal={j}
           onOptimistic={(next) => onScoreOptimistic(next)}
           onSettled={(serverScore) => onScoreSettled(serverScore)}
         />

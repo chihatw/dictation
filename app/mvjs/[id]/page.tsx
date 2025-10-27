@@ -52,23 +52,15 @@ const Page = async ({ params }: Props) => {
       body,
       rating_score,
       self_award,
-      cloze_spans
+      cloze_spans,
+      locked
       `
         )
         .eq('user_id', mvj.user_id)
         .gte('due_at', mvj.window_start)
         .lte('due_at', mvj.window_end);
 
-  const items: Pick<
-    Journal,
-    | 'id'
-    | 'created_at'
-    | 'article_id'
-    | 'body'
-    | 'rating_score'
-    | 'self_award'
-    | 'cloze_spans'
-  >[] = data
+  const items: Journal[] = data
     ? data.map((i) => ({
         id: i.id as string,
         created_at: i.created_at as string,
@@ -77,6 +69,7 @@ const Page = async ({ params }: Props) => {
         rating_score: i.rating_score as number,
         self_award: i.self_award as SelfAward,
         cloze_spans: i.cloze_spans as ClozeSpan[],
+        locked: i.locked as boolean,
       }))
     : [];
 

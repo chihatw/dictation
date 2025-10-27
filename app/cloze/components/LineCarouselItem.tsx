@@ -23,11 +23,7 @@ const LineCarouselItem = ({ journal, lineText }: Props) => {
         <div className='mb-4'>
           <ClozeRow objs={objs} />
         </div>
-        <Vote
-          id={j.id}
-          initialScore={j.rating_score}
-          createdAt={j.created_at}
-        />
+        <Vote journal={j} />
       </section>
     </CarouselItem>
   );

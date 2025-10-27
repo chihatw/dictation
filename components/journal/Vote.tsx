@@ -2,6 +2,7 @@
 'use client';
 
 import { voteAction } from '@/app/actions/vote';
+import { Journal } from '@/types/dictation';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -10,26 +11,23 @@ function pad(n: number) {
 }
 
 export function Vote({
-  id,
-  initialScore,
-  createdAt,
+  journal,
   onOptimistic,
   onSettled,
 }: {
-  id: string;
-  initialScore: number;
-  createdAt: string;
+  journal: Journal;
   onOptimistic?: (score: number) => void;
   onSettled?: (score: number) => void;
 }) {
   const [state, formAction, isPending] = useActionState(voteAction, {
-    score: initialScore,
+    score: journal.rating_score,
     error: null as string | null,
   });
 
   const unlockAt = useMemo(
-    () => new Date(new Date(createdAt).getTime() + 24 * 60 * 60 * 1000),
-    [createdAt]
+    () =>
+      new Date(new Date(journal.created_at).getTime() + 24 * 60 * 60 * 1000),
+    [journal.created_at]
   );
 
   const [now, setNow] = useState<Date>(new Date());
@@ -79,7 +77,7 @@ export function Vote({
       </div>
 
       <form>
-        <input type='hidden' name='id' value={id} />
+        <input type='hidden' name='id' value={journal.id} />
         <input type='hidden' name='current' value={state.score} />
         <input type='hidden' name='delta' value='1' />
         <button
@@ -95,7 +93,7 @@ export function Vote({
       </form>
 
       <form>
-        <input type='hidden' name='id' value={id} />
+        <input type='hidden' name='id' value={journal.id} />
         <input type='hidden' name='current' value={state.score} />
         <input type='hidden' name='delta' value='-1' />
         <button

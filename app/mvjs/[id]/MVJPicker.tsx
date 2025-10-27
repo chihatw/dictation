@@ -11,23 +11,12 @@ const toLabel = (body: string) => {
 
 type SortKey = 'created_desc' | 'created_asc' | 'rating_desc';
 
-type MVJJournal = Pick<
-  Journal,
-  | 'id'
-  | 'created_at'
-  | 'article_id'
-  | 'body'
-  | 'rating_score'
-  | 'self_award'
-  | 'cloze_spans'
->;
-
 type Props = {
-  items: MVJJournal[];
+  items: Journal[];
 };
 
 export function MVJPicker({ items: initialItems }: Props) {
-  const [items, setItems] = useState<MVJJournal[]>(initialItems);
+  const [items, setItems] = useState<Journal[]>(initialItems);
   const [bestId, setBestId] = useState<string | null>(null);
   const [hmIds, setHmIds] = useState<string[]>([]);
   const [sort, setSort] = useState<SortKey>('rating_desc');

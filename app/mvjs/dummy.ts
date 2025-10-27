@@ -243,4 +243,4 @@ export const JOURNALS_DUMMY = [
     self_award: 'none',
     cloze_spans: [],
   },
-];
+].map((i) => ({ ...i, locked: true }));
