@@ -129,7 +129,7 @@ export default async function Home() {
               className='text-center hover:underline'
             >
               <span className='font-bold text-2xl text-slate-900 text-shadow-2xs'>
-                🏆 選出最有價值日誌 🏆
+                🏆 選出9-10月最有價值日誌 🏆
               </span>
             </Link>
           </section>

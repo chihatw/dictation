@@ -1,6 +1,8 @@
 import { MVJPicker } from '@/app/mvjs/[id]/MVJPicker';
 import { createClient } from '@/lib/supabase/server';
 import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
+import { ChevronLeft } from 'lucide-react';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { JOURNALS_DUMMY, MVJ_DUMMY } from '../dummy';
 
@@ -82,7 +84,15 @@ const Page = async ({ params }: Props) => {
 
   return (
     <div>
-      <div className='mx-auto max-w-6xl mt-10 px-4 pb-2'>
+      <div className='mx-auto max-w-6xl mt-2 px-4'>
+        <div className='py-4'>
+          <Link
+            href='/'
+            className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
+          >
+            <ChevronLeft className='h-4 w-4' /> 返回首頁
+          </Link>
+        </div>
         <h1 className='font-bold text-2xl pl-2'>{mvj.title}</h1>
         <div className='text-sm text-slate-500 p-2 pt-1'>
           <div className='flex items-baseline'>
