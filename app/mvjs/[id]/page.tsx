@@ -67,7 +67,6 @@ const Page = async ({ params }: Props) => {
   const dueAt = new Date(mvj.due_at);
   const fmtDate = (iso: Date) =>
     iso.toLocaleDateString('zh-TW', {
-      year: 'numeric',
       month: 'numeric',
       day: 'numeric',
       weekday: 'narrow',
@@ -76,17 +75,19 @@ const Page = async ({ params }: Props) => {
 
   const fmtTime = (iso: Date) =>
     iso.toLocaleTimeString('ja-JP', {
-      hour: '2-digit',
+      hour: 'numeric',
       minute: '2-digit',
       timeZone: 'Asia/Taipei',
     });
 
   return (
     <div>
-      <div className='mx-auto max-w-6xl mt-10 px-4'>
-        <h1 className='font-bold text-2xl'>{mvj.title}</h1>
-        <div>{fmtDate(dueAt)}</div>
-        <div>{fmtTime(dueAt)}</div>
+      <div className='mx-auto max-w-6xl mt-10 px-4 pb-2'>
+        <h1 className='font-bold text-2xl pl-2'>{mvj.title}</h1>
+        <div className='text-sm text-slate-500 p-2'>
+          <div>{`截止日期: ${fmtDate(dueAt)}凌晨${fmtTime(dueAt)}。`}</div>
+          <div>截止前皆可修改選擇。</div>
+        </div>
       </div>
       <MVJPicker mvj={mvj} items={items} />
     </div>

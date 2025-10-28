@@ -17,17 +17,17 @@ export const MVJModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className='text-xl font-extrabold px-4 py-4 bg-slate-800 text-white'>
-          關於這個活動
+          關於這項活動
         </h2>
         <section className='text-sm leading-4 p-5 space-y-4 font-light tracking-wide'>
           <p>
-            我們要閱讀過去留給未來的自己、可以用在對話上的日語，也就是學習日誌。
+            我們要閱讀「過去留給未來的自己、可以用在對話上的日語」，也就是學習日誌。
           </p>
 
           <ol className='list-decimal pl-6 space-y-2'>
             <li>重新閱讀自己的學習日誌。</li>
             <li>
-              選出你認為「最能用在對話中」的內容為 「
+              選出你認為「最能用在對話中的內容」為 「
               <span className='marker-underline-yellow'>最佳作品</span>」。
               若還有覺得能派上用場的內容，可標為 「
               <span className='marker-underline-yellow'>佳作</span>」；
@@ -49,13 +49,13 @@ export const MVJModal = ({
             </div>
           </div>
 
-          <p>期望你學到的日語，不只是知識，而是能在現實中使用的工具。</p>
+          <p>希望你學到的日語，不只是知識，而是能在生活中運用的能力。</p>
 
           <div className='pt-2 border-t'>
             <div className='mb-2'>例）</div>
             <ul className='list-disc pl-6 space-y-1.5'>
               <li>能和第一次見面的人打招呼</li>
-              <li>對店員能追加點餐</li>
+              <li>能對店員追加點餐</li>
               <li>能向朋友表達自己的心情</li>
               <li>能主動對需要幫助的人說話</li>
               <li>能向日本人介紹旅行中看到的事物</li>

@@ -14,7 +14,7 @@ export const MVJController = ({
 }) => {
   return (
     <div className='mb-4 flex items-center gap-2'>
-      <span className='text-sm text-zinc-600'>排序</span>
+      <span className='text-sm text-zinc-600 pl-2'>排序</span>
       <div className='inline-flex overflow-hidden rounded-lg border bg-white shadow-sm'>
         <button
           type='button'

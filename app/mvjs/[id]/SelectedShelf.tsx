@@ -84,7 +84,7 @@ export function SelectedShelf({
                     onClear={onClearBest}
                   />
                 ) : (
-                  <Placeholder text='尚未選擇最佳作品' />
+                  <Placeholder text='尚未選出最佳作品' />
                 )}
                 {hmIds.length ? (
                   hmIds.map((id) => (
@@ -97,7 +97,7 @@ export function SelectedShelf({
                     />
                   ))
                 ) : (
-                  <Placeholder text='尚未選擇佳作' />
+                  <Placeholder text='尚未選出佳作' />
                 )}
               </div>
             </div>
@@ -116,7 +116,7 @@ export function SelectedShelf({
               className=' px-2 py-1 text-slate-900 text-xs tracking-tighter cursor-pointer flex items-center gap-0.5 hover:underline'
               onClick={() => setIntroOpen(true)}
             >
-              <div>關於這個活動</div>
+              <div>關於這項活動</div>
               <Info className='w-3.5 h-3.5' />
             </button>
             <div className='flex-1' />
@@ -124,7 +124,7 @@ export function SelectedShelf({
               className='shrink-0 rounded-lg bg-black px-3 py-2 text-white'
               onClick={onSubmit}
             >
-              確認選擇
+              確認送出
             </button>
           </div>
         </div>

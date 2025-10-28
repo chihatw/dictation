@@ -96,7 +96,7 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
   }, [items]);
 
   return (
-    <main className='mx-auto max-w-6xl px-4 py-6'>
+    <main className='mx-auto max-w-6xl px-4 pb-6'>
       <SelectedShelf
         bestId={bestId}
         hmIds={hmIds}
