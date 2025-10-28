@@ -146,7 +146,7 @@ export function SelectedShelf({
               <textarea
                 value={reason}
                 onChange={(e) => onReasonChange(e.target.value)}
-                className='w-full rounded-lg border bg-white px-3 py-2 text-sm leading-6 outline-none focus:ring-2 focus:ring-black/10'
+                className='w-full rounded-lg border bg-white px-3 py-2 text-sm leading-6 focus:outline-0'
                 placeholder={placeholder}
                 aria-describedby='reason-help reason-count'
               />
