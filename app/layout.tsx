@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='zh-Hant' className={cn('h-full', `${notoSansTC.variable}`)}>
+    <html lang='zh-Hant' className={cn('h-full', notoSansTC.className)}>
       <body className='min-h-dvh bg-gray-100 antialiased'>{children}</body>
     </html>
   );

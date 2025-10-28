@@ -8,15 +8,6 @@ type Props = { params: Promise<{ id: string }> };
 
 const DEBUG = process.env.NEXT_PUBLIC_DEBUG === 'true';
 
-const COLUMNS = `
-  id,
-  window_start,
-  window_end,
-  user_id,
-  title,
-  due_at
-`;
-
 const Page = async ({ params }: Props) => {
   const { id } = await params;
 
@@ -32,7 +23,7 @@ const Page = async ({ params }: Props) => {
     : async () => {
         return await supabase
           .from('dictation_mvjs')
-          .select(COLUMNS)
+          .select('*')
           .eq('id', id)
           .single();
       };
@@ -97,7 +88,7 @@ const Page = async ({ params }: Props) => {
         <div>{fmtDate(dueAt)}</div>
         <div>{fmtTime(dueAt)}</div>
       </div>
-      <MVJPicker items={items} />
+      <MVJPicker mvj={mvj} items={items} />
     </div>
   );
 };

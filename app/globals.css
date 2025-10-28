@@ -129,3 +129,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+.marker-underline-yellow {
+  @apply font-extrabold text-base tracking-tighter px-1 pb-2;
+
+  background: linear-gradient(transparent 10%, theme(colors.yellow.300) 0);
+  background-repeat: no-repeat;
+  background-size: 100% 30%;
+  background-position: 10% 65%;
+}

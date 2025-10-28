@@ -1,7 +1,8 @@
 'use client';
-import { Journal } from '@/types/dictation';
+import { Journal, MVJ } from '@/types/dictation';
 import { useMemo, useState } from 'react';
 import { JournalCard } from './JournalCard';
+import { MVJController } from './MVJController';
 import { SelectedShelf } from './SelectedShelf';
 
 const toLabel = (body: string) => {
@@ -9,13 +10,14 @@ const toLabel = (body: string) => {
   return first.length > 10 ? first.slice(0, 10) + '…' : first || '（無標題）';
 };
 
-type SortKey = 'created_desc' | 'created_asc' | 'rating_desc';
+export type SortKey = 'created_desc' | 'created_asc' | 'rating_desc';
 
 type Props = {
+  mvj: MVJ;
   items: Journal[];
 };
 
-export function MVJPicker({ items: initialItems }: Props) {
+export function MVJPicker({ mvj, items: initialItems }: Props) {
   const [items, setItems] = useState<Journal[]>(initialItems);
   // 導出
   const bestId = useMemo(
@@ -95,63 +97,24 @@ export function MVJPicker({ items: initialItems }: Props) {
 
   return (
     <main className='mx-auto max-w-6xl px-4 py-6'>
-      {/* 選出棚 */}
       <SelectedShelf
         bestId={bestId}
         hmIds={hmIds}
         labelsById={labelsById}
+        reason={''}
+        onReasonChange={() => {}}
         onClearBest={() => toggleBest(bestId!)}
         onToggleHM={toggleHM}
         onSubmit={submit}
       />
 
-      {/* 並び替え */}
-      <div className='mb-4 flex items-center gap-2'>
-        <span className='text-sm text-zinc-600'>排序</span>
-        <div className='inline-flex overflow-hidden rounded-lg border bg-white shadow-sm'>
-          <button
-            type='button'
-            aria-pressed={sort === 'rating_desc'}
-            onClick={() => setSort('rating_desc')}
-            className={[
-              'border-l px-3 py-1.5 text-sm',
-              sort === 'rating_desc'
-                ? 'bg-zinc-900 text-white'
-                : 'hover:bg-zinc-50',
-            ].join(' ')}
-          >
-            評分高優先
-          </button>
-          <button
-            type='button'
-            aria-pressed={sort === 'created_desc'}
-            onClick={() => setSort('created_desc')}
-            className={[
-              'px-3 py-1.5 text-sm',
-              sort === 'created_desc'
-                ? 'bg-zinc-900 text-white'
-                : 'hover:bg-zinc-50',
-            ].join(' ')}
-          >
-            由新到舊
-          </button>
-          <button
-            type='button'
-            aria-pressed={sort === 'created_asc'}
-            onClick={() => setSort('created_asc')}
-            className={[
-              'border-l px-3 py-1.5 text-sm',
-              sort === 'created_asc'
-                ? 'bg-zinc-900 text-white'
-                : 'hover:bg-zinc-50',
-            ].join(' ')}
-          >
-            由舊到新
-          </button>
-        </div>
-      </div>
+      <MVJController
+        sort={sort}
+        ratingDescSort={() => setSort('rating_desc')}
+        createdAtAscSort={() => setSort('created_asc')}
+        createdAtDescSort={() => setSort('created_desc')}
+      />
 
-      {/* 一覧 */}
       <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'>
         {view.map((j) => (
           <JournalCard
