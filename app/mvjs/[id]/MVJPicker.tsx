@@ -1,9 +1,11 @@
 'use client';
 import { Journal, MVJ } from '@/types/dictation';
-import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { JournalCard } from './JournalCard';
 import { MVJController } from './MVJController';
 import { SelectedShelf } from './SelectedShelf';
+import { submitMvjAndAwardsAction } from './actions';
 
 const toLabel = (body: string) => {
   const first = (body.split('\n')[0] || '').trim();
@@ -18,7 +20,16 @@ type Props = {
 };
 
 export function MVJPicker({ mvj, items: initialItems }: Props) {
+  const router = useRouter();
   const [items, setItems] = useState<Journal[]>(initialItems);
+  const [reason, setReason] = useState<string>(mvj.reason || '');
+  const [serverReason, setServerReason] = useState(mvj.reason ?? '');
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setReason(mvj?.reason ?? '');
+  }, [mvj]);
+
   // 導出
   const bestId = useMemo(
     () => items.find((j) => j.self_award === 'mbest')?.id ?? null,
@@ -28,6 +39,15 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
     () => items.filter((j) => j.self_award === 'mhm').map((j) => j.id),
     [items]
   );
+  const initialBestId = useMemo(
+    () => initialItems.find((j) => j.self_award === 'mbest')?.id ?? null,
+    [initialItems]
+  );
+  const initialHmIds = useMemo(
+    () => initialItems.filter((j) => j.self_award === 'mhm').map((j) => j.id),
+    [initialItems]
+  );
+
   const [sort, setSort] = useState<SortKey>('rating_desc');
 
   // スコア更新
@@ -65,7 +85,20 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
     );
 
   const submit = () => {
-    // submit(bestId, hmIds)
+    const initialIds = initialItems.map((i) => i.id);
+    startTransition(() => {
+      (async () => {
+        const res = await submitMvjAndAwardsAction({
+          mvjId: mvj.id,
+          reason,
+          initialIds,
+          bestId,
+          hmIds,
+        });
+        setServerReason(res.reason); // 直ちに canSubmit が false になる
+        router.refresh(); // サーバー側を再取得
+      })();
+    });
   };
 
   // 並び替えビュー
@@ -100,12 +133,19 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
       <SelectedShelf
         bestId={bestId}
         hmIds={hmIds}
+        initialBestId={initialBestId}
+        initialHmIds={initialHmIds}
         labelsById={labelsById}
-        reason={''}
-        onReasonChange={() => {}}
-        onClearBest={() => toggleBest(bestId!)}
+        reason={reason}
+        onReasonChange={setReason}
+        onClearBest={() => {
+          if (bestId) toggleBest(bestId);
+        }}
         onToggleHM={toggleHM}
         onSubmit={submit}
+        dueAt={new Date(mvj.due_at)}
+        isPending={isPending}
+        serverReason={serverReason}
       />
 
       <MVJController

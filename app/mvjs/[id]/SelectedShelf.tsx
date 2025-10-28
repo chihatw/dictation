@@ -1,18 +1,12 @@
 'use client';
-import { Info } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Info, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge } from './Badge';
 import { MVJModal } from './MVJModal';
 
 function Placeholder({ text }: { text: string }) {
   return (
-    <div
-      className='
-        rounded-lg border border-dashed bg-gray-50 px-2 py-1 text-xs text-gray-500
-        shadow-[inset_0_0_0_1px_var(--color-gray-200)]
-        whitespace-nowrap
-      '
-    >
+    <div className='rounded-lg border border-dashed bg-gray-50 px-2 py-1 text-xs text-gray-500 shadow-[inset_0_0_0_1px_var(--color-gray-200)] whitespace-nowrap'>
       {text}
     </div>
   );
@@ -21,23 +15,33 @@ function Placeholder({ text }: { text: string }) {
 type Props = {
   bestId: string | null;
   hmIds: string[];
+  initialBestId: string | null;
+  initialHmIds: string[];
   labelsById: Record<string, string>;
   onClearBest: () => void;
   onToggleHM: (id: string) => void;
   onSubmit: () => void;
   reason: string;
   onReasonChange: (v: string) => void;
+  dueAt: Date;
+  isPending: boolean;
+  serverReason: string;
 };
 
 export function SelectedShelf({
   bestId,
   hmIds,
+  initialBestId,
+  initialHmIds,
   labelsById,
   reason,
   onReasonChange,
   onClearBest,
   onToggleHM,
   onSubmit,
+  dueAt,
+  isPending,
+  serverReason,
 }: Props) {
   const placeholder = bestId
     ? '為什麼選這篇為「最佳作品」？'
@@ -57,6 +61,43 @@ export function SelectedShelf({
     setIntroOpen(false);
     if (dontShowAgain) localStorage.setItem('hideIntroModal', 'true');
   };
+
+  // canSubmit 管理
+  const [isBeforeDue, setIsBeforeDue] = useState(
+    () => Date.now() <= dueAt.getTime()
+  );
+
+  useEffect(() => {
+    // 初回即時チェック
+    setIsBeforeDue(Date.now() <= dueAt.getTime());
+
+    const id = setInterval(() => {
+      setIsBeforeDue(Date.now() <= dueAt.getTime());
+    }, 60_000);
+
+    return () => clearInterval(id);
+  }, [dueAt]);
+
+  const sameSet = (a: string[], b: string[]) => {
+    if (a.length !== b.length) return false;
+    const s = new Set(a);
+    for (const x of b) if (!s.has(x)) return false;
+    return true;
+  };
+
+  const awardsChanged = useMemo(() => {
+    const bestChanged = (bestId ?? null) !== (initialBestId ?? null);
+    const hmChanged = !sameSet(hmIds, initialHmIds);
+    return bestChanged || hmChanged;
+  }, [bestId, hmIds, initialBestId, initialHmIds]);
+
+  const canSubmit = useMemo(() => {
+    const hasText = reason.trim().length > 0;
+    const reasonChanged = reason.trim() !== (serverReason ?? '').trim();
+    return (
+      hasText && isBeforeDue && !isPending && (reasonChanged || awardsChanged)
+    );
+  }, [reason, serverReason, isBeforeDue, isPending, awardsChanged]);
 
   return (
     <>
@@ -121,10 +162,12 @@ export function SelectedShelf({
             </button>
             <div className='flex-1' />
             <button
-              className='shrink-0 rounded-lg bg-black px-3 py-2 text-white'
+              className='shrink-0 rounded-lg bg-black px-3 py-2 text-white hover:cursor-pointer disabled:opacity-50 disabled:hover:cursor-not-allowed flex justify-center'
               onClick={onSubmit}
+              disabled={!canSubmit}
+              aria-disabled={!canSubmit}
             >
-              確認送出
+              {isPending ? <Loader2 className='animate-spin' /> : `確認送出`}
             </button>
           </div>
         </div>

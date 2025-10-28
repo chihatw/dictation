@@ -1124,6 +1124,16 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      submit_mvj_and_awards: {
+        Args: {
+          p_best_id: string
+          p_hm_ids: string[]
+          p_initial_ids: string[]
+          p_mvj_id: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
       unaccent: { Args: { "": string }; Returns: string }
     }
     Enums: {

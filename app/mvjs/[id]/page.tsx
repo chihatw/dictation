@@ -84,8 +84,14 @@ const Page = async ({ params }: Props) => {
     <div>
       <div className='mx-auto max-w-6xl mt-10 px-4 pb-2'>
         <h1 className='font-bold text-2xl pl-2'>{mvj.title}</h1>
-        <div className='text-sm text-slate-500 p-2'>
-          <div>{`截止日期: ${fmtDate(dueAt)}凌晨${fmtTime(dueAt)}。`}</div>
+        <div className='text-sm text-slate-500 p-2 pt-1'>
+          <div className='flex items-baseline'>
+            <div className='pr-2'>{`截止日期:`}</div>
+            <div className='font-bold text-slate-700 text-base tracking-tighter'>
+              {fmtDate(dueAt)}
+            </div>
+            <div>{`凌晨${fmtTime(dueAt)}。`}</div>
+          </div>
           <div>截止前皆可修改選擇。</div>
         </div>
       </div>
