@@ -82,7 +82,6 @@ export function TeacherFeedbackEditor({
           onKeyDown={(e) =>
             (e.metaKey || e.ctrlKey) && e.key === 'Enter' && submit()
           }
-          placeholder='例：発音が明瞭で良いです。助詞「は／が」を意識しましょう。'
           className='min-h-[140px] w-full rounded border p-2 text-sm font-mono'
         />
         <div className='prose prose-sm max-w-none rounded border p-2'>
