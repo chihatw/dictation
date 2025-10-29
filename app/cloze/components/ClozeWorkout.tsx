@@ -5,39 +5,16 @@ import { makeClozeText } from '@/utils/cloze/converter';
 import { useEffect, useState } from 'react';
 
 import { Journal } from '@/types/dictation';
+import { useQuerySync } from '../hooks/useQuerySync';
+import { ClozeCarouselItem, LineItem, Order, Unit } from '../types';
+import { shuffle } from '../utils/shuffle';
 import ClozeCarousel from './ClozeCarousel';
 import ClozeCarouselController from './ClozeCarouselController';
 
-type Unit = 'journal' | 'line';
-type Order = 'seq' | 'rand';
-
 type Props = {
   journals: Journal[];
-  defaultUnit?: Unit; // from searchParams
-  defaultOrder?: Order; // from searchParams
-};
-
-type LineItem = {
-  type: 'line';
-  journal: Journal;
-  lineText: string;
-  lineIndex: number;
-};
-
-type JournalItem = {
-  type: 'journal';
-  journal: Journal;
-};
-
-export type ClozeCarouselItem = LineItem | JournalItem;
-
-const shuffle = <T,>(arr: T[]) => {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+  defaultUnit?: Unit;
+  defaultOrder?: Order;
 };
 
 const ClozeWorkout = ({
@@ -45,11 +22,21 @@ const ClozeWorkout = ({
   defaultUnit = 'journal',
   defaultOrder = 'seq',
 }: Props) => {
+  const { setQuery } = useQuerySync();
   const [api, setApi] = useState<CarouselApi | null>(null);
   const [index, setIndex] = useState(1);
   const [unit, setUnit] = useState<Unit>(defaultUnit);
   const [order, setOrder] = useState<Order>(defaultOrder);
   const [items, setItems] = useState<ClozeCarouselItem[]>([]);
+
+  const setUnitAndSync = (u: Unit) => {
+    setUnit(u);
+    setQuery({ unit: u });
+  };
+  const setOrderAndSync = (o: Order) => {
+    setOrder(o);
+    setQuery({ order: o });
+  };
 
   useEffect(() => {
     const genItems = (): ClozeCarouselItem[] => {
@@ -111,10 +98,10 @@ const ClozeWorkout = ({
           isJournalUnit={unit === 'journal'}
           isSeqOrder={order === 'seq'}
           handleReset={handleReset}
-          setJournalUnit={() => setUnit('journal')}
-          setLineUnit={() => setUnit('line')}
-          setSeqOrder={() => setOrder('seq')}
-          setRandomOrder={() => setOrder('rand')}
+          setJournalUnit={() => setUnitAndSync('journal')}
+          setLineUnit={() => setUnitAndSync('line')}
+          setSeqOrder={() => setOrderAndSync('seq')}
+          setRandomOrder={() => setOrderAndSync('rand')}
         />
 
         {/* 進捗バー */}

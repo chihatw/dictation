@@ -5,7 +5,8 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
-import { ClozeCarouselItem } from './ClozeWorkout';
+
+import { ClozeCarouselItem } from '../types';
 import JournalCarouselItem from './JournalCarouselItem';
 import LineCarouselItem from './LineCarouselItem';
 
