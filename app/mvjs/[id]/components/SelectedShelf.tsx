@@ -1,6 +1,6 @@
 'use client';
-import { Image, Info, Loader2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Image, Info, Loader2, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MVJBadges } from './MVJBadges';
 import { MVJModal } from './MVJModal';
 
@@ -15,12 +15,18 @@ type Props = {
   onSubmit: () => void;
   reason: string;
   onReasonChange: (v: string) => void;
+  serverReason: string;
+
+  // 保存済みの公開URL（UI表示用）
+  imageUrl: string;
+  // 新規選択ファイルのプレビュー制御
+  previewUrl: string;
+  onPickImage: (file: File, previewUrl: string) => void;
+  // UI から完全に消す（プレビューと imageUrl を空に）
+  onClearImageUI: () => void;
+
   dueAt: Date;
   isPending: boolean;
-  serverReason: string;
-  imageUrl: string;
-  onImageUrlChange: (v: string) => void;
-  serverImageUrl: string;
 };
 
 export function SelectedShelf({
@@ -38,29 +44,58 @@ export function SelectedShelf({
   isPending,
   serverReason,
   imageUrl,
-  serverImageUrl,
-  onImageUrlChange,
+  previewUrl,
+  onPickImage,
+  onClearImageUI,
 }: Props) {
   const placeholder = bestId
-    ? '為什麼選這篇為「最佳作品」？'
+    ? '說明這篇「最佳作品」在什麼場景、對誰可以使用'
     : '請先選擇一篇「最佳作品」。';
 
-  // 導入文モーダル
+  // 導入モーダル
   const [introOpen, setIntroOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
-
-  // 初回判定
   useEffect(() => {
     const flag = localStorage.getItem('hideIntroModal');
     if (!flag) setIntroOpen(true);
   }, []);
-
   const closeIntro = () => {
     setIntroOpen(false);
     if (dontShowAgain) localStorage.setItem('hideIntroModal', 'true');
   };
 
-  // canSubmit 管理
+  // 画像選択 UI
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const pickFile = () => fileInputRef.current?.click();
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const f = files[0];
+    if (!f.type.startsWith('image/')) return;
+    const url = URL.createObjectURL(f);
+    onPickImage(f, url);
+  };
+
+  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    handleFiles(e.target.files);
+    e.currentTarget.value = '';
+  };
+
+  const onDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    handleFiles(e.dataTransfer.files);
+  };
+  const onDragOver: React.DragEventHandler<HTMLDivElement> = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+  const onDragLeave: React.DragEventHandler<HTMLDivElement> = () => {
+    setIsDragOver(false);
+  };
+
+  // 期限
   const [isBeforeDue, setIsBeforeDue] = useState(
     () => Date.now() <= dueAt.getTime()
   );
@@ -89,30 +124,35 @@ export function SelectedShelf({
     return bestChanged || hmChanged;
   }, [bestId, hmIds, initialBestId, initialHmIds]);
 
+  // 送信可否
   const canSubmit = useMemo(() => {
     const hasBest = !!bestId;
-    const hasImageUrl = !!imageUrl;
-    const hasText = reason.trim().length > 0;
+    const hasNewImage = !!previewUrl;
+    const hasSavedImage = !!imageUrl;
+    const hasAnyImage = hasNewImage || hasSavedImage;
     const reasonChanged = reason.trim() !== (serverReason ?? '').trim();
-    const imageUrlChanged = imageUrl !== serverImageUrl;
+    const imageChanged = !!previewUrl;
     return (
       hasBest &&
-      hasImageUrl &&
-      hasText &&
+      hasAnyImage &&
+      reason.trim().length > 0 &&
       isBeforeDue &&
       !isPending &&
-      (reasonChanged || awardsChanged || imageUrlChanged)
+      (reasonChanged || awardsChanged || imageChanged)
     );
   }, [
     bestId,
     reason,
-    imageUrl,
     serverReason,
-    serverImageUrl,
+    previewUrl,
+    imageUrl,
     isBeforeDue,
     isPending,
     awardsChanged,
   ]);
+
+  // 表示ソースはプレビュー優先
+  const displaySrc = previewUrl || imageUrl;
 
   return (
     <>
@@ -134,14 +174,60 @@ export function SelectedShelf({
               onClearBest={onClearBest}
               onToggleHM={onToggleHM}
             />
-            <div className='h-16 bg-slate-50 rounded-lg my-2 border-2 border-dashed border-slate-300 flex justify-center items-center'>
-              <div className='flex gap-2 items-center text-slate-400 text-sm'>
-                <Image className='h-4 w-4' />
-                <div>請將圖片拖曳到這裡 或點擊以選擇圖片</div>
-              </div>
+
+            <div
+              className={[
+                'w-full h-32 rounded-lg my-2 border-2 border-dashed flex justify-center items-center overflow-hidden relative',
+                displaySrc
+                  ? 'border-slate-200 bg-white'
+                  : 'border-slate-300 bg-slate-50',
+                isDragOver
+                  ? 'ring-2 ring-slate-400 ring-offset-1 ring-inset'
+                  : '',
+              ].join(' ')}
+              onClick={() => !displaySrc && pickFile()}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+              role='button'
+              aria-label={displaySrc ? '已選擇圖片' : '拖曳或點擊以選擇圖片'}
+              tabIndex={0}
+            >
+              <input
+                ref={fileInputRef}
+                type='file'
+                accept='image/*'
+                className='hidden'
+                onChange={onInputChange}
+              />
+
+              {displaySrc ? (
+                <>
+                  <img
+                    src={displaySrc}
+                    alt='選擇的圖片預覽'
+                    className='h-full w-full object-contain'
+                  />
+                  <button
+                    type='button'
+                    onClick={onClearImageUI}
+                    className='absolute right-1.5 top-1.5 inline-flex items-center justify-center rounded-full bg-black/70 p-1 text-white hover:bg-black/80'
+                    aria-label='刪除圖片'
+                  >
+                    <X className='h-4 w-4' />
+                  </button>
+                </>
+              ) : (
+                <div className='flex gap-2 items-center text-slate-400 text-sm pointer-events-none'>
+                  <Image className='h-4 w-4' />
+                  <div>請將圖片拖曳到這裡 或點擊以選擇圖片</div>
+                </div>
+              )}
             </div>
+
             <div className='mt-3 space-y-1.5'>
-              <textarea
+              <input
+                type='text'
                 value={reason}
                 onChange={(e) => onReasonChange(e.target.value)}
                 className='w-full rounded-lg border bg-white px-3 py-2 text-sm leading-6 focus:outline-0'
@@ -150,9 +236,9 @@ export function SelectedShelf({
               />
             </div>
           </div>
-          <div className='flex flex-col gap-2 pb-1.5 shrink-0'>
+          <div className='flex flex-col gap-2 shrink-0'>
             <button
-              className=' px-2 py-1 text-slate-900 text-xs tracking-tighter cursor-pointer flex items-center gap-0.5 hover:underline'
+              className='px-2 py-1 text-slate-900 text-xs tracking-tighter cursor-pointer flex items-center gap-0.5 hover:underline'
               onClick={() => setIntroOpen(true)}
             >
               <div>關於這項活動</div>
@@ -165,7 +251,7 @@ export function SelectedShelf({
               disabled={!canSubmit}
               aria-disabled={!canSubmit}
             >
-              {isPending ? <Loader2 className='animate-spin' /> : `確認送出`}
+              {isPending ? <Loader2 className='animate-spin' /> : '確認送出'}
             </button>
           </div>
         </div>

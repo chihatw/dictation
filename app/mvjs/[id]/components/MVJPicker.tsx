@@ -20,8 +20,12 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
   const [items, setItems] = useState<Journal[]>(initialItems);
   const [reason, setReason] = useState(mvj.reason ?? '');
   const [serverReason, setServerReason] = useState(mvj.reason ?? '');
-  const [imageUrl, setImageUrl] = useState(mvj.image_url ?? '');
-  const [serverImageUrl, setSeverImageUrl] = useState(mvj.image_url ?? '');
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState(mvj.image_url ?? ''); // 画面表示用
+  const [serverImageUrl, setServerImageUrl] = useState(mvj.image_url ?? ''); // サーバ保存値の記録
+
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -55,16 +59,14 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
     );
   const optimisticScore = applyScore;
 
-  // トグル（SSOT: items）
+  // best/HM 切替
   const toggleBest = (id: string) =>
     setItems((prev) => {
       const isBest = prev.some((j) => j.id === id && j.self_award === 'mbest');
       return prev.map((j) => {
         if (j.id === id) return { ...j, self_award: isBest ? 'none' : 'mbest' };
-        // best は一意。別の mbest は none に。
         if (!isBest && j.self_award === 'mbest')
           return { ...j, self_award: 'none' };
-        // HM との衝突排除
         if (!isBest && j.id === id && j.self_award === 'mhm')
           return { ...j, self_award: 'mbest' };
         return j;
@@ -76,28 +78,49 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
       prev.map((j) => {
         if (j.id !== id) return j;
         if (j.self_award === 'mhm') return { ...j, self_award: 'none' };
-        // best と衝突しないように
         if (j.self_award === 'mbest') return { ...j, self_award: 'none' };
         return { ...j, self_award: 'mhm' };
       })
     );
 
+  // 画像選択
+  const onPickImage = (file: File, url: string) => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setImageFile(file);
+    setPreviewUrl(url);
+  };
+
+  // X クリック時: UI からは完全に消す（サーバ側は触らない）
+  const onClearImageUI = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl('');
+    setImageFile(null);
+    setImageUrl('');
+  };
+
   const submit = () => {
     const initialIds = initialItems.map((i) => i.id);
-    startTransition(() => {
-      (async () => {
-        const res = await submitMvjAndAwardsAction({
-          mvjId: mvj.id,
-          imageUrl,
-          reason,
-          initialIds,
-          bestId,
-          hmIds,
-        });
-        setServerReason(res.reason); // 直ちに canSubmit が false になる
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set('mvjId', mvj.id);
+      fd.set('reason', reason);
+      fd.set('initialIds', JSON.stringify(initialIds));
+      fd.set('bestId', bestId ?? '');
+      fd.set('hmIds', JSON.stringify(hmIds));
+      fd.set('oldImageUrl', serverImageUrl || '');
+      if (imageFile) fd.set('image', imageFile);
+
+      const res = await submitMvjAndAwardsAction(fd);
+
+      setServerReason(res.reason);
+      if (res.imageUrl) {
         setImageUrl(res.imageUrl);
-        router.refresh(); // サーバー側を再取得
-      })();
+        setServerImageUrl(res.imageUrl);
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl('');
+        setImageFile(null);
+      }
+      router.refresh();
     });
   };
 
@@ -139,9 +162,10 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
         reason={reason}
         serverReason={serverReason}
         onReasonChange={setReason}
+        previewUrl={previewUrl}
+        onPickImage={onPickImage}
+        onClearImageUI={onClearImageUI}
         imageUrl={imageUrl}
-        serverImageUrl={serverImageUrl}
-        onImageUrlChange={setImageUrl}
         onClearBest={() => {
           if (bestId) toggleBest(bestId);
         }}
