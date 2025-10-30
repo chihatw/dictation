@@ -1,5 +1,5 @@
 'use client';
-import { Info, Loader2 } from 'lucide-react';
+import { Image, Info, Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { MVJBadges } from './MVJBadges';
 import { MVJModal } from './MVJModal';
@@ -119,8 +119,11 @@ export function SelectedShelf({
               onClearBest={onClearBest}
               onToggleHM={onToggleHM}
             />
-            <div className='h-48'>
-              <div className='rounded-lg bg-slate-50'>Image</div>
+            <div className='h-16 bg-slate-50 rounded-lg my-2 border-2 border-dashed border-slate-300 flex justify-center items-center'>
+              <div className='flex gap-2 items-center text-slate-400 text-sm'>
+                <Image className='h-4 w-4' />
+                <div>請將圖片拖曳到這裡 或點擊以選擇圖片</div>
+              </div>
             </div>
             <div className='mt-3 space-y-1.5'>
               <textarea
