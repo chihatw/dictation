@@ -19,6 +19,7 @@ const LineCarouselItem = ({ journal, lineText }: Props) => {
         <ClozeCarouselHeader
           articleId={j.article_id}
           createdAt={j.created_at}
+          selfAward={j.self_award}
         />
         <div className='mb-4'>
           <ClozeRow objs={objs} />

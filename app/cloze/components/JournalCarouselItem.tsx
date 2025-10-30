@@ -18,6 +18,7 @@ const JournalCarouselItem = ({ journal }: Props) => {
         <ClozeCarouselHeader
           articleId={j.article_id}
           createdAt={j.created_at}
+          selfAward={j.self_award}
         />
         <div className='flex flex-col gap-2 mb-4'>
           {clozeText

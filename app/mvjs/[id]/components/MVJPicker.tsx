@@ -1,6 +1,5 @@
 'use client';
 import { Journal, MVJ } from '@/types/dictation';
-import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { submitMvjAndAwardsAction } from '../actions';
 import { toLabel } from '../utils';
@@ -16,15 +15,12 @@ type Props = {
 };
 
 export function MVJPicker({ mvj, items: initialItems }: Props) {
-  const router = useRouter();
   const [items, setItems] = useState<Journal[]>(initialItems);
   const [reason, setReason] = useState(mvj.reason ?? '');
-  const [serverReason, setServerReason] = useState(mvj.reason ?? '');
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [imageUrl, setImageUrl] = useState(mvj.image_url ?? ''); // 画面表示用
-  const [serverImageUrl, setServerImageUrl] = useState(mvj.image_url ?? ''); // サーバ保存値の記録
 
   const [isPending, startTransition] = useTransition();
 
@@ -101,26 +97,22 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
   const submit = () => {
     const initialIds = initialItems.map((i) => i.id);
     startTransition(async () => {
-      const fd = new FormData();
-      fd.set('mvjId', mvj.id);
-      fd.set('reason', reason);
-      fd.set('initialIds', JSON.stringify(initialIds));
-      fd.set('bestId', bestId ?? '');
-      fd.set('hmIds', JSON.stringify(hmIds));
-      fd.set('oldImageUrl', serverImageUrl || '');
-      if (imageFile) fd.set('image', imageFile);
+      try {
+        const fd = new FormData();
+        fd.set('mvjId', mvj.id);
+        fd.set('reason', reason);
+        fd.set('initialIds', JSON.stringify(initialIds));
+        fd.set('bestId', bestId ?? '');
+        fd.set('hmIds', JSON.stringify(hmIds));
+        fd.set('oldImageUrl', mvj.image_url ?? '');
+        if (imageFile) fd.set('image', imageFile);
 
-      const res = await submitMvjAndAwardsAction(fd);
-
-      setServerReason(res.reason);
-      if (res.imageUrl) {
-        setImageUrl(res.imageUrl);
-        setServerImageUrl(res.imageUrl);
+        await submitMvjAndAwardsAction(fd);
+      } catch (e) {
+        console.error(e);
+      } finally {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
-        setPreviewUrl('');
-        setImageFile(null);
       }
-      router.refresh();
     });
   };
 
@@ -160,7 +152,7 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
         initialHmIds={initialHmIds}
         labelsById={labelsById}
         reason={reason}
-        serverReason={serverReason}
+        serverReason={mvj.reason ?? ''}
         onReasonChange={setReason}
         previewUrl={previewUrl}
         onPickImage={onPickImage}

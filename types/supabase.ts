@@ -1040,6 +1040,7 @@ export type Database = {
           done_count: number
           due_at: string
           mvj_id: string
+          mvj_image_url: string
           next_article_id: string
           next_full_title: string
           next_sentence_id: string

@@ -60,6 +60,7 @@ export default async function Home() {
   const timeProgress = timeProgress5pct(startAt, endAt);
   const topAssignmentIds = row?.top_assignment_ids;
   const mvjId = row?.mvj_id;
+  const mvjImageUrl = row?.mvj_image_url;
 
   return (
     <div className='min-h-screen p-6'>
@@ -132,6 +133,15 @@ export default async function Home() {
                 🏆 選出9-10月最有價值日誌 🏆
               </span>
             </Link>
+            {mvjImageUrl && (
+              <div className='flex justify-center'>
+                <img
+                  src={mvjImageUrl}
+                  alt='最佳作品圖片'
+                  className='rounded shadow-md max-h-64 object-contain'
+                />
+              </div>
+            )}
           </section>
         )}
 

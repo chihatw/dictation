@@ -5,7 +5,7 @@ import { Vote } from '@/components/journal/Vote';
 import { supabase } from '@/lib/supabase/browser';
 import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
 import { makeClozeText, parseCloze } from '@/utils/cloze/converter';
-import { LinkIcon } from 'lucide-react';
+import { Award, LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import ClozeRow from '../cloze/ClozeRow';
@@ -211,6 +211,16 @@ const JournalLinkHeader = ({ journal }: { journal: Journal }) => {
     <div className='flex items-center justify-between w-full'>
       <Link href={`/articles/${journal.article_id}`} className='block'>
         <div className='flex items-center hover:underline gap-x-1'>
+          {['mbest'].includes(journal.self_award) && (
+            <span>
+              <Award className='w-5 h-5 text-yellow-500' fill='currentColor' />
+            </span>
+          )}
+          {['mhm'].includes(journal.self_award) && (
+            <span>
+              <Award className='w-5 h-5 text-gray-400' fill='currentColor' />
+            </span>
+          )}
           <time className='font-bold '>
             {date.toLocaleString('ja-JP', {
               year: 'numeric',

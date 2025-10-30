@@ -2,7 +2,7 @@
 'use server';
 
 import { createClientAction } from '@/lib/supabase/server-action';
-import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { extractPathFromPublicUrl } from './utils';
 
 export async function submitMvjAndAwardsAction(formData: FormData) {
@@ -77,6 +77,6 @@ export async function submitMvjAndAwardsAction(formData: FormData) {
   });
   if (error) throw new Error(error.message);
 
-  revalidatePath(`/mvjs/${mvjId}`);
-  return { reason, imageUrl: urlForDb };
+  // revalidatePath(`/`);
+  redirect('/');
 }

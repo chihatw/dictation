@@ -97,9 +97,7 @@ export function SelectedShelf({
   // 送信可否
   const canSubmit = useMemo(() => {
     const hasBest = !!bestId;
-    const hasNewImage = !!previewUrl;
-    const hasSavedImage = !!imageUrl;
-    const hasAnyImage = hasNewImage || hasSavedImage;
+    const hasAnyImage = !!previewUrl || !!imageUrl;
     const reasonChanged = reason.trim() !== (serverReason ?? '').trim();
     const imageChanged = !!previewUrl;
     return (
