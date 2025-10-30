@@ -1,6 +1,7 @@
 'use client';
-import { Image, Info, Loader2, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Info, Loader2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import ImageDropBox from './ImageDropBox';
 import { MVJBadges } from './MVJBadges';
 import { MVJModal } from './MVJModal';
 
@@ -62,37 +63,6 @@ export function SelectedShelf({
   const closeIntro = () => {
     setIntroOpen(false);
     if (dontShowAgain) localStorage.setItem('hideIntroModal', 'true');
-  };
-
-  // 画像選択 UI
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const pickFile = () => fileInputRef.current?.click();
-
-  const handleFiles = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const f = files[0];
-    if (!f.type.startsWith('image/')) return;
-    const url = URL.createObjectURL(f);
-    onPickImage(f, url);
-  };
-
-  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    handleFiles(e.target.files);
-    e.currentTarget.value = '';
-  };
-
-  const onDrop: React.DragEventHandler<HTMLDivElement> = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    handleFiles(e.dataTransfer.files);
-  };
-  const onDragOver: React.DragEventHandler<HTMLDivElement> = (e) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-  const onDragLeave: React.DragEventHandler<HTMLDivElement> = () => {
-    setIsDragOver(false);
   };
 
   // 期限
@@ -175,55 +145,15 @@ export function SelectedShelf({
               onToggleHM={onToggleHM}
             />
 
-            <div
-              className={[
-                'w-full h-32 rounded-lg my-2 border-2 border-dashed flex justify-center items-center overflow-hidden relative',
-                displaySrc
-                  ? 'border-slate-200 bg-white'
-                  : 'border-slate-300 bg-slate-50',
-                isDragOver
-                  ? 'ring-2 ring-slate-400 ring-offset-1 ring-inset'
-                  : '',
-              ].join(' ')}
-              onClick={() => !displaySrc && pickFile()}
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              role='button'
-              aria-label={displaySrc ? '已選擇圖片' : '拖曳或點擊以選擇圖片'}
-              tabIndex={0}
-            >
-              <input
-                ref={fileInputRef}
-                type='file'
-                accept='image/*'
-                className='hidden'
-                onChange={onInputChange}
-              />
-
-              {displaySrc ? (
-                <>
-                  <img
-                    src={displaySrc}
-                    alt='選擇的圖片預覽'
-                    className='h-full w-full object-contain'
-                  />
-                  <button
-                    type='button'
-                    onClick={onClearImageUI}
-                    className='absolute right-1.5 top-1.5 inline-flex items-center justify-center rounded-full bg-black/70 p-1 text-white hover:bg-black/80'
-                    aria-label='刪除圖片'
-                  >
-                    <X className='h-4 w-4' />
-                  </button>
-                </>
-              ) : (
-                <div className='flex gap-2 items-center text-slate-400 text-sm pointer-events-none'>
-                  <Image className='h-4 w-4' />
-                  <div>請將圖片拖曳到這裡 或點擊以選擇圖片</div>
-                </div>
-              )}
-            </div>
+            <ImageDropBox
+              displaySrc={displaySrc}
+              onPickImage={onPickImage}
+              onClear={onClearImageUI}
+              emptyAriaLabel={
+                displaySrc ? '已選擇圖片' : '拖曳或點擊以選擇圖片'
+              }
+              disabled={isPending}
+            />
 
             <div className='mt-3 space-y-1.5'>
               <input
