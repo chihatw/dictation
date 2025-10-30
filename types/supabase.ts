@@ -1041,6 +1041,7 @@ export type Database = {
           due_at: string
           mvj_id: string
           mvj_image_url: string
+          mvj_reason: string
           next_article_id: string
           next_full_title: string
           next_sentence_id: string

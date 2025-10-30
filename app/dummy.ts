@@ -7,6 +7,7 @@ type Weather = {
 export const nextTask: Rpc<{
   mvj_id: string;
   mvj_image_url: string;
+  mvj_reason: string;
   published_at: null;
   due_at: null;
   next_article_id: null;
@@ -21,6 +22,7 @@ export const nextTask: Rpc<{
     mvj_id: 'dummy',
     mvj_image_url:
       'https://ifhrlwhlgpgzpmwdonjo.supabase.co/storage/v1/object/public/dictation-mvj/c049d5c9-66ba-4986-94f3-48c99d893457/0558d7fd-2cd1-4c14-9bf8-d1cf3bf99c35_1761835072763.png',
+    mvj_reason: 'これはダミーの mvj reason です。',
     published_at: null,
     due_at: null,
     next_article_id: null,
