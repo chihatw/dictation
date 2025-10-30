@@ -18,8 +18,10 @@ type Props = {
 export function MVJPicker({ mvj, items: initialItems }: Props) {
   const router = useRouter();
   const [items, setItems] = useState<Journal[]>(initialItems);
-  const [reason, setReason] = useState<string>(mvj.reason || '');
+  const [reason, setReason] = useState(mvj.reason ?? '');
   const [serverReason, setServerReason] = useState(mvj.reason ?? '');
+  const [imageUrl, setImageUrl] = useState(mvj.image_url ?? '');
+  const [serverImageUrl, setSeverImageUrl] = useState(mvj.image_url ?? '');
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -86,12 +88,14 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
       (async () => {
         const res = await submitMvjAndAwardsAction({
           mvjId: mvj.id,
+          imageUrl,
           reason,
           initialIds,
           bestId,
           hmIds,
         });
         setServerReason(res.reason); // 直ちに canSubmit が false になる
+        setImageUrl(res.imageUrl);
         router.refresh(); // サーバー側を再取得
       })();
     });
@@ -133,7 +137,11 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
         initialHmIds={initialHmIds}
         labelsById={labelsById}
         reason={reason}
+        serverReason={serverReason}
         onReasonChange={setReason}
+        imageUrl={imageUrl}
+        serverImageUrl={serverImageUrl}
+        onImageUrlChange={setImageUrl}
         onClearBest={() => {
           if (bestId) toggleBest(bestId);
         }}
@@ -141,7 +149,6 @@ export function MVJPicker({ mvj, items: initialItems }: Props) {
         onSubmit={submit}
         dueAt={new Date(mvj.due_at)}
         isPending={isPending}
-        serverReason={serverReason}
       />
 
       <MVJController

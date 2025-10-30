@@ -30,13 +30,17 @@ export const MVJModal = ({
               選出你認為「最能用在對話中的內容」為 「
               <span className='marker-underline-yellow'>最佳作品</span>」。
               若還有覺得能派上用場的內容，可標為 「
-              <span className='marker-underline-yellow'>佳作</span>」；
-              若沒有，也
-              <span className='marker-underline-yellow'>可以不選</span>。
+              <span className='marker-underline-yellow'>佳作</span>」。
             </li>
             <li>
-              <span className='marker-underline-yellow'>寫下理由</span>：
-              為什麼選這篇，或為什麼這次沒有選。
+              使用 AI 生成一張圖片，呈現「
+              <span className='marker-underline-yellow'>最佳作品</span>
+              」實際可以使用的情境，並上傳圖片。
+            </li>
+            <li>
+              說明這篇「
+              <span className='marker-underline-yellow'>最佳作品</span>
+              」在什麼場景、對誰可以使用。
             </li>
           </ol>
 
@@ -44,7 +48,7 @@ export const MVJModal = ({
             <div className='mb-1 flex'>評選基準</div>
             <div className='flex'>
               <div className='font-extrabold tracking-tighter text-base'>
-                能清楚想像自己在什麼情境使用。
+                能清楚想像自己在什麼情境、對誰使用。
               </div>
             </div>
           </div>

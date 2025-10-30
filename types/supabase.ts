@@ -251,6 +251,7 @@ export type Database = {
           created_at: string
           due_at: string
           id: string
+          image_url: string | null
           published_at: string | null
           reason: string | null
           scope: Database["public"]["Enums"]["mvj_scope_t"]
@@ -263,6 +264,7 @@ export type Database = {
           created_at?: string
           due_at: string
           id?: string
+          image_url?: string | null
           published_at?: string | null
           reason?: string | null
           scope?: Database["public"]["Enums"]["mvj_scope_t"]
@@ -275,6 +277,7 @@ export type Database = {
           created_at?: string
           due_at?: string
           id?: string
+          image_url?: string | null
           published_at?: string | null
           reason?: string | null
           scope?: Database["public"]["Enums"]["mvj_scope_t"]
@@ -1128,6 +1131,7 @@ export type Database = {
         Args: {
           p_best_id: string
           p_hm_ids: string[]
+          p_image_url: string
           p_initial_ids: string[]
           p_mvj_id: string
           p_reason: string

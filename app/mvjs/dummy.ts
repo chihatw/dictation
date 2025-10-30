@@ -10,7 +10,9 @@ export const MVJ_DUMMY: MVJ = {
   window_end: '2025-10-31T15:00:00+00:00',
   published_at: '2025-10-28T01:39:37+00:00',
   due_at: '2025-11-11T16:00:00+00:00',
-  reason: null,
+  reason: '👻 from dummy data!! ',
+  image_url:
+    'https://ifhrlwhlgpgzpmwdonjo.supabase.co/storage/v1/object/public/dictation-mvj/c049d5c9-66ba-4986-94f3-48c99d893457/dasdfaldjfakdladsk.png',
 };
 
 export const JOURNALS_DUMMY = [

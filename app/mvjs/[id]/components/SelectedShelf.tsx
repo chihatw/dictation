@@ -4,14 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { MVJBadges } from './MVJBadges';
 import { MVJModal } from './MVJModal';
 
-function Placeholder({ text }: { text: string }) {
-  return (
-    <div className='rounded-lg border border-dashed bg-gray-50 px-2 py-1 text-xs text-gray-500 shadow-[inset_0_0_0_1px_var(--color-gray-200)] whitespace-nowrap'>
-      {text}
-    </div>
-  );
-}
-
 type Props = {
   bestId: string | null;
   hmIds: string[];
@@ -26,6 +18,9 @@ type Props = {
   dueAt: Date;
   isPending: boolean;
   serverReason: string;
+  imageUrl: string;
+  onImageUrlChange: (v: string) => void;
+  serverImageUrl: string;
 };
 
 export function SelectedShelf({
@@ -42,10 +37,13 @@ export function SelectedShelf({
   dueAt,
   isPending,
   serverReason,
+  imageUrl,
+  serverImageUrl,
+  onImageUrlChange,
 }: Props) {
   const placeholder = bestId
     ? '為什麼選這篇為「最佳作品」？'
-    : '為什麼本月未選出「最佳作品」？';
+    : '請先選擇一篇「最佳作品」。';
 
   // 導入文モーダル
   const [introOpen, setIntroOpen] = useState(false);
@@ -92,12 +90,29 @@ export function SelectedShelf({
   }, [bestId, hmIds, initialBestId, initialHmIds]);
 
   const canSubmit = useMemo(() => {
+    const hasBest = !!bestId;
+    const hasImageUrl = !!imageUrl;
     const hasText = reason.trim().length > 0;
     const reasonChanged = reason.trim() !== (serverReason ?? '').trim();
+    const imageUrlChanged = imageUrl !== serverImageUrl;
     return (
-      hasText && isBeforeDue && !isPending && (reasonChanged || awardsChanged)
+      hasBest &&
+      hasImageUrl &&
+      hasText &&
+      isBeforeDue &&
+      !isPending &&
+      (reasonChanged || awardsChanged || imageUrlChanged)
     );
-  }, [reason, serverReason, isBeforeDue, isPending, awardsChanged]);
+  }, [
+    bestId,
+    reason,
+    imageUrl,
+    serverReason,
+    serverImageUrl,
+    isBeforeDue,
+    isPending,
+    awardsChanged,
+  ]);
 
   return (
     <>
