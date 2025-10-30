@@ -58,11 +58,11 @@ export const MVJModal = ({
           <div className='pt-2 border-t'>
             <div className='mb-2'>例）</div>
             <ul className='list-disc pl-6 space-y-1.5'>
-              <li>能和第一次見面的人打招呼</li>
-              <li>能對店員追加點餐</li>
-              <li>能向朋友表達自己的心情</li>
-              <li>能主動對需要幫助的人說話</li>
-              <li>能向日本人介紹旅行中看到的事物</li>
+              <li>在被朋友介紹時，能向第一次見面的人打招呼。</li>
+              <li>在餐廳用餐時，能對店員追加點餐。</li>
+              <li>在和朋友聊天時，能表達自己的心情。</li>
+              <li>在看到需要幫助的人時，能主動上前說話。</li>
+              <li>在旅行結束後，能向日本人分享旅行中看到的事物。</li>
             </ul>
           </div>
         </section>
