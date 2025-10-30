@@ -1,4 +1,4 @@
-import { MVJPicker } from '@/app/mvjs/[id]/MVJPicker';
+import { MVJPicker } from '@/app/mvjs/[id]/components/MVJPicker';
 import { createClient } from '@/lib/supabase/server';
 import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
 import { ChevronLeft } from 'lucide-react';

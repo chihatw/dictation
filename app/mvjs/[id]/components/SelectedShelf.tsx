@@ -1,7 +1,7 @@
 'use client';
 import { Info, Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Badge } from './Badge';
+import { MVJBadges } from './MVJBadges';
 import { MVJModal } from './MVJModal';
 
 function Placeholder({ text }: { text: string }) {
@@ -112,35 +112,15 @@ export function SelectedShelf({
       <section className='sticky top-0 z-10 mb-4 rounded-xl border bg-white/90 p-3 backdrop-blur'>
         <div className='flex gap-3 '>
           <div className='flex-1 overflow-hidden'>
-            <div>
-              <div
-                className='flex flex-wrap gap-2 items-center min-h-9'
-                aria-live='polite'
-              >
-                {bestId ? (
-                  <Badge
-                    id={bestId}
-                    label={labelsById[bestId] ?? '最佳作品'}
-                    color='gold'
-                    onClear={onClearBest}
-                  />
-                ) : (
-                  <Placeholder text='尚未選出最佳作品' />
-                )}
-                {hmIds.length ? (
-                  hmIds.map((id) => (
-                    <Badge
-                      key={id}
-                      id={id}
-                      label={labelsById[id] ?? '佳作'}
-                      color='silver'
-                      onClear={() => onToggleHM(id)}
-                    />
-                  ))
-                ) : (
-                  <Placeholder text='尚未選出佳作' />
-                )}
-              </div>
+            <MVJBadges
+              bestId={bestId}
+              hmIds={hmIds}
+              labelsById={labelsById}
+              onClearBest={onClearBest}
+              onToggleHM={onToggleHM}
+            />
+            <div className='h-48'>
+              <div className='rounded-lg bg-slate-50'>Image</div>
             </div>
             <div className='mt-3 space-y-1.5'>
               <textarea

@@ -12,3 +12,8 @@ export const fmtTime = (iso: Date) =>
     minute: '2-digit',
     timeZone: 'Asia/Taipei',
   });
+
+export const toLabel = (body: string) => {
+  const first = (body.split('\n')[0] || '').trim();
+  return first.length > 10 ? first.slice(0, 10) + '…' : first || '（無標題）';
+};

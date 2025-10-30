@@ -2,15 +2,11 @@
 import { Journal, MVJ } from '@/types/dictation';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, useTransition } from 'react';
+import { submitMvjAndAwardsAction } from '../actions';
+import { toLabel } from '../utils';
 import { JournalCard } from './JournalCard';
 import { MVJController } from './MVJController';
 import { SelectedShelf } from './SelectedShelf';
-import { submitMvjAndAwardsAction } from './actions';
-
-const toLabel = (body: string) => {
-  const first = (body.split('\n')[0] || '').trim();
-  return first.length > 10 ? first.slice(0, 10) + '…' : first || '（無標題）';
-};
 
 export type SortKey = 'created_desc' | 'created_asc' | 'rating_desc';
 
