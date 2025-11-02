@@ -3,29 +3,23 @@ import { Noto_Sans_TC } from 'next/font/google';
 import './globals.css';
 
 export const metadata = {
+  metadataBase: new URL('https://dictation-eight.vercel.app'),
   title: '原田日本語教室',
-  description: '原田日本語教室 — lang gym',
+  description: '原田日本語教室｜聽力練習｜學習日誌',
   openGraph: {
     title: '原田日本語教室',
-    description: '原田日本語教室 — lang gym',
-    url: 'https://dictation-eight.vercel.app/',
+    description: '原田日本語教室｜聽力練習｜學習日誌',
+    url: '/',
     siteName: '原田日本語教室',
-    images: [
-      {
-        url: 'https://dictation-eight.vercel.app/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: '原田日本語教室',
-      },
-    ],
-    locale: 'zh_Hant',
+    images: ['/og-image.png'],
+    locale: 'zh_TW ',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: '原田日本語教室',
-    description: '原田日本語教室 — lang gym',
-    images: ['https://dictation-eight.vercel.app/og-image.png'],
+    description: '原田日本語教室｜聽力練習｜學習日誌',
+    images: ['/og-image.png'],
   },
 };
 
