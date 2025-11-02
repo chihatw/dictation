@@ -5,21 +5,21 @@ import './globals.css';
 export const metadata = {
   metadataBase: new URL('https://dictation-eight.vercel.app'),
   title: '原田日本語教室',
-  description: '原田日本語教室｜聽力練習｜學習日誌',
+  description: '原田日本語教室｜學習日誌',
   openGraph: {
     title: '原田日本語教室',
-    description: '原田日本語教室｜聽力練習｜學習日誌',
+    description: '原田日本語教室｜學習日誌',
     url: '/',
     siteName: '原田日本語教室',
-    images: ['/og-image.png'],
+    images: ['https://dictation-eight.vercel.app/og-image.png'],
     locale: 'zh_TW ',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: '原田日本語教室',
-    description: '原田日本語教室｜聽力練習｜學習日誌',
-    images: ['/og-image.png'],
+    description: '原田日本語教室｜學習日誌',
+    images: ['https://dictation-eight.vercel.app/og-image.png'],
   },
 };
 
