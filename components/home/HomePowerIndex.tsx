@@ -91,9 +91,9 @@ export const HomePowerIndex = ({
         <ResponsiveContainer width='100%' height='100%'>
           <LineChart
             data={sorted}
-            margin={{ top: 10, right: 40, left: 30, bottom: 0 }}
+            margin={{ top: 10, right: 30, left: 30, bottom: 0 }}
           >
-            {/* 横軸: 日付 MM/DD, 7点分だけ表示 */}
+            {/* 横軸: 日付 MM/DD  */}
             <XAxis
               dataKey='day'
               tickFormatter={formatDayLabel}
