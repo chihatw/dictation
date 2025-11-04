@@ -46,6 +46,8 @@ export default function JournalQuickWriteButton({ assignment_id }: Props) {
     openJournalModal(article_id);
   };
 
+  if (!items.length) return null;
+
   return (
     <div className='flex flex-col gap-2 mt-4'>
       {items.map((item) => (

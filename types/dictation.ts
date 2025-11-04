@@ -19,6 +19,8 @@ type ArticleViewDb =
 
 export type SelfAward = Database['public']['Enums']['self_award_t'];
 export type MVJScope = Database['public']['Enums']['mvj_scope_t'];
+export type PIState =
+  Database['public']['Enums']['dictation_power_index_state_t'];
 
 // 将来的には スネーク を キャメル に
 type User = UserDb;

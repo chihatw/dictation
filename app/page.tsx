@@ -8,11 +8,12 @@ import { formatDueTW, formatTodayTW } from '@/utils/home/formatDate';
 
 import HomeCloze from '@/components/home/HomeCloze';
 import { HomeJournals } from '@/components/home/HomeJornals';
-import JournalQuickWriteButton from '@/components/home/JournalQuickWriteButton';
+import { HomePowerIndex } from '@/components/home/HomePowerIndex';
+import { NextTask } from '@/components/home/NextTask';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import { dueDayStartUtc, timeProgress5pct } from '@/utils/timeProgress';
 import Link from 'next/link';
-import { journals, nextTask, weather } from './dummy';
+import { DAILY_POWER_INDEX, JOURNALS, NEXT_TASK, WEATHER } from './dummy';
 
 const DEBUG = process.env.NEXT_PUBLIC_DEBUG === 'true';
 
@@ -26,25 +27,33 @@ export default async function Home() {
   const fetchHomeBundle = DEBUG
     ? async () => {
         console.log('no fetch');
-        return [nextTask, journals, weather] as const;
+        return [NEXT_TASK, JOURNALS, DAILY_POWER_INDEX, WEATHER] as const;
       }
     : async () => {
-        const [a, b, c] = await Promise.all([
-          supabase.rpc('get_home_next_task', { p_uid: user.id }),
-          supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
-          fetchMultiWeather(),
-        ]);
-        return [a, b, c] as const;
+        const [nextTask, journals, dailyPowerIndex, weather] =
+          await Promise.all([
+            supabase.rpc('get_home_next_task', { p_uid: user.id }),
+            supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
+            supabase
+              .from('dictation_power_index_daily')
+              .select('day, score')
+              .eq('user_id', user.id)
+              .limit(7),
+            fetchMultiWeather(),
+          ]);
+        return [nextTask, journals, dailyPowerIndex, weather] as const;
       };
 
   const [
     { data, error },
     { data: journal, error: error_j },
+    { data: dailyPowerIndex, error: error_d },
     { yunlin, hyogo },
   ] = await fetchHomeBundle();
 
   if (error) throw new Error((error as { message: string }).message);
   if (error_j) throw new Error((error_j as { message: string }).message);
+  if (error_d) throw new Error((error_d as { message: string }).message);
   if (!data) throw new Error('no data');
 
   const row = Array.isArray(data) ? data[0] : data;
@@ -75,8 +84,8 @@ export default async function Home() {
 
           <div className='text-sm text-gray-700'>
             <div>
-              時間進度為{` `}
-              <span className='font-bold text-4xl'>{timeProgress}</span>%
+              時間進度
+              <span className='pl-2 font-bold text-4xl'>{timeProgress}</span>%
             </div>
             <div className=' leading-none font-extralight text-gray-500'>
               <div>這表示從聽寫題目發布到上課當天凌晨 0 點為止的時間經過。</div>
@@ -85,44 +94,23 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 下一個作業 */}
-        <section className='rounded-xl border p-5 bg-white space-y-3'>
-          <div className='text-sm text-gray-500'>作業</div>
+        <NextTask
+          pct={pct}
+          title={row?.title}
+          assignmentId={row?.assignment_id}
+          nextFullTitle={row?.next_full_title}
+          nextArticleId={nextArticleId}
+          nextSentenceSeq={row?.next_sentence_seq}
+        />
 
-          <div className='text-sm text-gray-700'>
-            <div>
-              作業進度為 <span className='font-bold text-4xl'>{pct}</span>%
-            </div>
-            <div className=' leading-none font-extralight text-gray-500'>
-              語言學習重在習慣。 與其一天做很多，不如盡量每天都做一點。
-            </div>
-          </div>
-
-          <JournalQuickWriteButton assignment_id={row.assignment_id} />
-
-          {nextArticleId ? (
-            <Link
-              href={`/articles/${nextArticleId}`}
-              className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
-            >
-              {`前往「${row.next_full_title ?? ''}」第 ${
-                row.next_sentence_seq ?? ''
-              } 行`}
-            </Link>
-          ) : (
-            <div>
-              <div className='text-sm  text-gray-700 mb-4'>
-                所有作業都結束了，辛苦了！🎉
-              </div>
-              <Link
-                href={`/assignments/${row.assignment_id}`}
-                className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
-              >
-                {`查看「${row.title ?? ''}」的成果`}
-              </Link>
-            </div>
-          )}
-        </section>
+        <HomePowerIndex
+          piState={row?.power_index_state}
+          idleDays={row?.consecutive_idle_days}
+          powerIndex={row?.power_index}
+          nextPenalty={row?.next_penalty}
+          hasSubmissions={row?.has_submissions}
+          dailyPowerIndex={dailyPowerIndex || []}
+        />
 
         {mvjId && (
           <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>

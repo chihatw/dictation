@@ -1167,15 +1167,20 @@ export type Database = {
         Args: { p_uid: string }
         Returns: {
           assignment_id: string
+          consecutive_idle_days: number
           done_count: number
           due_at: string
+          has_submissions: boolean
           mvj_id: string
           mvj_image_url: string
           mvj_reason: string
           next_article_id: string
           next_full_title: string
+          next_penalty: number
           next_sentence_id: string
           next_sentence_seq: number
+          power_index: number
+          power_index_state: Database["public"]["Enums"]["dictation_power_index_state_t"]
           published_at: string
           title: string
           top_assignment_ids: string[]

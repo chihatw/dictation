@@ -1,10 +1,12 @@
+import { PIState } from '@/types/dictation';
+
 type Rpc<T> = { data: T; error: unknown | null | undefined };
 type Weather = {
   yunlin: Record<string, unknown>;
   hyogo: Record<string, unknown>;
 };
 
-export const nextTask: Rpc<{
+export const NEXT_TASK: Rpc<{
   mvj_id: string;
   mvj_image_url: string;
   mvj_reason: string;
@@ -17,6 +19,11 @@ export const nextTask: Rpc<{
   next_full_title: null;
   next_sentence_seq: null;
   title: null;
+  power_index: number;
+  consecutive_idle_days: number;
+  next_penalty: number;
+  has_submissions: boolean;
+  power_index_state: PIState;
 }> = {
   data: {
     mvj_id: 'dummy',
@@ -32,10 +39,15 @@ export const nextTask: Rpc<{
     next_full_title: null,
     next_sentence_seq: null,
     title: null,
+    power_index: 112,
+    consecutive_idle_days: 0,
+    next_penalty: 1,
+    has_submissions: false,
+    power_index_state: 'running',
   },
   error: undefined,
 };
-export const journals: Rpc<any[]> = {
+export const JOURNALS: Rpc<any[]> = {
   data: [
     {
       id: 'af92d3a4-eb79-466e-a8de-6e25695ffcb9',
@@ -57,4 +69,38 @@ export const journals: Rpc<any[]> = {
   ],
   error: undefined,
 };
-export const weather: Weather = { yunlin: {}, hyogo: {} };
+export const WEATHER: Weather = { yunlin: {}, hyogo: {} };
+
+export const DAILY_POWER_INDEX: Rpc<{ day: string; score: number }[]> = {
+  data: [
+    {
+      day: '2025-10-28',
+      score: 120,
+    },
+    {
+      day: '2025-10-29',
+      score: 124,
+    },
+    {
+      day: '2025-10-30',
+      score: 127,
+    },
+    {
+      day: '2025-10-31',
+      score: 131,
+    },
+    {
+      day: '2025-11-01',
+      score: 133,
+    },
+    {
+      day: '2025-11-02',
+      score: 100,
+    },
+    {
+      day: '2025-11-03',
+      score: 100,
+    },
+  ],
+  error: undefined,
+};
