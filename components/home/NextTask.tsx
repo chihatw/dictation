@@ -4,19 +4,22 @@ import JournalQuickWriteButton from './JournalQuickWriteButton';
 
 export const NextTask = ({
   nextArticleId,
-  pct,
+  totalCount,
+  doneCount,
   assignmentId,
   nextFullTitle,
   nextSentenceSeq,
   title,
 }: {
   nextArticleId: string | null | undefined;
-  pct: number;
+  totalCount: number | null;
+  doneCount: number;
   assignmentId: string;
   nextFullTitle: string | null;
   nextSentenceSeq: number | null;
   title: string | null;
 }) => {
+  const pct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
   return (
     <section className='rounded-xl border p-5 bg-white space-y-3'>
       <div className='flex items-start justify-between'>

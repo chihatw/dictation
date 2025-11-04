@@ -14,6 +14,7 @@ export const NEXT_TASK: Rpc<{
   due_at: null;
   next_article_id: null;
   total_count: null;
+  done_count: null;
   top_assignment_ids: string[];
   assignment_id: string;
   next_full_title: null;
@@ -34,6 +35,7 @@ export const NEXT_TASK: Rpc<{
     due_at: null,
     next_article_id: null,
     total_count: null,
+    done_count: null,
     top_assignment_ids: [],
     assignment_id: '',
     next_full_title: null,
