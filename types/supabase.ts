@@ -288,6 +288,62 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_power_index_daily: {
+        Row: {
+          consecutive_idle_days: number
+          created_at: string
+          day: string
+          score: number
+          state: Database["public"]["Enums"]["dictation_power_index_state_t"]
+          user_id: string
+        }
+        Insert: {
+          consecutive_idle_days: number
+          created_at?: string
+          day: string
+          score: number
+          state: Database["public"]["Enums"]["dictation_power_index_state_t"]
+          user_id: string
+        }
+        Update: {
+          consecutive_idle_days?: number
+          created_at?: string
+          day?: string
+          score?: number
+          state?: Database["public"]["Enums"]["dictation_power_index_state_t"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      dictation_power_indices: {
+        Row: {
+          current_score: number
+          state: Database["public"]["Enums"]["dictation_power_index_state_t"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_score?: number
+          state?: Database["public"]["Enums"]["dictation_power_index_state_t"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_score?: number
+          state?: Database["public"]["Enums"]["dictation_power_index_state_t"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_power_indices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
+          },
+        ]
+      }
       dictation_sentences: {
         Row: {
           article_id: string
@@ -375,6 +431,13 @@ export type Database = {
             referencedRelation: "dictation_sentences_view"
             referencedColumns: ["sentence_id"]
           },
+          {
+            foreignKeyName: "dictation_submissions_sentence_id_fkey"
+            columns: ["sentence_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_submissions_view"
+            referencedColumns: ["sentence_id"]
+          },
         ]
       }
       dictation_tag_master: {
@@ -431,6 +494,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_submissions"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_teacher_feedback_tags_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_submissions_view"
+            referencedColumns: ["submission_id"]
           },
           {
             foreignKeyName: "dtft_tag_master_fkey"
@@ -865,6 +935,7 @@ export type Database = {
           created_at: string | null
           due_at: string | null
           id: string | null
+          lines_count: number | null
           locked: boolean | null
           rating_score: number | null
           self_award: Database["public"]["Enums"]["self_award_t"] | null
@@ -915,6 +986,7 @@ export type Database = {
           submission_id: string | null
           subtitle: string | null
           title: string | null
+          user_id: string | null
         }
         Relationships: [
           {
@@ -930,6 +1002,61 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
+          },
+          {
+            foreignKeyName: "dictation_sentences_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dictation_submissions_view: {
+        Row: {
+          ai_feedback_md: string | null
+          answer: string | null
+          article_id: string | null
+          assignment_id: string | null
+          created_at: string | null
+          date: string | null
+          elapsed_ms_since_first_play: number | null
+          elapsed_ms_since_item_view: number | null
+          plays_count: number | null
+          self_assessed_comprehension: number | null
+          sentence_id: string | null
+          submission_id: string | null
+          teacher_feedback_md: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_articles_assignment_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_articles_assignment_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_assignments_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
           },
           {
             foreignKeyName: "dictation_sentences_article_id_fkey"
@@ -1001,6 +1128,9 @@ export type Database = {
         Args: { p_image_id: string }
         Returns: undefined
       }
+      dictation_close_day: { Args: { p_day?: string }; Returns: undefined }
+      dictation_count_lines: { Args: { p_text: string }; Returns: number }
+      dictation_penalty: { Args: { consecutive_days: number }; Returns: number }
       get_article_answers_for_modal: {
         Args: { p_article_id: string }
         Returns: {
@@ -1111,6 +1241,7 @@ export type Database = {
           created_at: string | null
           due_at: string | null
           id: string | null
+          lines_count: number | null
           locked: boolean | null
           rating_score: number | null
           self_award: Database["public"]["Enums"]["self_award_t"] | null
@@ -1144,6 +1275,7 @@ export type Database = {
     }
     Enums: {
       chat_role: "system" | "user" | "assistant"
+      dictation_power_index_state_t: "stopped" | "running" | "paused"
       mvj_scope_t: "monthly" | "half" | "yearly"
       self_award_t: "none" | "mbest" | "mhm" | "hbest" | "hhm" | "ybest" | "yhm"
     }
@@ -1274,6 +1406,7 @@ export const Constants = {
   public: {
     Enums: {
       chat_role: ["system", "user", "assistant"],
+      dictation_power_index_state_t: ["stopped", "running", "paused"],
       mvj_scope_t: ["monthly", "half", "yearly"],
       self_award_t: ["none", "mbest", "mhm", "hbest", "hhm", "ybest", "yhm"],
     },
