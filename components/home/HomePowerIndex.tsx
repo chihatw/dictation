@@ -1,7 +1,7 @@
 'use client';
 
 import { PIState } from '@/types/dictation';
-import { CircleQuestionMark } from 'lucide-react';
+import { CircleQuestionMark, Pause } from 'lucide-react';
 import {
   Line,
   LineChart,
@@ -84,7 +84,10 @@ export const HomePowerIndex = ({
             hasSubmissions={hasSubmissions}
           />
         ) : (
-          <div className='text-sm text-gray-500 pt-2'>🛑 待命中</div>
+          <div className='text-sm text-gray-500 pt-2 flex items-center gap-1'>
+            <Pause className='h-4 w-4 -mb-0.5 ' />
+            <span className=''>暫停</span>
+          </div>
         )}
       </div>
       <div className='h-32 rounded-lg bg-slate-100'>
