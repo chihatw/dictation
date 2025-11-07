@@ -36,6 +36,7 @@ export default async function Home() {
             supabase
               .from('dictation_power_index_daily')
               .select('day, score')
+              .order('day', { ascending: false })
               .eq('user_id', user.id)
               .limit(7),
             fetchMultiWeather(),
