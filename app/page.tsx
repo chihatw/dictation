@@ -87,7 +87,7 @@ export default async function Home() {
           dailyPowerIndex={dailyPowerIndex || []}
         />
 
-        {mvjId && (
+        {false && mvjId && (
           <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>
             <div className='grid gap-1'>
               <Link
