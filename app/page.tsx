@@ -36,9 +36,10 @@ export default async function Home() {
             supabase
               .from('dictation_power_index_daily')
               .select('day, score')
-              .order('day', { ascending: false })
               .eq('user_id', user.id)
-              .limit(7),
+              .gte('day', '2025-11-05')
+              .order('day', { ascending: false })
+              .limit(30),
             fetchMultiWeather(),
           ]);
         return [nextTask, journals, dailyPowerIndex, weather] as const;
