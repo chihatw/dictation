@@ -120,3 +120,20 @@ export async function updateSubtitle(formData: FormData) {
   revalidatePath('/admin/articles');
   return { ok: true };
 }
+
+export async function setJournalLocked(journalId: string, locked: boolean) {
+  const supabase = await createClientAction();
+
+  const { error } = await supabase
+    .from('dictation_journals')
+    .update({ locked })
+    .eq('id', journalId);
+
+  if (error) {
+    // ロールバックしたい場合は、呼び出し側でキャッチできるようにそのまま投げる
+    throw new Error(error.message);
+  }
+
+  // 一覧を再取得させる
+  revalidatePath('/admin/articles');
+}

@@ -1,7 +1,9 @@
 // app/admin/articles/page.tsx
 import { createClient } from '@/lib/supabase/server';
 import { ArticleView, Assignment } from '@/types/dictation';
+import { LinkIcon } from 'lucide-react';
 import Link from 'next/link';
+import { JournalLockToggle } from './components/JournalLockToggle';
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -57,14 +59,21 @@ export default async function Page(props: PageProps) {
   // articles
   const { data: articlesRaw, error: artErr } = await supabase
     .from('dictation_article_journal_status_view')
-    .select('article_id, subtitle, seq, journal_id, has_cloze_spans')
+    .select(
+      'article_id, subtitle, seq, journal_id, has_cloze_spans, journal_locked'
+    )
     .eq('assignment_id', col.id)
     .order('seq', { ascending: true });
 
   if (artErr) throw new Error(artErr.message);
   const articles: Pick<
     ArticleView,
-    'article_id' | 'subtitle' | 'seq' | 'journal_id' | 'has_cloze_spans'
+    | 'article_id'
+    | 'subtitle'
+    | 'seq'
+    | 'journal_id'
+    | 'has_cloze_spans'
+    | 'journal_locked'
   >[] = Array.isArray(articlesRaw) ? articlesRaw : [];
 
   const dueAt = new Date(col.due_at!);
@@ -74,7 +83,7 @@ export default async function Page(props: PageProps) {
       <div className='flex items-start gap-3'>
         <div>
           <h1 className='text-xl font-semibold'>
-            <span className='mr-2'>{dueAt.toLocaleDateString()}</span>
+            <span className='mr-2'>{dueAt.toLocaleDateString('ja-JP')}</span>
             <span>{`${col.title}`}</span>
           </h1>
         </div>
@@ -111,17 +120,22 @@ export default async function Page(props: PageProps) {
             {(articles ?? []).map((a) => (
               <tr key={a.article_id} className='border-t'>
                 <td className='px-2 py-1'>{a.seq}</td>
-                <td className='px-2 py-1'>
-                  {a.subtitle} {a.has_cloze_spans ? '*' : ''}
+                <td className='px-2 py-1 flex items-center gap-1'>
+                  <Link
+                    href={`/articles/${a.article_id}`}
+                    className='underline underline-offset-2 flex items-center gap-1.5 h-6'
+                  >
+                    {a.subtitle}
+                    <LinkIcon className='h-3 w-3 text-slate-700' />
+                  </Link>
+                  <span>{a.has_cloze_spans ? '*' : ''}</span>
                 </td>
-                <td className='px-2 py-1 space-x-2'>
+                <td className='px-2 py-1 space-x-2 '>
                   <div className='flex gap-x-2 items-center'>
-                    <Link
-                      href={`/articles/${a.article_id}`}
-                      className='rounded-md border px-2 py-1'
-                    >
-                      Article ページ
-                    </Link>
+                    <JournalLockToggle
+                      journalId={a.journal_id}
+                      initialLocked={a.journal_locked}
+                    />
                     {a.journal_id ? (
                       <Link
                         href={`/admin/journals/${a.journal_id}?assignment_id=${colId}&user_id=${userId}`}

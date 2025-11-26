@@ -835,6 +835,7 @@ export type Database = {
           has_cloze_spans: boolean | null
           has_journal: boolean | null
           journal_id: string | null
+          journal_locked: boolean | null
           seq: number | null
           subtitle: string | null
           title: string | null
