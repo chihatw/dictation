@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
 import { Assignment } from '@/types/dictation';
+import { LinkIcon } from 'lucide-react';
 import { UserSelect } from '../components/UserSelect';
 import { publishAssignment, unpublishAssignment } from './actions';
 import { ConfirmDeleteForm } from './ConfirmDeleteForm';
@@ -62,7 +63,15 @@ export default async function Page(props: {
                 className='flex flex-wrap items-center justify-between gap-3 px-3 py-2'
               >
                 <div>
-                  <div className='font-medium'>{col.title}</div>
+                  <div className='font-medium'>
+                    <Link
+                      href={`/admin/articles?assignment_id=${col.id}&user_id=${selectedUserId}`}
+                      className='underline underline-offset-2 flex items-center gap-1.5'
+                    >
+                      <span>{col.title}</span>
+                      <LinkIcon className='h-3 w-3 text-slate-700' />
+                    </Link>
+                  </div>
                   <div className='text-xs text-gray-500'>
                     {nameByUid.get(col.user_id) ?? col.user_id} ・{' '}
                     {new Date(col.created_at).toLocaleString('ja-JP', {
@@ -112,12 +121,6 @@ export default async function Page(props: {
                     className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
                   >
                     due_at 編集
-                  </Link>
-                  <Link
-                    href={`/admin/articles?assignment_id=${col.id}&user_id=${selectedUserId}`}
-                    className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
-                  >
-                    文章一覧
                   </Link>
 
                   <ConfirmDeleteForm id={col.id} />
