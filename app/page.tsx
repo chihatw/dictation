@@ -88,7 +88,7 @@ export default async function Home() {
           dailyPowerIndex={dailyPowerIndex || []}
         />
 
-        {false && mvjId && (
+        {mvjId && (
           <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>
             <div className='grid gap-1'>
               <Link
@@ -96,11 +96,11 @@ export default async function Home() {
                 className='text-center hover:underline'
               >
                 <span className='font-bold text-2xl text-slate-900 text-shadow-2xs'>
-                  🏆 選出9-10月最有價值日誌 🏆
+                  🏆 選出11月最有價值日誌 🏆
                 </span>
               </Link>
               <div className='text-xs text-center text-slate-500'>
-                截止日期: 11/12（三） 凌晨0:00。
+                截止日期: 12/10（三） 凌晨0:00。
               </div>
             </div>
             {mvjImageUrl && (
