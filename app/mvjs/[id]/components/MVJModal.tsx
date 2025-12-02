@@ -27,15 +27,21 @@ export const MVJModal = ({
           <ol className='list-decimal pl-6 space-y-2'>
             <li>重新閱讀自己的學習日誌。</li>
             <li>
-              選出你認為「最能用在對話中的內容」為 「
+              選出你認為「最能用在真實對話中使用的內容」為 「
               <span className='marker-underline-yellow'>最佳作品</span>」。
               若還有覺得能派上用場的內容，可標為 「
               <span className='marker-underline-yellow'>佳作</span>」。
             </li>
             <li>
-              使用 AI 生成一張圖片，呈現「
-              <span className='marker-underline-yellow'>最佳作品</span>
-              」實際可以使用的情境，並上傳圖片。
+              使用 AI 生成一張圖片，「
+              <span className='marker-underline-yellow'>
+                你會在什麼情境、對誰說出這句日語
+              </span>
+              」的畫面， 並上傳圖片。
+              <span className='marker-underline-yellow'>
+                不是內容本身的畫面
+              </span>
+              。
             </li>
             <li>
               說明這篇「
@@ -48,7 +54,7 @@ export const MVJModal = ({
             <div className='mb-1 flex'>評選基準</div>
             <div className='flex'>
               <div className='font-extrabold tracking-tighter text-base'>
-                能清楚想像自己在什麼情境、對誰使用。
+                能清楚想像「自己在什麼情境、對誰說出這句日語」。
               </div>
             </div>
           </div>

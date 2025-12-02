@@ -926,6 +926,15 @@ export type Database = {
           },
         ]
       }
+      dictation_current_streak_view: {
+        Row: {
+          current_streak_days: number | null
+          latest_logged_day: string | null
+          streak_start_day: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       dictation_journals_view: {
         Row: {
           article_id: string | null
