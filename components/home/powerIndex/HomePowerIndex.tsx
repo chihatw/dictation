@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { PowerIndexMessage } from './PowerIndexMessage';
 
 const formatDayLabel = (day: string) => {
   // "2025-10-28" -> "10/28"
@@ -39,6 +40,7 @@ export const HomePowerIndex = ({
   powerIndex,
   dailyPowerIndex,
   piState,
+  currentStreakDays,
 }: {
   hasSubmissions: boolean;
   idleDays: number;
@@ -46,6 +48,7 @@ export const HomePowerIndex = ({
   powerIndex: number;
   dailyPowerIndex: { day: string; score: number }[];
   piState: PIState;
+  currentStreakDays: number;
 }) => {
   const todayInTaipei = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Taipei',
@@ -82,6 +85,7 @@ export const HomePowerIndex = ({
             nextPenalty={nextPenalty}
             idleDays={idleDays}
             hasSubmissions={hasSubmissions}
+            currentStreakDays={currentStreakDays}
           />
         ) : (
           <div className='text-sm text-gray-500 pt-2 flex items-center gap-1'>
@@ -125,45 +129,5 @@ export const HomePowerIndex = ({
         </ResponsiveContainer>
       </div>
     </section>
-  );
-};
-
-const PowerIndexMessage = ({
-  hasSubmissions,
-  idleDays,
-  nextPenalty,
-}: {
-  hasSubmissions: boolean;
-  idleDays: number;
-  nextPenalty: number;
-}) => {
-  return (
-    <div className='text-sm text-gray-500 font-extralight leading-none'>
-      {hasSubmissions ? (
-        <div className='pb-2'>
-          今天有練習呢！請保持這個節奏，每天都持續一點點就很好。
-        </div>
-      ) : idleDays ? (
-        <div>
-          <span>目前已經</span>
-          <span className='font-bold text-gray-700 text-base px-1'>
-            {idleDays + 1}
-          </span>
-          <span className='pr-1'>天 沒有練習了。若再不練習，將會扣</span>
-          <span className='font-bold text-gray-700 text-base px-1'>
-            {nextPenalty}
-          </span>
-          <span> 分。</span>
-        </div>
-      ) : (
-        <div>
-          <span>今天還沒練習喔。若持續未練習，將會扣</span>
-          <span className='font-bold text-gray-700 text-base px-1'>
-            {nextPenalty}
-          </span>
-          <span>分。</span>
-        </div>
-      )}
-    </div>
   );
 };

@@ -7,9 +7,9 @@ import { createClient } from '@/lib/supabase/server';
 
 import HomeCloze from '@/components/home/HomeCloze';
 import { HomeJournals } from '@/components/home/HomeJornals';
-import { HomePowerIndex } from '@/components/home/HomePowerIndex';
 import { NextClass } from '@/components/home/NextClass';
 import { NextTask } from '@/components/home/NextTask';
+import { HomePowerIndex } from '@/components/home/powerIndex/HomePowerIndex';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import Link from 'next/link';
 import { DAILY_POWER_INDEX, JOURNALS, NEXT_TASK, WEATHER } from './dummy';
@@ -86,6 +86,7 @@ export default async function Home() {
           nextPenalty={row?.next_penalty}
           hasSubmissions={row?.has_submissions}
           dailyPowerIndex={dailyPowerIndex || []}
+          currentStreakDays={row?.current_streak_days}
         />
 
         {mvjId && (

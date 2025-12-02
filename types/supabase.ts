@@ -1178,6 +1178,7 @@ export type Database = {
         Returns: {
           assignment_id: string
           consecutive_idle_days: number
+          current_streak_days: number
           done_count: number
           due_at: string
           has_submissions: boolean

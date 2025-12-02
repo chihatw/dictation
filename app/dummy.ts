@@ -25,6 +25,7 @@ export const NEXT_TASK: Rpc<{
   next_penalty: number;
   has_submissions: boolean;
   power_index_state: PIState;
+  current_streak_days: number;
 }> = {
   data: {
     mvj_id: 'dummy',
@@ -46,6 +47,7 @@ export const NEXT_TASK: Rpc<{
     next_penalty: 1,
     has_submissions: false,
     power_index_state: 'running',
+    current_streak_days: 0,
   },
   error: undefined,
 };
