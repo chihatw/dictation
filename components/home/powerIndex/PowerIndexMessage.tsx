@@ -17,7 +17,7 @@ export const PowerIndexMessage = ({
       <StreakDays currentStreakDays={computedStreakDays} />
       {hasSubmissions ? (
         <div className={cn('pb-2', computedStreakDays === 1 ? 'pt-1.5' : '')}>
-          今天有練習呢！請保持這個節奏，每天都持續一點點就很好。
+          請保持這個節奏，每天都持續一點點就很好。
         </div>
       ) : (
         <div>
@@ -29,7 +29,21 @@ export const PowerIndexMessage = ({
   );
 };
 
+const getCheerMessage = (days: number) => {
+  if (days >= 3 && days < 5) return '太棒了！';
+  if (days >= 5 && days < 7) return '超有毅力！';
+  if (days >= 7 && days < 14) return '一週紀念！堅持就是勝利！';
+  if (days >= 14 && days < 21) return '突破極限！真的很佩服！';
+  if (days >= 21 && days < 30) return '形成習慣了！了不起！';
+  if (days >= 30 && days < 50) return '30天傳說達成！太感動了！';
+  if (days >= 50 && days < 100) return '驚人的堅持！你是模範！';
+  if (days >= 100) return '百日傳奇！敬佩！！';
+  return null;
+};
+
 const StreakDays = ({ currentStreakDays }: { currentStreakDays: number }) => {
+  const message = getCheerMessage(currentStreakDays);
+
   // 1 日の場合は、「連続１日」とは表示しない
   if (currentStreakDays < 2) return null;
   return (
@@ -39,7 +53,7 @@ const StreakDays = ({ currentStreakDays }: { currentStreakDays: number }) => {
         {currentStreakDays}
       </span>
       <span>天。</span>
-      {currentStreakDays > 2 && <span>太棒了！</span>}
+      {message && <span className='ml-1'>{message}</span>}
     </div>
   );
 };
