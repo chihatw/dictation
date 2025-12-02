@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { getCheerMessage } from './cheerMessage';
 
 export const PowerIndexMessage = ({
   hasSubmissions,
@@ -27,18 +28,6 @@ export const PowerIndexMessage = ({
       )}
     </div>
   );
-};
-
-const getCheerMessage = (days: number) => {
-  if (days >= 3 && days < 5) return '太棒了！';
-  if (days >= 5 && days < 7) return '超有毅力！';
-  if (days >= 7 && days < 14) return '一週紀念！堅持就是勝利！';
-  if (days >= 14 && days < 21) return '突破極限！真的很佩服！';
-  if (days >= 21 && days < 30) return '形成習慣了！了不起！';
-  if (days >= 30 && days < 50) return '30天傳說達成！太感動了！';
-  if (days >= 50 && days < 100) return '驚人的堅持！你是模範！';
-  if (days >= 100) return '百日傳奇！敬佩！！';
-  return null;
 };
 
 const StreakDays = ({ currentStreakDays }: { currentStreakDays: number }) => {
