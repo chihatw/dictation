@@ -101,7 +101,7 @@ export default async function Home() {
                 </span>
               </Link>
               <div className='text-xs text-center text-slate-500'>
-                截止日期: 12/10（三） 凌晨0:00。
+                截止日期: 12/17（三） 凌晨0:00。
               </div>
             </div>
             {mvjImageUrl && (
