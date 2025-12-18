@@ -112,7 +112,7 @@ export const HomePowerIndex = ({
 
             {/* ホバーで日付と score を表示 */}
             <Tooltip
-              formatter={(value: number) => [value, '指數']}
+              formatter={(value) => [value, '指數']}
               labelFormatter={(l) => ''}
             />
 
