@@ -1,7 +1,6 @@
 // app/admin/articles/page.tsx
 import { createClient } from '@/lib/supabase/server';
 import { ArticleView, Assignment } from '@/types/dictation';
-import { LinkIcon } from 'lucide-react';
 import Link from 'next/link';
 import { JournalLockToggle } from './components/JournalLockToggle';
 
@@ -79,87 +78,97 @@ export default async function Page(props: PageProps) {
   const dueAt = new Date(col.due_at!);
 
   return (
-    <div className='space-y-6'>
-      <div className='flex items-start gap-3'>
-        <div>
-          <h1 className='text-xl font-semibold'>
-            <span className='mr-2'>{dueAt.toLocaleDateString('ja-JP')}</span>
-            <span>{`${col.title}`}</span>
-          </h1>
-        </div>
-        <div className='ml-auto flex items-center gap-2'>
-          <Link
-            href={`/admin/assignments?user_id=${userId}`}
-            className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
-          >
-            ユーザー別課題一覧に戻る
-          </Link>
+    <>
+      <h1 className='mb-6 text-2xl font-semibold'>課題文章一覧</h1>
+      <div className='space-y-6'>
+        <div className='flex items-start gap-3'>
+          <div>
+            <h1 className='text-xl font-semibold'>
+              <span className='mr-2'>{dueAt.toLocaleDateString('ja-JP')}</span>
+              <span>{`${col.title}`}</span>
+            </h1>
+          </div>
+          <div className='ml-auto flex items-center gap-2'>
+            <Link
+              href={`/admin/assignments?user_id=${userId}`}
+              className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
+            >
+              ユーザー別課題一覧に戻る
+            </Link>
 
-          <Link
-            href={`/admin/articles/new?assignment_id=${encodeURIComponent(
-              col.id
-            )}`}
-            className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
-          >
-            新規作成
-          </Link>
+            <Link
+              href={`/admin/articles/new?assignment_id=${encodeURIComponent(
+                col.id
+              )}`}
+              className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
+            >
+              新規作成
+            </Link>
+          </div>
+        </div>
+
+        <div className='overflow-x-auto'>
+          <table className='w-full text-sm'>
+            <thead>
+              <tr className='text-left'>
+                <th className='px-2 py-1'>順</th>
+                <th className='px-2 py-1'>サブタイトル</th>
+                <th className='px-2 py-1'></th>
+                <th className='px-2 py-1'>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(articles ?? []).map((a) => (
+                <tr key={a.article_id} className='border-t'>
+                  <td className='px-2 py-1'>{a.seq}</td>
+                  <td className='px-2 py-1 flex items-center gap-1'>
+                    <Link
+                      href={`/articles/${a.article_id}`}
+                      className='underline underline-offset-2 flex items-center gap-1.5 h-6'
+                    >
+                      {a.subtitle}
+                    </Link>
+                    <span>{a.has_cloze_spans ? '*' : ''}</span>
+                  </td>
+                  <td>
+                    <Link
+                      href={`/admin/articles/${a.article_id}`}
+                      className='underline underline-offset-2 flex items-center gap-1.5 h-6'
+                    >
+                      ♪
+                    </Link>
+                  </td>
+                  <td className='px-2 py-1 space-x-2 '>
+                    <div className='flex gap-x-2 items-center'>
+                      <JournalLockToggle
+                        journalId={a.journal_id}
+                        initialLocked={a.journal_locked}
+                      />
+                      {a.journal_id ? (
+                        <Link
+                          href={`/admin/journals/${a.journal_id}?assignment_id=${colId}&user_id=${userId}`}
+                          className='rounded-md border px-2 py-1'
+                        >
+                          編輯填空題
+                        </Link>
+                      ) : (
+                        <div className='ml-2 text-slate-400'>学習日誌なし</div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {(articles?.length ?? 0) === 0 && (
+                <tr>
+                  <td className='px-2 py-6 text-gray-500' colSpan={4}>
+                    該当データなし
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <div className='overflow-x-auto'>
-        <table className='w-full text-sm'>
-          <thead>
-            <tr className='text-left'>
-              <th className='px-2 py-1'>順</th>
-              <th className='px-2 py-1'>サブタイトル</th>
-
-              <th className='px-2 py-1'>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(articles ?? []).map((a) => (
-              <tr key={a.article_id} className='border-t'>
-                <td className='px-2 py-1'>{a.seq}</td>
-                <td className='px-2 py-1 flex items-center gap-1'>
-                  <Link
-                    href={`/articles/${a.article_id}`}
-                    className='underline underline-offset-2 flex items-center gap-1.5 h-6'
-                  >
-                    {a.subtitle}
-                    <LinkIcon className='h-3 w-3 text-slate-700' />
-                  </Link>
-                  <span>{a.has_cloze_spans ? '*' : ''}</span>
-                </td>
-                <td className='px-2 py-1 space-x-2 '>
-                  <div className='flex gap-x-2 items-center'>
-                    <JournalLockToggle
-                      journalId={a.journal_id}
-                      initialLocked={a.journal_locked}
-                    />
-                    {a.journal_id ? (
-                      <Link
-                        href={`/admin/journals/${a.journal_id}?assignment_id=${colId}&user_id=${userId}`}
-                        className='rounded-md border px-2 py-1'
-                      >
-                        編輯填空題
-                      </Link>
-                    ) : (
-                      <div className='ml-2 text-slate-400'>学習日誌なし</div>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {(articles?.length ?? 0) === 0 && (
-              <tr>
-                <td className='px-2 py-6 text-gray-500' colSpan={4}>
-                  該当データなし
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </>
   );
 }
