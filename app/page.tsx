@@ -79,6 +79,14 @@ export default async function Home() {
           nextSentenceSeq={row?.next_sentence_seq}
         />
 
+        {true && (
+          <HomeMVJ
+            mvjId={mvjId}
+            mvjImageUrl={mvjImageUrl}
+            mvjReason={mvjReason}
+          />
+        )}
+
         <HomePowerIndex
           piState={row?.power_index_state}
           idleDays={row?.consecutive_idle_days}
@@ -88,38 +96,6 @@ export default async function Home() {
           dailyPowerIndex={dailyPowerIndex || []}
           currentStreakDays={row?.current_streak_days}
         />
-
-        {false && mvjId && (
-          <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>
-            <div className='grid gap-1'>
-              <Link
-                href={`/mvjs/${mvjId}`}
-                className='text-center hover:underline'
-              >
-                <span className='font-bold text-2xl text-slate-900 text-shadow-2xs'>
-                  🏆 選出11月最有價值日誌 🏆
-                </span>
-              </Link>
-              <div className='text-xs text-center text-slate-500'>
-                截止日期: 12/17（三） 凌晨0:00。
-              </div>
-            </div>
-            {mvjImageUrl && (
-              <div className='flex justify-center'>
-                <img
-                  src={mvjImageUrl}
-                  alt='最佳作品圖片'
-                  className='rounded shadow-md max-h-64 object-contain'
-                />
-              </div>
-            )}
-            {mvjReason && (
-              <div className='grid text-center text-sm text-slate-700'>
-                {mvjReason}
-              </div>
-            )}
-          </section>
-        )}
 
         {journal && journal[0] && <HomeCloze journal={journal[0]} />}
 
@@ -131,3 +107,43 @@ export default async function Home() {
     </div>
   );
 }
+
+const HomeMVJ = ({
+  mvjId,
+  mvjImageUrl,
+  mvjReason,
+}: {
+  mvjId: string;
+  mvjImageUrl: string;
+  mvjReason: string;
+}) => {
+  if (!mvjId) return null;
+  return (
+    <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>
+      <div className='grid gap-1'>
+        <Link href={`/mvjs/${mvjId}`} className='text-center hover:underline'>
+          <span className='font-bold text-2xl text-slate-900 text-shadow-2xs'>
+            🏆 選出12月最有價值日誌 🏆
+          </span>
+        </Link>
+        <div className='text-xs text-center text-slate-500'>
+          截止日期: 1/14（三） 凌晨0:00。
+        </div>
+      </div>
+      {mvjImageUrl && (
+        <div className='flex justify-center'>
+          <img
+            src={mvjImageUrl}
+            alt='最佳作品圖片'
+            className='rounded shadow-md max-h-64 object-contain'
+          />
+        </div>
+      )}
+      {mvjReason && (
+        <div className='grid text-center text-sm text-slate-700'>
+          {mvjReason}
+        </div>
+      )}
+    </section>
+  );
+};
