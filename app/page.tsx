@@ -127,7 +127,7 @@ const HomeMVJ = ({
           </span>
         </Link>
         <div className='text-xs text-center text-slate-500'>
-          截止日期: 1/14（三） 凌晨0:00。
+          截止日期: 1/29（木） 凌晨0:00。
         </div>
       </div>
       {mvjImageUrl && (
