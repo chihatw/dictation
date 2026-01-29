@@ -79,7 +79,7 @@ export default async function Home() {
           nextSentenceSeq={row?.next_sentence_seq}
         />
 
-        {true && (
+        {false && (
           <HomeMVJ
             mvjId={mvjId}
             mvjImageUrl={mvjImageUrl}
