@@ -12,9 +12,6 @@ import { NextTask } from '@/components/home/NextTask';
 import { HomePowerIndex } from '@/components/home/powerIndex/HomePowerIndex';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
 import Link from 'next/link';
-import { DAILY_POWER_INDEX, JOURNALS, NEXT_TASK, WEATHER } from './dummy';
-
-const DEBUG = process.env.NEXT_PUBLIC_DEBUG === 'true';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -23,27 +20,20 @@ export default async function Home() {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('unauthorized');
 
-  const fetchHomeBundle = DEBUG
-    ? async () => {
-        console.log('no fetch');
-        return [NEXT_TASK, JOURNALS, DAILY_POWER_INDEX, WEATHER] as const;
-      }
-    : async () => {
-        const [nextTask, journals, dailyPowerIndex, weather] =
-          await Promise.all([
-            supabase.rpc('get_home_next_task', { p_uid: user.id }),
-            supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
-            supabase
-              .from('dictation_power_index_daily')
-              .select('day, score')
-              .eq('user_id', user.id)
-              .gte('day', '2025-11-05')
-              .order('day', { ascending: false })
-              .limit(30),
-            fetchMultiWeather(),
-          ]);
-        return [nextTask, journals, dailyPowerIndex, weather] as const;
-      };
+  const fetchHomeBundle = async () => {
+    const [nextTask, journals, dailyPowerIndex, weather] = await Promise.all([
+      supabase.rpc('get_home_next_task', { p_uid: user.id }),
+      supabase.rpc('pick_random_cloze_journal_fast', { p_uid: user.id }),
+      supabase
+        .from('dictation_power_index_daily')
+        .select('day, score')
+        .eq('user_id', user.id)
+        .order('day', { ascending: false })
+        .limit(30),
+      fetchMultiWeather(),
+    ]);
+    return [nextTask, journals, dailyPowerIndex, weather] as const;
+  };
 
   const [
     { data, error },
