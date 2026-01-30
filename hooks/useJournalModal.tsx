@@ -51,6 +51,8 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
   const [rows, setRows] = useState<AnswerRow[]>([]);
   const [body, setBody] = useState('');
 
+  const [checkedAi, setCheckedAi] = useState(false);
+
   const [isPending, startTransition] = useTransition();
 
   const listRef = useRef<HTMLDivElement>(null);
@@ -65,6 +67,7 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
     setRows([]);
     setBody('');
     setLoading(false);
+    setCheckedAi(false);
   }, []);
 
   const close = useCallback(() => {
@@ -124,8 +127,8 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
   }, [articleId, body, loading, close]);
 
   const canSave = useMemo(
-    () => !!body.trim() && !loading && !isPending,
-    [body, loading, isPending],
+    () => !!body.trim() && checkedAi && !loading && !isPending,
+    [body, checkedAi, loading, isPending],
   );
 
   const sortedRows = useMemo(
@@ -135,6 +138,9 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
 
   const JournalModalElement = useMemo(() => {
     if (!open) return null;
+
+    const checkboxId = 'ai-checked';
+
     return (
       <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'>
         <div className='w-full max-w-3xl rounded-lg bg-white p-4 shadow-xl flex flex-col max-h-[85vh] overflow-hidden'>
@@ -157,7 +163,21 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
             onChange={(e) => setBody(e.target.value)}
           />
 
-          <div className='mt-4 flex justify-end gap-2'>
+          <div className='mt-4 flex justify-end gap-3 items-center'>
+            <label
+              htmlFor={checkboxId}
+              className='flex items-center gap-2 text-sm text-gray-700 select-none'
+            >
+              <input
+                id={checkboxId}
+                type='checkbox'
+                className='h-4 w-4 accent-black'
+                checked={checkedAi}
+                onChange={(e) => setCheckedAi(e.target.checked)}
+              />
+              <span>我已用 AI 檢查過內容</span>
+            </label>
+
             <button
               className='rounded bg-black px-3 py-1.5 text-white disabled:opacity-40'
               onClick={save}
@@ -170,7 +190,17 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
         </div>
       </div>
     );
-  }, [open, loading, sortedRows, body, canSave, isPending, save, close]);
+  }, [
+    open,
+    loading,
+    sortedRows,
+    body,
+    canSave,
+    isPending,
+    save,
+    close,
+    checkedAi,
+  ]);
 
   return { openJournalModal, JournalModalElement };
 }

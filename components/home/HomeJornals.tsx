@@ -36,7 +36,7 @@ export function HomeJournals({
         cloze_spans, 
         locked,
         self_award
-        `
+        `,
       )
       .in('assignment_id', topAssignmentIds)
       .order('created_at', { ascending: false });
@@ -86,7 +86,7 @@ export function HomeJournals({
             .select(
               `
           id, assignment_id, created_at, article_id, body, rating_score, cloze_spans, locked, self_award
-        `
+        `,
             )
             .eq('id', id)
             .single();
@@ -107,7 +107,7 @@ export function HomeJournals({
           setItems((prev) => [j, ...prev]);
           // ページネーション用の before は必要なら再計算
           setBefore((prev) => prev ?? j.created_at);
-        }
+        },
       )
       .subscribe();
 
@@ -135,36 +135,7 @@ export function HomeJournals({
 
   return (
     <section className='rounded-xl border p-5 bg-white space-y-4'>
-      <h2 className='text-lg font-semibold'>向過去的自己說聲謝謝</h2>
-
-      <div className='text-sm text-slate-700 space-y-0'>
-        <p>
-          <span className='font-extrabold'>過去的你</span>
-          在忙碌之中把握每一點空檔學習，
-          <span className='font-extrabold'>為了今天的你，留下這本學習日誌</span>
-          。
-        </p>
-        <p>
-          如果覺得這些記錄<span className='font-extrabold'>有幫助</span>，
-          <span className='font-bold'>請按「👍Good」</span>
-          向過去的自己<span className='font-extrabold'>說聲謝謝</span>。
-        </p>
-        <p>
-          若你覺得<span className='font-extrabold'>「這在寫什麼？」</span>或
-          <span className='font-extrabold'>「這樣的筆記完全幫不上忙」</span>，
-          <span className='font-extrabold'>請按「👎Bad」</span>
-          提醒過去的自己<span className='font-extrabold'>需要改進</span>。
-        </p>
-        <p>
-          <span className='font-extrabold'>
-            給自己的感謝，或對自己的督促，都是讓你持續成長的力量
-          </span>
-          。
-        </p>
-        <p className='pt-2 text-xs font-extralight'>
-          「👍 Good」和「👎 Bad」都可以按很多次，想按幾次都沒問題喔。
-        </p>
-      </div>
+      <div className='text-sm text-gray-500'>最近的學習日誌</div>
       <div>
         <ul className='space-y-4'>
           {items.map((j) => {
