@@ -111,7 +111,7 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
       try {
         const { data, error } = await supabase.rpc(
           'get_article_answers_for_modal',
-          { p_article_id: articleId }
+          { p_article_id: articleId },
         );
         if (error) throw error;
         if (!cancelled) {
@@ -156,12 +156,12 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
 
   const canSave = useMemo(
     () => !!body.trim() && !loading && !isPending,
-    [body, loading, isPending]
+    [body, loading, isPending],
   );
 
   const sortedRows = useMemo(
     () => rows.slice().sort((a, b) => a.seq - b.seq),
-    [rows]
+    [rows],
   );
 
   const JournalModalElement = useMemo(() => {

@@ -31,7 +31,7 @@ export default function JournalQuickWriteButton({ assignment_id }: Props) {
       (data ?? []).map((i) => ({
         article_id: i.article_id as string,
         full_title: i.full_title as string,
-      }))
+      })),
     );
   }, [assignment_id]);
 
@@ -46,22 +46,25 @@ export default function JournalQuickWriteButton({ assignment_id }: Props) {
     openJournalModal(article_id);
   };
 
-  if (!items.length) return null;
-
   return (
-    <div className='flex flex-col gap-2 mt-4'>
-      {items.map((item) => (
-        <div key={item.article_id}>
-          <button
-            type='button'
-            onClick={() => onClick(item.article_id)}
-            className='border rounded-full px-4 py-2 text-sm inline-flex cursor-pointer'
-          >
-            {`去寫「${item.full_title}」的學習日誌`}
-          </button>
+    <>
+      {!!items.length && (
+        <div className='flex flex-col gap-2 mt-4'>
+          {items.map((item) => (
+            <div key={item.article_id}>
+              <button
+                type='button'
+                onClick={() => onClick(item.article_id)}
+                className='border rounded-full px-4 py-2 text-sm inline-flex cursor-pointer'
+              >
+                {`去寫「${item.full_title}」的學習日誌`}
+              </button>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
+
       {JournalModalElement}
-    </div>
+    </>
   );
 }
