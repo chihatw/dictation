@@ -1,50 +1,26 @@
 'use client';
 
 import { useJournalModal } from '@/hooks/useJournalModal';
-import { supabase } from '@/lib/supabase/browser';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Item = { article_id: string; full_title: string };
-type Props = { assignment_id: string };
+type Props = { items: Item[] };
 
-export default function JournalQuickWriteButton({ assignment_id }: Props) {
-  const [items, setItems] = useState<Item[]>([]);
+export default function JournalQuickWriteButton({ items }: Props) {
+  const [localItems, setLocalItems] = useState<Item[]>(items);
+  useEffect(() => setLocalItems(items), [items]);
+
   const { openJournalModal, JournalModalElement } = useJournalModal({
     isFromHome: true,
   });
 
-  const fetchItems = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('dictation_article_journal_status_view')
-      .select('article_id, full_title')
-      .eq('assignment_id', assignment_id)
-      .eq('all_done', true)
-      .eq('has_journal', false)
-      .order('seq');
-
-    if (error) {
-      console.error(error.message);
-      setItems([]);
-      return;
-    }
-    setItems(
-      (data ?? []).map((i) => ({
-        article_id: i.article_id as string,
-        full_title: i.full_title as string,
-      })),
-    );
-  }, [assignment_id]);
-
-  useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
-
   const onClick = (article_id: string) => {
     // 超楽観的: 即時に非表示
-    setItems((prev) => prev.filter((i) => i.article_id !== article_id));
-    // モーダルは結果を待たない
+    setLocalItems((prev) => prev.filter((i) => i.article_id !== article_id));
     openJournalModal(article_id);
   };
+
+  if (!localItems.length) return <>{JournalModalElement}</>;
 
   return (
     <>

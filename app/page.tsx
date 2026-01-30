@@ -52,6 +52,16 @@ export default async function Home() {
   const mvjImageUrl = row?.mvj_image_url;
   const mvjReason = row?.mvj_reason;
 
+  const { data: quickWriteItems, error: qErr } = await supabase
+    .from('dictation_article_journal_status_view')
+    .select('article_id, full_title')
+    .eq('assignment_id', row?.assignment_id)
+    .eq('all_done', true)
+    .eq('has_journal', false)
+    .order('seq');
+
+  if (qErr) throw new Error(qErr.message);
+
   return (
     <div className='min-h-screen p-6'>
       <main className='mx-auto max-w-2xl space-y-6'>
@@ -67,6 +77,10 @@ export default async function Home() {
           nextFullTitle={row?.next_full_title}
           nextArticleId={row?.next_article_id}
           nextSentenceSeq={row?.next_sentence_seq}
+          quickWriteItems={(quickWriteItems ?? []).map((i) => ({
+            article_id: i.article_id as string,
+            full_title: i.full_title as string,
+          }))}
         />
 
         {false && (

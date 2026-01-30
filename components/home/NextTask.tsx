@@ -2,6 +2,8 @@ import { CircleQuestionMark } from 'lucide-react';
 import Link from 'next/link';
 import JournalQuickWriteButton from './JournalQuickWriteButton';
 
+type QuickWriteItem = { article_id: string; full_title: string };
+
 export const NextTask = ({
   nextArticleId,
   totalCount,
@@ -10,6 +12,7 @@ export const NextTask = ({
   nextFullTitle,
   nextSentenceSeq,
   title,
+  quickWriteItems,
 }: {
   nextArticleId: string | null | undefined;
   totalCount: number | null;
@@ -18,8 +21,33 @@ export const NextTask = ({
   nextFullTitle: string | null;
   nextSentenceSeq: number | null;
   title: string | null;
+  quickWriteItems: QuickWriteItem[];
 }) => {
   const pct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
+
+  const hasQuickWrite = quickWriteItems.length > 0;
+  const hasNext = Boolean(nextArticleId);
+
+  const actionEl = hasQuickWrite ? null : hasNext ? (
+    <Link
+      href={`/articles/${nextArticleId}`}
+      className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
+    >
+      {`前往「${nextFullTitle}」第 ${nextSentenceSeq ?? ''} 行`}
+    </Link>
+  ) : (
+    <div>
+      <div className='text-sm text-gray-700 mb-4'>
+        所有作業都結束了，辛苦了！🎉
+      </div>
+      <Link
+        href={`/assignments/${assignmentId}`}
+        className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
+      >
+        {`查看「${title ?? ''}」的成果`}
+      </Link>
+    </div>
+  );
   return (
     <section className='rounded-xl border p-5 bg-white space-y-3'>
       <div className='flex items-start justify-between'>
@@ -40,28 +68,9 @@ export const NextTask = ({
         作業進度<span className='pl-2 font-bold text-4xl'>{pct}</span>%
       </div>
 
-      <JournalQuickWriteButton assignment_id={assignmentId} />
+      <JournalQuickWriteButton items={quickWriteItems} />
 
-      {nextArticleId ? (
-        <Link
-          href={`/articles/${nextArticleId}`}
-          className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
-        >
-          {`前往「${nextFullTitle}」第 ${nextSentenceSeq ?? ''} 行`}
-        </Link>
-      ) : (
-        <div>
-          <div className='text-sm  text-gray-700 mb-4'>
-            所有作業都結束了，辛苦了！🎉
-          </div>
-          <Link
-            href={`/assignments/${assignmentId}`}
-            className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
-          >
-            {`查看「${title ?? ''}」的成果`}
-          </Link>
-        </div>
-      )}
+      {actionEl}
     </section>
   );
 };
