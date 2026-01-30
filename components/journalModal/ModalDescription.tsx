@@ -6,7 +6,7 @@ export const ModalDescription = () => {
       請用聽到的單字或句子，做出一段像「手寫的信」那樣有心意、值得你親口說、能縮短彼此距離的對話。
       <br />
       <span className='font-bold text-red-500'>
-        寫好之後，完成後一定要用 AI 檢查正不正確、自然不自然
+        寫好之後，一定要用 AI 檢查正不正確、自然不自然
       </span>
       。
       <br />
