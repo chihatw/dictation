@@ -7,11 +7,11 @@ import { createClient } from '@/lib/supabase/server';
 
 import HomeCloze from '@/components/home/HomeCloze';
 import { HomeJournals } from '@/components/home/HomeJornals';
+import { HomeMVJ } from '@/components/home/HomeMVJ';
 import { NextClass } from '@/components/home/NextClass';
 import { NextTask } from '@/components/home/NextTask';
 import { HomePowerIndex } from '@/components/home/powerIndex/HomePowerIndex';
 import { fetchMultiWeather } from '@/lib/openweathermap/fetchTaichungWeather';
-import Link from 'next/link';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -49,8 +49,10 @@ export default async function Home() {
 
   const row = Array.isArray(data) ? data[0] : data;
   const mvjId = row?.mvj_id;
+  const mvjTitle = row?.mvj_title;
   const mvjImageUrl = row?.mvj_image_url;
   const mvjReason = row?.mvj_reason;
+  const mvjDueAtUtc = new Date(row?.mvj_due_at);
 
   const { data: quickWriteItems, error: qErr } = await supabase
     .from('dictation_article_journal_status_view')
@@ -83,13 +85,13 @@ export default async function Home() {
           }))}
         />
 
-        {false && (
-          <HomeMVJ
-            mvjId={mvjId}
-            mvjImageUrl={mvjImageUrl}
-            mvjReason={mvjReason}
-          />
-        )}
+        <HomeMVJ
+          mvjId={mvjId}
+          mvjImageUrl={mvjImageUrl}
+          mvjReason={mvjReason}
+          mvjDueAtUtc={mvjDueAtUtc}
+          mvjTitle={mvjTitle}
+        />
 
         <HomePowerIndex
           piState={row?.power_index_state}
@@ -111,43 +113,3 @@ export default async function Home() {
     </div>
   );
 }
-
-const HomeMVJ = ({
-  mvjId,
-  mvjImageUrl,
-  mvjReason,
-}: {
-  mvjId: string;
-  mvjImageUrl: string;
-  mvjReason: string;
-}) => {
-  if (!mvjId) return null;
-  return (
-    <section className='rounded-xl border p-5 bg-amber-50 space-y-3 flex flex-col shadow-xl'>
-      <div className='grid gap-1'>
-        <Link href={`/mvjs/${mvjId}`} className='text-center hover:underline'>
-          <span className='font-bold text-2xl text-slate-900 text-shadow-2xs'>
-            🏆 選出12月最有價值日誌 🏆
-          </span>
-        </Link>
-        <div className='text-xs text-center text-slate-500'>
-          截止日期: 1/29（木） 凌晨0:00。
-        </div>
-      </div>
-      {mvjImageUrl && (
-        <div className='flex justify-center'>
-          <img
-            src={mvjImageUrl}
-            alt='最佳作品圖片'
-            className='rounded shadow-md max-h-64 object-contain'
-          />
-        </div>
-      )}
-      {mvjReason && (
-        <div className='grid text-center text-sm text-slate-700'>
-          {mvjReason}
-        </div>
-      )}
-    </section>
-  );
-};

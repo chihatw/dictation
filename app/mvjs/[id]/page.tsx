@@ -4,12 +4,9 @@ import { ClozeSpan, Journal, SelfAward } from '@/types/dictation';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { JOURNALS_DUMMY, MVJ_DUMMY } from '../dummy';
 import { fmtDate, fmtTime } from './utils';
 
 type Props = { params: Promise<{ id: string }> };
-
-const DEBUG = process.env.NEXT_PUBLIC_DEBUG === 'true';
 
 const Page = async ({ params }: Props) => {
   const { id } = await params;
@@ -18,28 +15,21 @@ const Page = async ({ params }: Props) => {
 
   const supabase = await createClient();
 
-  const fetchMvj = DEBUG
-    ? async () => {
-        console.log('no fetch');
-        return { data: MVJ_DUMMY } as const;
-      }
-    : async () => {
-        return await supabase
-          .from('dictation_mvjs')
-          .select('*')
-          .eq('id', id)
-          .single();
-      };
+  const fetchMvj = async () => {
+    return await supabase
+      .from('dictation_mvjs')
+      .select('*')
+      .eq('id', id)
+      .single();
+  };
   const { data: mvj } = await fetchMvj();
 
   if (!mvj) return notFound();
 
-  const { data } = DEBUG
-    ? { data: JOURNALS_DUMMY }
-    : await supabase
-        .from('dictation_journals_view')
-        .select(
-          `
+  const { data } = await supabase
+    .from('dictation_journals_view')
+    .select(
+      `
       id,
       created_at,
       article_id,
@@ -48,11 +38,11 @@ const Page = async ({ params }: Props) => {
       self_award,
       cloze_spans,
       locked
-      `
-        )
-        .eq('user_id', mvj.user_id)
-        .gte('due_at', mvj.window_start)
-        .lte('due_at', mvj.window_end);
+      `,
+    )
+    .eq('user_id', mvj.user_id)
+    .gte('due_at', mvj.window_start)
+    .lte('due_at', mvj.window_end);
 
   const items: Journal[] = data
     ? data.map((i) => ({
@@ -83,7 +73,7 @@ const Page = async ({ params }: Props) => {
         <h1 className='font-bold text-2xl pl-2'>{mvj.title}</h1>
         <div className='text-sm text-slate-500 p-2 pt-1'>
           <div className='flex items-baseline'>
-            <div className='pr-2'>{`截止日期:`}</div>
+            <div className='pr-2'>截止日期:</div>
             <div className='font-bold text-slate-700 text-base tracking-tighter'>
               {fmtDate(dueAt)}
             </div>
