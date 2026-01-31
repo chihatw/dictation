@@ -28,26 +28,15 @@ export const NextTask = ({
   const hasQuickWrite = quickWriteItems.length > 0;
   const hasNext = Boolean(nextArticleId);
 
-  const actionEl = hasQuickWrite ? null : hasNext ? (
-    <Link
-      href={`/articles/${nextArticleId}`}
-      className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
-    >
-      {`前往「${nextFullTitle}」第 ${nextSentenceSeq ?? ''} 行`}
-    </Link>
-  ) : (
-    <div>
-      <div className='text-sm text-gray-700 mb-4'>
-        所有作業都結束了，辛苦了！🎉
-      </div>
+  const actionEl =
+    !hasQuickWrite && hasNext ? (
       <Link
-        href={`/assignments/${assignmentId}`}
-        className='inline-flex items-center rounded-xl px-4 py-2 border text-gray-700 text-sm'
+        href={`/articles/${nextArticleId}`}
+        className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
       >
-        {`查看「${title ?? ''}」的成果`}
+        {`前往「${nextFullTitle}」第 ${nextSentenceSeq ?? ''} 行`}
       </Link>
-    </div>
-  );
+    ) : null;
   return (
     <section className='rounded-xl border p-5 bg-white space-y-3'>
       <div className='flex items-start justify-between'>
@@ -71,6 +60,13 @@ export const NextTask = ({
       <JournalQuickWriteButton items={quickWriteItems} />
 
       {actionEl}
+
+      <Link
+        href={`/assignments/${assignmentId}`}
+        className='text-center rounded-full px-4 py-2 border text-gray-700 text-sm'
+      >
+        查看聽力練習結果
+      </Link>
     </section>
   );
 };
