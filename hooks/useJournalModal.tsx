@@ -143,27 +143,33 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
 
     return (
       <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'>
-        <div className='w-full max-w-3xl rounded-lg bg-white p-4 shadow-xl flex flex-col max-h-[85vh] overflow-hidden'>
-          <h2 className='text-lg font-semibold'>學習日誌</h2>
+        <div className='w-full max-w-3xl rounded-lg bg-white shadow-xl flex flex-col max-h-[85vh] overflow-hidden'>
+          <div className='p-4 pb-0'>
+            <h2 className='text-lg font-semibold'>學習日誌</h2>
+          </div>
 
-          <ModalDescription />
+          <div className='flex-1 overflow-auto p-4 space-y-3'>
+            <ModalDescription />
 
-          <PromptCopySection prompt={AI_PROMPT} />
+            <DictationResults
+              loading={loading}
+              listRef={listRef}
+              sortedRows={sortedRows}
+            />
 
-          <DictationResults
-            loading={loading}
-            listRef={listRef}
-            sortedRows={sortedRows}
-          />
+            <PromptCopySection prompt={AI_PROMPT} />
 
-          <label className='mt-4 block text-sm font-medium'>日誌內容</label>
-          <textarea
-            className='mt-1 h-40 w-full resize-y rounded border p-2 text-sm'
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-          />
+            <div>
+              <label className='block text-sm font-medium'>日誌內容</label>
+              <textarea
+                className='mt-1 w-full resize-y rounded border p-2 text-sm min-h-[24vh] max-h-[40vh]'
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+              />
+            </div>
+          </div>
 
-          <div className='mt-4 flex justify-end gap-3 items-center'>
+          <div className='shrink-0 border-t bg-white p-4 flex justify-end gap-3 items-center'>
             <label
               htmlFor={checkboxId}
               className='flex items-center gap-2 text-sm text-gray-700 select-none'
