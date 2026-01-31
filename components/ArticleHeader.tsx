@@ -9,9 +9,14 @@ import { UrlPlayButton } from './audio/UrlPlayButton';
 type Props = {
   article: ArticleWithSentences;
   isAdmin?: boolean;
+  hasJournal: boolean;
 };
 
-export default function ArticleHeader({ article, isAdmin = false }: Props) {
+export default function ArticleHeader({
+  article,
+  isAdmin = false,
+  hasJournal,
+}: Props) {
   const audioUrl = article.audio_path_full
     ? toPublicUrl(article.audio_path_full)
     : undefined;
@@ -25,12 +30,14 @@ export default function ArticleHeader({ article, isAdmin = false }: Props) {
           >
             <ChevronLeft className='h-4 w-4' /> 返回首頁
           </Link>
-          <Link
-            href={`/assignments/${article.assignment_id}`}
-            className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
-          >
-            <ChevronLeft className='h-4 w-4' /> 返回主題頁
-          </Link>
+          {hasJournal && (
+            <Link
+              href={`/assignments/${article.assignment_id}`}
+              className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
+            >
+              <ChevronLeft className='h-4 w-4' /> 返回主題頁
+            </Link>
+          )}
         </div>
         <h1 className='ml-1 flex-1 truncate text-lg font-semibold'>
           {article.title} {article.subtitle}

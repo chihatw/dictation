@@ -4,7 +4,6 @@
 import ArticleHeader from '@/components/ArticleHeader';
 import SentencesList from '@/components/SentencesList';
 import { useArticle } from '@/hooks/useArticle';
-import { useJournalModal } from '@/hooks/useJournalModal';
 import { supabase } from '@/lib/supabase/browser';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -35,28 +34,22 @@ export default function ArticlePage() {
     aiFeedbacks,
   } = useArticle(id);
 
-  const { openJournalModal, JournalModalElement } = useJournalModal();
-
   const handleSubmitOne = async (
     sentenceId: string,
     playsCount: number,
     elapsedMsSinceItemView: number,
     elapsedMsSinceFirstPlay: number,
-    selfAssessedComprehension: number
+    selfAssessedComprehension: number,
   ) => {
     const s = article?.sentences.find((x) => x.id === sentenceId);
     if (!s) return;
-    const result = await submitOne(
+    await submitOne(
       s,
       playsCount,
       elapsedMsSinceItemView,
       elapsedMsSinceFirstPlay,
-      selfAssessedComprehension
+      selfAssessedComprehension,
     );
-
-    if (result?.completed && result.articleId) {
-      openJournalModal(result.articleId);
-    }
   };
 
   if (loading) {
@@ -81,7 +74,11 @@ export default function ArticlePage() {
 
   return (
     <div className='min-h-screen'>
-      <ArticleHeader article={article} isAdmin={isAdmin} />
+      <ArticleHeader
+        article={article}
+        isAdmin={isAdmin}
+        hasJournal={!!journal}
+      />
 
       <main className='mx-auto max-w-4xl px-4 py-6'>
         {journal && (
@@ -125,7 +122,6 @@ export default function ArticlePage() {
           {allSubmitted ? '所有句子都已送出。辛苦了！' : '尚有未送出的回答'}
         </div>
       </main>
-      {JournalModalElement}
     </div>
   );
 }

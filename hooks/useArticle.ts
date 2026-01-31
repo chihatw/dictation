@@ -66,7 +66,7 @@ export function useArticle(articleId: string | undefined) {
 
   const allSubmitted = useMemo(
     () => article?.sentences.every((s) => submitted[s.id]) ?? false,
-    [submitted, article?.sentences]
+    [submitted, article?.sentences],
   );
 
   const submitOne = useCallback(
@@ -75,7 +75,7 @@ export function useArticle(articleId: string | undefined) {
       plays_count: number,
       elapsed_ms_since_item_view: number,
       elapsed_ms_since_first_play: number,
-      selfAssessedComprehension: number
+      selfAssessedComprehension: number,
     ) => {
       const val = (answers[s.id] ?? '').trim();
       if (!val) return;
@@ -100,17 +100,13 @@ export function useArticle(articleId: string | undefined) {
           alert(res.error ?? '保存に失敗しました。');
         } else {
           setAiFeedbacks((o) => ({ ...o, [s.id]: res.aiFeedback || '' }));
-          return {
-            completed: res.completed,
-            articleId: res.articleId,
-            aiFeedback: res.aiFeedback || '',
-          };
+          return;
         }
       } finally {
         setLoadingMap((o) => ({ ...o, [s.id]: false }));
       }
     },
-    [answers]
+    [answers],
   );
 
   return {
