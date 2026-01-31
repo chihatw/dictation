@@ -159,11 +159,11 @@ export function useJournalModal(opts?: {
         aria-modal='true'
       >
         <div className='w-full max-w-3xl rounded-lg bg-white shadow-xl flex flex-col max-h-[85vh] overflow-hidden'>
-          <div className='p-4 pb-0'>
+          <div className='p-4 pb-2'>
             <h2 className='text-lg font-semibold'>學習日誌</h2>
           </div>
 
-          <div className='flex-1 overflow-auto p-4 space-y-3'>
+          <div className='flex-1 overflow-auto p-4 pt-0 space-y-3'>
             <ModalDescription />
 
             <DictationResults

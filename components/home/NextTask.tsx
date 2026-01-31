@@ -11,7 +11,6 @@ export const NextTask = ({
   assignmentId,
   nextFullTitle,
   nextSentenceSeq,
-  title,
   quickWriteItems,
 }: {
   nextArticleId: string | null | undefined;
@@ -20,7 +19,6 @@ export const NextTask = ({
   assignmentId: string;
   nextFullTitle: string | null;
   nextSentenceSeq: number | null;
-  title: string | null;
   quickWriteItems: QuickWriteItem[];
 }) => {
   const pct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
@@ -30,13 +28,16 @@ export const NextTask = ({
 
   const actionEl =
     !hasQuickWrite && hasNext ? (
-      <Link
-        href={`/articles/${nextArticleId}`}
-        className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
-      >
-        {`前往「${nextFullTitle}」第 ${nextSentenceSeq ?? ''} 行`}
-      </Link>
+      <div className='flex '>
+        <Link
+          href={`/articles/${nextArticleId}`}
+          className='inline-flex items-center justify-center text-sm rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors'
+        >
+          {`前往「${nextFullTitle}」第 ${nextSentenceSeq ?? ''} 行`}
+        </Link>
+      </div>
     ) : null;
+
   return (
     <section className='rounded-xl border p-5 bg-white space-y-3'>
       <div className='flex items-start justify-between'>
@@ -57,16 +58,19 @@ export const NextTask = ({
         作業進度<span className='pl-2 font-bold text-4xl'>{pct}</span>%
       </div>
 
-      <JournalQuickWriteButton items={quickWriteItems} />
+      <div className='grid gap-y-2'>
+        <JournalQuickWriteButton items={quickWriteItems} />
+        {actionEl}
 
-      {actionEl}
-
-      <Link
-        href={`/assignments/${assignmentId}`}
-        className='text-center rounded-full px-4 py-2 border text-gray-700 text-sm'
-      >
-        查看聽力練習結果
-      </Link>
+        <div className='flex'>
+          <Link
+            href={`/assignments/${assignmentId}`}
+            className='inline-flex items-center justify-center rounded-full px-4 py-2 border text-gray-700 text-sm'
+          >
+            查看聽力練習結果
+          </Link>
+        </div>
+      </div>
     </section>
   );
 };

@@ -26,7 +26,7 @@ export default function JournalQuickWriteButton({ items }: Props) {
   return (
     <>
       {!!localItems.length && (
-        <div className='flex flex-col gap-2 mt-4'>
+        <div className='flex flex-col gap-2'>
           {localItems.map(
             (
               item, // ← items ではなく localItems
