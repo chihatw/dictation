@@ -12,11 +12,12 @@ export default function JournalQuickWriteButton({ items }: Props) {
 
   const { openJournalModal, JournalModalElement } = useJournalModal({
     isFromHome: true,
+    onSaved: (articleId: string) => {
+      setLocalItems((prev) => prev.filter((i) => i.article_id !== articleId));
+    },
   });
 
   const onClick = (article_id: string) => {
-    // 超楽観的: 即時に非表示
-    setLocalItems((prev) => prev.filter((i) => i.article_id !== article_id));
     openJournalModal(article_id);
   };
 
@@ -24,19 +25,23 @@ export default function JournalQuickWriteButton({ items }: Props) {
 
   return (
     <>
-      {!!items.length && (
+      {!!localItems.length && (
         <div className='flex flex-col gap-2 mt-4'>
-          {items.map((item) => (
-            <div key={item.article_id}>
-              <button
-                type='button'
-                onClick={() => onClick(item.article_id)}
-                className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors cursor-pointer'
-              >
-                {`去寫「${item.full_title}」的學習日誌`}
-              </button>
-            </div>
-          ))}
+          {localItems.map(
+            (
+              item, // ← items ではなく localItems
+            ) => (
+              <div key={item.article_id}>
+                <button
+                  type='button'
+                  onClick={() => onClick(item.article_id)}
+                  className='text-sm inline-flex items-center rounded-full px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 transition-colors cursor-pointer'
+                >
+                  {`去寫「${item.full_title}」的學習日誌`}
+                </button>
+              </div>
+            ),
+          )}
         </div>
       )}
 

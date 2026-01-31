@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -40,7 +41,10 @@ const AI_PROMPT = `我是日語學習者。
 我不想讀太長的內容，請盡量寫得簡潔。
 不需要說明修改原因。`;
 
-export function useJournalModal(opts?: { isFromHome?: boolean }) {
+export function useJournalModal(opts?: {
+  isFromHome?: boolean;
+  onSaved?: (articleId: string) => void;
+}) {
   const router = useRouter();
   const isFromHome = opts?.isFromHome ?? false;
 
@@ -56,6 +60,8 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
   const [isPending, startTransition] = useTransition();
 
   const listRef = useRef<HTMLDivElement>(null);
+
+  const checkboxId = useId();
 
   const openJournalModal = useCallback((id: string) => {
     setArticleId(id);
@@ -112,7 +118,7 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
   }, [open, loading, rows.length, isFromHome]);
 
   const save = useCallback(() => {
-    if (!articleId || !body.trim() || loading) return;
+    if (!articleId || !body.trim() || loading || isPending) return;
     startTransition(async () => {
       try {
         if (isFromHome) {
@@ -121,10 +127,13 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
         } else {
           await saveDictationJournalAction(articleId, body.trim());
         }
+        opts?.onSaved?.(articleId);
         close();
-      } catch {}
+      } catch {
+        // エラー表示したいならここ
+      }
     });
-  }, [articleId, body, loading, close]);
+  }, [articleId, body, loading, isPending, isFromHome, router, opts, close]);
 
   const canSave = useMemo(
     () => !!body.trim() && checkedAi && !loading && !isPending,
@@ -139,10 +148,16 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
   const JournalModalElement = useMemo(() => {
     if (!open) return null;
 
-    const checkboxId = 'ai-checked';
-
     return (
-      <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'>
+      <div
+        className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4'
+        onMouseDown={(e) => {
+          if (isPending) return;
+          if (e.target === e.currentTarget) close();
+        }}
+        role='dialog'
+        aria-modal='true'
+      >
         <div className='w-full max-w-3xl rounded-lg bg-white shadow-xl flex flex-col max-h-[85vh] overflow-hidden'>
           <div className='p-4 pb-0'>
             <h2 className='text-lg font-semibold'>學習日誌</h2>
@@ -206,6 +221,7 @@ export function useJournalModal(opts?: { isFromHome?: boolean }) {
     save,
     close,
     checkedAi,
+    checkboxId,
   ]);
 
   return { openJournalModal, JournalModalElement };
