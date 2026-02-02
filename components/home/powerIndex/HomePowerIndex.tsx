@@ -34,7 +34,7 @@ const getYDomain = (points: { score: number }[]) => {
 };
 
 export const HomePowerIndex = ({
-  hasSubmissions,
+  hasActivityToday,
   idleDays,
   nextPenalty,
   powerIndex,
@@ -42,7 +42,7 @@ export const HomePowerIndex = ({
   piState,
   currentStreakDays,
 }: {
-  hasSubmissions: boolean;
+  hasActivityToday: boolean;
   idleDays: number;
   nextPenalty: number;
   powerIndex: number;
@@ -84,7 +84,7 @@ export const HomePowerIndex = ({
           <PowerIndexMessage
             nextPenalty={nextPenalty}
             idleDays={idleDays}
-            hasSubmissions={hasSubmissions}
+            hasActivityToday={hasActivityToday}
             currentStreakDays={currentStreakDays}
           />
         ) : (

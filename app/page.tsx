@@ -97,7 +97,7 @@ export default async function Home() {
           idleDays={row?.consecutive_idle_days}
           powerIndex={row?.power_index}
           nextPenalty={row?.next_penalty}
-          hasSubmissions={row?.has_submissions}
+          hasActivityToday={row?.has_submissions || row?.has_journal}
           dailyPowerIndex={dailyPowerIndex || []}
           currentStreakDays={row?.current_streak_days}
         />

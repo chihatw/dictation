@@ -1211,6 +1211,7 @@ export type Database = {
           current_streak_days: number
           done_count: number
           due_at: string
+          has_journal: boolean
           has_submissions: boolean
           mvj_due_at: string
           mvj_id: string

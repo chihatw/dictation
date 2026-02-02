@@ -2,21 +2,21 @@ import { cn } from '@/lib/utils';
 import { getCheerMessage } from './cheerMessage';
 
 export const PowerIndexMessage = ({
-  hasSubmissions,
+  hasActivityToday,
   idleDays,
   nextPenalty,
   currentStreakDays,
 }: {
-  hasSubmissions: boolean;
+  hasActivityToday: boolean;
   idleDays: number;
   nextPenalty: number;
   currentStreakDays: number;
 }) => {
-  const computedStreakDays = currentStreakDays + Number(hasSubmissions);
+  const computedStreakDays = currentStreakDays + Number(hasActivityToday);
   return (
     <div className='text-sm text-gray-500 font-extralight leading-none'>
       <StreakDays currentStreakDays={computedStreakDays} />
-      {hasSubmissions ? (
+      {hasActivityToday ? (
         <div className={cn('pb-2', computedStreakDays === 1 ? 'pt-1.5' : '')}>
           請保持這個節奏，每天都持續一點點就很好。
         </div>
