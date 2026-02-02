@@ -103,6 +103,12 @@ CREATE VIEW public.dictation_current_streak_view WITH (security_invoker='true') 
    FROM (segments s
      JOIN last_segment ls ON (((s.user_id = ls.user_id) AND (s.segment_id = ls.segment_id))))
   GROUP BY s.user_id;
+CREATE VIEW public.dictation_journals_daily_users_view WITH (security_invoker='true') AS
+ SELECT ass.user_id,
+    j.created_at
+   FROM ((public.dictation_journals j
+     JOIN public.dictation_articles art ON ((art.id = j.article_id)))
+     JOIN public.dictation_assignments ass ON ((ass.id = art.assignment_id)));
 CREATE VIEW public.dictation_sentences_view WITH (security_invoker='true') AS
  SELECT ass.user_id,
     art.assignment_id,

@@ -92,10 +92,15 @@ begin
   ) on commit drop;
 
   insert into _submitted_users(user_id)
-  select distinct v.user_id
-  from public.dictation_submissions_daily_users_view v
-  where v.created_at >= v_start
-    and v.created_at <  v_end;
+select v.user_id
+from public.dictation_submissions_daily_users_view v
+where v.created_at >= v_start
+  and v.created_at <  v_end
+union
+select vj.user_id
+from public.dictation_journals_daily_users_view vj
+where vj.created_at >= v_start
+  and vj.created_at <  v_end;
 
   for r in
     select *
