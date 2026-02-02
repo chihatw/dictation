@@ -935,6 +935,21 @@ export type Database = {
         }
         Relationships: []
       }
+      dictation_journals_daily_users_view: {
+        Row: {
+          created_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
+          },
+        ]
+      }
       dictation_journals_view: {
         Row: {
           article_id: string | null
@@ -1026,6 +1041,21 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_articles"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      dictation_submissions_daily_users_view: {
+        Row: {
+          created_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["uid"]
           },
         ]
       }

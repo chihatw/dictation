@@ -504,12 +504,19 @@ latest_state AS (
     0
   ) AS consecutive_idle_days
 ),
+today_bounds AS (
+  SELECT
+    ((now() AT TIME ZONE 'Asia/Taipei')::date::timestamp AT TIME ZONE 'Asia/Taipei')      AS start_at,
+    (((now() AT TIME ZONE 'Asia/Taipei')::date + 1)::timestamp AT TIME ZONE 'Asia/Taipei') AS end_at
+),
 today_subs AS (
   SELECT EXISTS (
     SELECT 1
-    FROM public.dictation_submissions_view dsv
-    WHERE dsv.user_id = p_uid
-      AND dsv.date = (now() AT TIME ZONE 'Asia/Taipei'::text)::date
+    FROM public.dictation_submissions_daily_users_view v
+    CROSS JOIN today_bounds b
+    WHERE v.user_id = p_uid
+      AND v.created_at >= b.start_at
+      AND v.created_at <  b.end_at
   ) AS has_submissions
 )
 SELECT
