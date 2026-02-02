@@ -121,6 +121,13 @@ CREATE VIEW public.dictation_sentences_view WITH (security_invoker='true') AS
      JOIN public.dictation_articles art ON ((art.id = s.article_id)))
      JOIN public.dictation_assignments ass ON ((ass.id = art.assignment_id)))
      LEFT JOIN public.dictation_submissions sub ON ((sub.sentence_id = s.id)));
+CREATE VIEW public.dictation_submissions_daily_users_view WITH (security_invoker='true') AS
+ SELECT ass.user_id,
+    sub.created_at
+   FROM (((public.dictation_submissions sub
+     JOIN public.dictation_sentences s ON ((s.id = sub.sentence_id)))
+     JOIN public.dictation_articles art ON ((art.id = s.article_id)))
+     JOIN public.dictation_assignments ass ON ((ass.id = art.assignment_id)));
 CREATE VIEW public.dictation_submissions_view WITH (security_invoker='true') AS
  SELECT ass.user_id,
     art.assignment_id,

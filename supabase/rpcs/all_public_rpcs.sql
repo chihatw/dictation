@@ -77,8 +77,30 @@ declare
   v_has_sub bool;
   v_state public.dictation_power_index_state_t;
   v_cidle int;
+  v_inserted int;
+
+  -- p_day の Asia/Taipei 00:00〜翌00:00 を timestamptz として用意
+  v_start timestamptz;
+  v_end   timestamptz;
 begin
-  for r in select * from public.dictation_power_indices loop
+  v_start := (p_day::timestamp at time zone 'Asia/Taipei');
+  v_end   := ((p_day + 1)::timestamp at time zone 'Asia/Taipei');
+
+  -- 当日提出ユーザーを事前に確定（N+1軽減・視認性優先）
+  create temporary table _submitted_users(
+    user_id uuid primary key
+  ) on commit drop;
+
+  insert into _submitted_users(user_id)
+  select distinct v.user_id
+  from public.dictation_submissions_daily_users_view v
+  where v.created_at >= v_start
+    and v.created_at <  v_end;
+
+  for r in
+    select *
+    from public.dictation_power_indices
+  loop
     v_state := r.state;
     v_score := r.current_score;
 
@@ -93,14 +115,14 @@ begin
         limit 1
       ),
       0
-    ) into v_cidle;
+    )
+    into v_cidle;
 
-    -- 当日提出の有無
-		select exists (
+    -- 当日提出の有無（事前集計した一時テーブルを見る）
+    select exists (
       select 1
-      from public.dictation_submissions_view v
-      where v.user_id = r.user_id
-        and v.date    = p_day
+      from _submitted_users s
+      where s.user_id = r.user_id
     )
     into v_has_sub;
 
@@ -113,7 +135,7 @@ begin
       end if;
 
     elsif v_state = 'paused' then
-      -- 何もしない
+      -- 連続放置日数を増やさないが保持（何もしない）
 
     else
       v_cidle := 0;
@@ -126,9 +148,14 @@ begin
     )
     on conflict (user_id, day) do nothing;
 
-    update public.dictation_power_indices
-      set current_score = v_score
-      where user_id = r.user_id;
+    -- その日の daily を新規作成できたときだけ current_score を更新（冪等化）
+    GET DIAGNOSTICS v_inserted = ROW_COUNT;
+
+    if v_inserted = 1 then
+      update public.dictation_power_indices
+        set current_score = v_score
+        where user_id = r.user_id;
+    end if;
   end loop;
 end;
 $function$
