@@ -416,7 +416,7 @@ $function$
 
 --- public.get_home_next_task(p_uid uuid)
 CREATE OR REPLACE FUNCTION public.get_home_next_task(p_uid uuid)
- RETURNS TABLE(assignment_id uuid, title text, due_at timestamp with time zone, published_at timestamp with time zone, done_count integer, total_count integer, next_article_id uuid, next_sentence_id uuid, next_full_title text, next_sentence_seq integer, top_assignment_ids uuid[], mvj_id text, mvj_image_url text, mvj_reason text, mvj_title text, mvj_due_at timestamp with time zone, power_index integer, power_index_state dictation_power_index_state_t, consecutive_idle_days integer, current_streak_days integer, next_penalty integer, has_submissions boolean, has_journal boolean)
+ RETURNS TABLE(assignment_id uuid, title text, due_at timestamp with time zone, published_at timestamp with time zone, done_count integer, total_count integer, next_article_id uuid, next_sentence_id uuid, next_full_title text, next_sentence_seq integer, top_assignment_ids uuid[], mvj_id text, mvj_image_url text, mvj_reason text, mvj_title text, mvj_due_at timestamp with time zone, power_index integer, power_index_state dictation_power_index_state_t, consecutive_idle_days integer, current_streak_days integer, next_penalty integer, has_submissions boolean, has_journal boolean, article_count integer, journal_count integer)
  LANGUAGE sql
  STABLE
  SET search_path TO 'public'
@@ -528,6 +528,16 @@ today_journals AS (
       AND v.created_at >= b.start_at
       AND v.created_at <  b.end_at
   ) AS has_journal
+),
+counts AS (
+  SELECT
+    COUNT(a.id)::int AS article_count,
+    COUNT(j.id)::int AS journal_count
+  FROM latest l
+  LEFT JOIN public.dictation_articles a
+    ON a.assignment_id = l.assignment_id
+  LEFT JOIN public.dictation_journals j
+    ON j.article_id = a.id
 )
 SELECT
   l.assignment_id,
@@ -552,7 +562,9 @@ SELECT
   COALESCE(cs.current_streak_days, 0) AS current_streak_days,
   dictation_penalty(latest_state.consecutive_idle_days + 1) AS next_penalty,
   today_subs.has_submissions,
-  today_journals.has_journal
+  today_journals.has_journal,
+  counts.article_count,
+  counts.journal_count
 FROM latest l
 LEFT JOIN dictation_assignment_counts_view v ON v.id = l.assignment_id
 LEFT JOIN nextq n ON n.assignment_id = l.assignment_id
@@ -562,6 +574,7 @@ CROSS JOIN pi
 CROSS JOIN latest_state
 CROSS JOIN today_subs
 CROSS JOIN today_journals
+CROSS JOIN counts
 LEFT JOIN public.dictation_current_streak_view cs
   ON cs.user_id = p_uid;
 $function$

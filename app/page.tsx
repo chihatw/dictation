@@ -73,7 +73,9 @@ export default async function Home() {
 
         <NextTask
           totalCount={row?.total_count}
-          doneCount={row?.done_count ?? 0}
+          doneCount={row?.done_count}
+          articleCount={row?.article_count}
+          journalCount={row?.journal_count}
           assignmentId={row?.assignment_id}
           nextFullTitle={row?.next_full_title}
           nextArticleId={row?.next_article_id}

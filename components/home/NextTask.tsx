@@ -8,20 +8,26 @@ export const NextTask = ({
   nextArticleId,
   totalCount,
   doneCount,
+  articleCount,
+  journalCount,
   assignmentId,
   nextFullTitle,
   nextSentenceSeq,
   quickWriteItems,
 }: {
   nextArticleId: string | null | undefined;
-  totalCount: number | null;
+  totalCount: number;
   doneCount: number;
+  articleCount: number;
+  journalCount: number;
   assignmentId: string;
   nextFullTitle: string | null;
   nextSentenceSeq: number | null;
   quickWriteItems: QuickWriteItem[];
 }) => {
-  const pct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
+  const completed = doneCount + journalCount;
+  const total = totalCount + articleCount;
+  const pct = total ? Math.round((completed / total) * 100) : 0;
 
   const hasQuickWrite = quickWriteItems.length > 0;
   const hasNext = Boolean(nextArticleId);

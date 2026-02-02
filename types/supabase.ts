@@ -1206,6 +1206,7 @@ export type Database = {
       get_home_next_task: {
         Args: { p_uid: string }
         Returns: {
+          article_count: number
           assignment_id: string
           consecutive_idle_days: number
           current_streak_days: number
@@ -1213,6 +1214,7 @@ export type Database = {
           due_at: string
           has_journal: boolean
           has_submissions: boolean
+          journal_count: number
           mvj_due_at: string
           mvj_id: string
           mvj_image_url: string
