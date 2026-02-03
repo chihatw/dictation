@@ -1,23 +1,16 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
+const PowerIndexChart = dynamic(() => import('./PowerIndexChart'), {
+  ssr: false,
+});
+
 import { PIState } from '@/types/dictation';
 import { CircleQuestionMark, Pause } from 'lucide-react';
-import {
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { PowerIndexMessage } from './PowerIndexMessage';
 
-const formatDayLabel = (day: string) => {
-  // "2025-10-28" -> "10/28"
-  return day.slice(5).replace('-', '/');
-};
-
-const getYDomain = (points: { score: number }[]) => {
+const getYDomain = (points: { score: number }[]): [number, number] => {
   if (points.length === 0) return [0, 1];
 
   const scores = points.map((p) => p.score);
@@ -25,7 +18,6 @@ const getYDomain = (points: { score: number }[]) => {
   const max = Math.max(...scores);
 
   if (min === max) {
-    // 全部同じ値のときは見やすいように少し幅を持たせる
     return [min - 10, max + 10];
   }
 
@@ -94,39 +86,8 @@ export const HomePowerIndex = ({
           </div>
         )}
       </div>
-      <div className='h-32 rounded-lg bg-slate-100'>
-        <ResponsiveContainer width='100%' height='100%'>
-          <LineChart
-            data={sorted}
-            margin={{ top: 10, right: 30, left: 30, bottom: 0 }}
-          >
-            {/* 横軸: 日付 MM/DD  */}
-            <XAxis
-              dataKey='day'
-              tickFormatter={formatDayLabel}
-              tick={{ fontSize: 10 }}
-            />
-
-            {/* 縦軸: スケールだけ使う。UI は非表示 */}
-            <YAxis hide domain={yDomain} />
-
-            {/* ホバーで日付と score を表示 */}
-            <Tooltip
-              formatter={(value) => [value, '指數']}
-              labelFormatter={(l) => ''}
-            />
-
-            {/* 曲線グラフ: monotone でカーブ */}
-            <Line
-              type='monotone'
-              dataKey='score'
-              strokeWidth={3}
-              dot={false}
-              activeDot={{ r: 4 }}
-              stroke='#334155'
-            />
-          </LineChart>
-        </ResponsiveContainer>
+      <div className='h-32 w-full rounded-lg bg-slate-100'>
+        <PowerIndexChart data={sorted} yDomain={yDomain} />
       </div>
     </section>
   );

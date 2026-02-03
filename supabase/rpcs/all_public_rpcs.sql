@@ -358,9 +358,66 @@ AS $function$
 $function$
 
 
---- public.get_home_more_journals(p_uid uuid, p_before timestamp with time zone, p_limit integer)
-CREATE OR REPLACE FUNCTION public.get_home_more_journals(p_uid uuid, p_before timestamp with time zone, p_limit integer DEFAULT 10)
- RETURNS jsonb
+--- public.get_journals(p_uid uuid)
+CREATE OR REPLACE FUNCTION public.get_journals(p_uid uuid)
+ RETURNS TABLE(id uuid, created_at timestamp with time zone, article_id uuid, body text, rating_score integer, cloze_spans jsonb, locked boolean, self_award self_award_t, next_before timestamp with time zone, has_more boolean)
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+WITH tops AS (
+  SELECT a.id
+  FROM public.dictation_assignments a
+  WHERE a.user_id = p_uid
+    AND a.published_at IS NOT NULL
+  ORDER BY a.due_at DESC NULLS LAST
+  LIMIT 2
+),
+page AS (
+  SELECT
+    v.id,
+    v.created_at,
+    v.article_id,
+    v.body,
+    v.rating_score,
+    v.cloze_spans,
+    v.locked,
+    v.self_award
+  FROM public.dictation_journals_view v
+  WHERE v.user_id = p_uid
+    AND v.assignment_id IN (SELECT id FROM tops)
+  ORDER BY v.created_at DESC
+),
+cur AS (
+  SELECT MIN(created_at) AS next_before FROM page
+),
+meta AS (
+  SELECT
+    c.next_before,
+    CASE
+      WHEN c.next_before IS NULL THEN FALSE
+      ELSE EXISTS (
+        SELECT 1
+        FROM public.dictation_journals_view v
+        WHERE v.user_id = p_uid
+          AND v.created_at < c.next_before
+      )
+    END AS has_more
+  FROM cur c
+)
+SELECT
+  p.*,
+  m.next_before,
+  m.has_more
+FROM page p
+CROSS JOIN meta m
+ORDER BY p.created_at DESC;
+$function$
+
+
+--- public.get_journals_more(p_uid uuid, p_before timestamp with time zone, p_limit integer)
+CREATE OR REPLACE FUNCTION public.get_journals_more(p_uid uuid, p_before timestamp with time zone, p_limit integer DEFAULT 10)
+ RETURNS TABLE(id uuid, created_at timestamp with time zone, article_id uuid, body text, rating_score integer, cloze_spans jsonb, locked boolean, self_award self_award_t, next_before timestamp with time zone, has_more boolean)
  LANGUAGE sql
  STABLE
  SET search_path TO 'public'
@@ -384,49 +441,54 @@ WITH base AS (
 page AS (
   SELECT * FROM base ORDER BY created_at DESC LIMIT p_limit
 ),
-next_cur AS (
-  SELECT MIN(created_at) AS next_before FROM page
-),
-has_more AS (
-  SELECT (COUNT(*) > p_limit) AS more FROM base
+meta AS (
+  SELECT
+    (SELECT MIN(created_at) FROM page) AS next_before,
+    (SELECT COUNT(*) > p_limit FROM base) AS has_more
 )
-SELECT jsonb_build_object(
-  'items',
-    COALESCE((
-      SELECT jsonb_agg(
-        jsonb_build_object(
-          'id',           p.id,
-          'created_at',   p.created_at,
-          'article_id',   p.article_id,
-          'body',         p.body,
-          'rating_score', p.rating_score,
-          'cloze_spans',  p.cloze_spans,
-          'locked',       p.locked,
-          'self_award',   p.self_award
-        )
-        ORDER BY p.created_at DESC
-      )
-      FROM page p
-    ), '[]'::jsonb),
-  'next_before', (SELECT next_before FROM next_cur),
-  'has_more',    (SELECT more FROM has_more)
-);
+SELECT
+  p.*,
+  m.next_before,
+  m.has_more
+FROM page p
+CROSS JOIN meta m
+ORDER BY p.created_at DESC;
 $function$
 
 
---- public.get_home_next_task(p_uid uuid)
-CREATE OR REPLACE FUNCTION public.get_home_next_task(p_uid uuid)
- RETURNS TABLE(assignment_id uuid, title text, due_at timestamp with time zone, published_at timestamp with time zone, done_count integer, total_count integer, next_article_id uuid, next_sentence_id uuid, next_full_title text, next_sentence_seq integer, top_assignment_ids uuid[], mvj_id text, mvj_image_url text, mvj_reason text, mvj_title text, mvj_due_at timestamp with time zone, power_index integer, power_index_state dictation_power_index_state_t, consecutive_idle_days integer, current_streak_days integer, next_penalty integer, has_submissions boolean, has_journal boolean, article_count integer, journal_count integer)
+--- public.get_mvj(p_uid uuid)
+CREATE OR REPLACE FUNCTION public.get_mvj(p_uid uuid)
+ RETURNS TABLE(mvj_id text, mvj_image_url text, mvj_reason text, mvj_title text, mvj_due_at timestamp with time zone)
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+  select
+    m.id::text      as mvj_id,
+    m.image_url     as mvj_image_url,
+    m.reason        as mvj_reason,
+    m.title         as mvj_title,
+    m.due_at        as mvj_due_at
+  from public.dictation_mvjs m
+  where m.user_id = p_uid
+    and m.published_at is not null
+  order by m.due_at desc
+  limit 1;
+$function$
+
+
+--- public.get_next_class(p_uid uuid)
+CREATE OR REPLACE FUNCTION public.get_next_class(p_uid uuid)
+ RETURNS TABLE(assignment_id uuid, start_at timestamp with time zone, due_at timestamp with time zone, done_count integer, total_count integer, next_article_id uuid, next_full_title text, next_sentence_seq integer, article_count integer, journal_count integer, quick_write_article_id uuid, quick_write_full_title text)
  LANGUAGE sql
  STABLE
  SET search_path TO 'public'
 AS $function$
 WITH latest AS (
   SELECT
-    a.id AS assignment_id,
-    a.title,
-    a.due_at,
-    a.published_at
+    a.id           AS assignment_id,
+    a.published_at AS start_at,
+    a.due_at       AS due_at
   FROM public.dictation_assignments a
   WHERE a.user_id = p_uid
     AND a.published_at IS NOT NULL
@@ -435,9 +497,7 @@ WITH latest AS (
 ),
 nextq AS (
   SELECT
-    s.assignment_id,
     s.article_id,
-    s.sentence_id,
     s.full_title,
     s.sentence_seq
   FROM public.dictation_sentences_view s
@@ -447,46 +507,84 @@ nextq AS (
   ORDER BY s.article_seq, s.sentence_seq
   LIMIT 1
 ),
-journal_todos AS (
-  SELECT COALESCE(
-    jsonb_agg(
-      jsonb_build_object(
-        'article_id', v.article_id::text,
-        'full_title', v.full_title
-      )
-      ORDER BY v.seq
-    ),
-    '[]'::jsonb
-  ) AS todos
+counts AS (
+  SELECT
+    COUNT(a.id)::int AS article_count,
+    COUNT(j.id)::int AS journal_count
+  FROM latest l
+  LEFT JOIN public.dictation_articles a
+    ON a.assignment_id = l.assignment_id
+  LEFT JOIN public.dictation_journals j
+    ON j.article_id = a.id
+),
+quick_write AS (
+  SELECT
+    v.article_id,
+    v.full_title
   FROM public.dictation_article_journal_status_view v
   CROSS JOIN latest l
   WHERE v.assignment_id = l.assignment_id
     AND v.all_done = true
     AND v.has_journal = false
-),
-tops AS (
-  SELECT
-    COALESCE(array_agg(x.id), '{}'::uuid[]) AS a_ids
-  FROM (
-    SELECT a.id
-    FROM public.dictation_assignments a
-    WHERE a.user_id = p_uid
-      AND a.published_at IS NOT NULL
-    ORDER BY a.due_at DESC NULLS LAST
-    LIMIT 2
-  ) x
-),
-mvj AS (
-  SELECT id, image_url, reason, title, due_at
-  FROM public.dictation_mvjs
-  WHERE user_id = p_uid
-    AND published_at IS NOT NULL
-  ORDER BY due_at DESC
+  ORDER BY v.seq
   LIMIT 1
-),
+)
+SELECT
+  l.assignment_id,
+  l.start_at,
+  l.due_at,
+
+  COALESCE(ac.done_count, 0)::int  AS done_count,
+  COALESCE(ac.total_count, 0)::int AS total_count,
+
+  n.article_id   AS next_article_id,
+  n.full_title   AS next_full_title,
+  n.sentence_seq AS next_sentence_seq,
+
+  c.article_count,
+  c.journal_count,
+
+  q.article_id AS quick_write_article_id,
+  q.full_title AS quick_write_full_title
+FROM latest l
+LEFT JOIN public.dictation_assignment_counts_view ac
+  ON ac.id = l.assignment_id
+LEFT JOIN nextq n
+  ON true
+CROSS JOIN counts c
+LEFT JOIN quick_write q
+  ON true;
+$function$
+
+
+--- public.get_or_create_dictation_tag(p_label text)
+CREATE OR REPLACE FUNCTION public.get_or_create_dictation_tag(p_label text)
+ RETURNS uuid
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE v_id uuid;
+BEGIN
+  INSERT INTO public.dictation_tag_master(label)
+  VALUES (p_label)
+  ON CONFLICT (norm_label) DO UPDATE SET label = EXCLUDED.label
+  RETURNING id INTO v_id;
+  RETURN v_id;
+END $function$
+
+
+--- public.get_power_index(p_uid uuid)
+CREATE OR REPLACE FUNCTION public.get_power_index(p_uid uuid)
+ RETURNS TABLE(power_index integer, power_index_state dictation_power_index_state_t, consecutive_idle_days integer, current_streak_days integer, next_penalty integer, has_submissions boolean, has_journal boolean)
+ LANGUAGE sql
+ STABLE
+ SET search_path TO 'public'
+AS $function$
+WITH
 pi AS (
   SELECT
-    COALESCE(current_score, 0) AS current_score,
+    COALESCE(current_score, 0) AS power_index,
     state AS power_index_state
   FROM public.dictation_power_indices
   WHERE user_id = p_uid
@@ -528,73 +626,22 @@ today_journals AS (
       AND v.created_at >= b.start_at
       AND v.created_at <  b.end_at
   ) AS has_journal
-),
-counts AS (
-  SELECT
-    COUNT(a.id)::int AS article_count,
-    COUNT(j.id)::int AS journal_count
-  FROM latest l
-  LEFT JOIN public.dictation_articles a
-    ON a.assignment_id = l.assignment_id
-  LEFT JOIN public.dictation_journals j
-    ON j.article_id = a.id
 )
 SELECT
-  l.assignment_id,
-  l.title,
-  l.due_at,
-  l.published_at,
-  COALESCE(v.done_count, 0) AS done_count,
-  COALESCE(v.total_count, 0) AS total_count,
-  n.article_id      AS next_article_id,
-  n.sentence_id     AS next_sentence_id,
-  n.full_title      AS next_full_title,
-  n.sentence_seq    AS next_sentence_seq,
-  t.a_ids           AS top_assignment_ids,
-  mvj.id::text      AS mvj_id,
-  mvj.image_url     AS mvj_image_url,
-  mvj.reason        AS mvj_reason,
-  mvj.title         AS mvj_title,
-  mvj.due_at        AS mvj_due_at,
-  pi.current_score  AS power_index,
+  pi.power_index,
   pi.power_index_state,
   latest_state.consecutive_idle_days,
   COALESCE(cs.current_streak_days, 0) AS current_streak_days,
   dictation_penalty(latest_state.consecutive_idle_days + 1) AS next_penalty,
   today_subs.has_submissions,
-  today_journals.has_journal,
-  counts.article_count,
-  counts.journal_count
-FROM latest l
-LEFT JOIN dictation_assignment_counts_view v ON v.id = l.assignment_id
-LEFT JOIN nextq n ON n.assignment_id = l.assignment_id
-CROSS JOIN tops t
-LEFT JOIN mvj ON true
-CROSS JOIN pi
+  today_journals.has_journal
+FROM pi
 CROSS JOIN latest_state
 CROSS JOIN today_subs
 CROSS JOIN today_journals
-CROSS JOIN counts
 LEFT JOIN public.dictation_current_streak_view cs
   ON cs.user_id = p_uid;
 $function$
-
-
---- public.get_or_create_dictation_tag(p_label text)
-CREATE OR REPLACE FUNCTION public.get_or_create_dictation_tag(p_label text)
- RETURNS uuid
- LANGUAGE plpgsql
- SECURITY DEFINER
- SET search_path TO 'public'
-AS $function$
-DECLARE v_id uuid;
-BEGIN
-  INSERT INTO public.dictation_tag_master(label)
-  VALUES (p_label)
-  ON CONFLICT (norm_label) DO UPDATE SET label = EXCLUDED.label
-  RETURNING id INTO v_id;
-  RETURN v_id;
-END $function$
 
 
 --- public.get_submission_by_id(p_submission_id uuid)

@@ -1199,43 +1199,78 @@ export type Database = {
           due_ym_key: string
         }[]
       }
-      get_home_more_journals: {
-        Args: { p_before: string; p_limit?: number; p_uid: string }
-        Returns: Json
-      }
-      get_home_next_task: {
+      get_journals: {
         Args: { p_uid: string }
         Returns: {
-          article_count: number
-          assignment_id: string
-          consecutive_idle_days: number
-          current_streak_days: number
-          done_count: number
-          due_at: string
-          has_journal: boolean
-          has_submissions: boolean
-          journal_count: number
+          article_id: string
+          body: string
+          cloze_spans: Json
+          created_at: string
+          has_more: boolean
+          id: string
+          locked: boolean
+          next_before: string
+          rating_score: number
+          self_award: Database["public"]["Enums"]["self_award_t"]
+        }[]
+      }
+      get_journals_more: {
+        Args: { p_before: string; p_limit?: number; p_uid: string }
+        Returns: {
+          article_id: string
+          body: string
+          cloze_spans: Json
+          created_at: string
+          has_more: boolean
+          id: string
+          locked: boolean
+          next_before: string
+          rating_score: number
+          self_award: Database["public"]["Enums"]["self_award_t"]
+        }[]
+      }
+      get_mvj: {
+        Args: { p_uid: string }
+        Returns: {
           mvj_due_at: string
           mvj_id: string
           mvj_image_url: string
           mvj_reason: string
           mvj_title: string
+        }[]
+      }
+      get_next_class: {
+        Args: { p_uid: string }
+        Returns: {
+          article_count: number
+          assignment_id: string
+          done_count: number
+          due_at: string
+          journal_count: number
           next_article_id: string
           next_full_title: string
-          next_penalty: number
-          next_sentence_id: string
           next_sentence_seq: number
-          power_index: number
-          power_index_state: Database["public"]["Enums"]["dictation_power_index_state_t"]
-          published_at: string
-          title: string
-          top_assignment_ids: string[]
+          quick_write_article_id: string
+          quick_write_full_title: string
+          start_at: string
           total_count: number
         }[]
       }
       get_or_create_dictation_tag: {
         Args: { p_label: string }
         Returns: string
+      }
+      get_power_index: {
+        Args: { p_uid: string }
+        Returns: {
+          consecutive_idle_days: number
+          current_streak_days: number
+          has_journal: boolean
+          has_submissions: boolean
+          next_penalty: number
+          power_index: number
+          power_index_state: Database["public"]["Enums"]["dictation_power_index_state_t"]
+        }[]
       }
       get_submission_by_id: { Args: { p_submission_id: string }; Returns: Json }
       get_submission_latest: {

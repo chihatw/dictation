@@ -1,3 +1,4 @@
+// components/home/NextTask.tsx
 import { CircleQuestionMark } from 'lucide-react';
 import Link from 'next/link';
 import JournalQuickWriteButton from './JournalQuickWriteButton';
@@ -6,30 +7,24 @@ type QuickWriteItem = { article_id: string; full_title: string };
 
 export const NextTask = ({
   nextArticleId,
-  totalCount,
-  doneCount,
-  articleCount,
-  journalCount,
+  total,
+  completed,
   assignmentId,
   nextFullTitle,
   nextSentenceSeq,
-  quickWriteItems,
+  quickWriteItem,
 }: {
   nextArticleId: string | null | undefined;
-  totalCount: number;
-  doneCount: number;
-  articleCount: number;
-  journalCount: number;
-  assignmentId: string;
+  total: number;
+  completed: number;
+  assignmentId: string; // '' の可能性あり
   nextFullTitle: string | null;
   nextSentenceSeq: number | null;
-  quickWriteItems: QuickWriteItem[];
+  quickWriteItem: QuickWriteItem | null;
 }) => {
-  const completed = doneCount + journalCount;
-  const total = totalCount + articleCount;
   const pct = total ? Math.round((completed / total) * 100) : 0;
 
-  const hasQuickWrite = quickWriteItems.length > 0;
+  const hasQuickWrite = Boolean(quickWriteItem);
   const hasNext = Boolean(nextArticleId);
 
   const actionEl =
@@ -65,17 +60,19 @@ export const NextTask = ({
       </div>
 
       <div className='grid gap-y-2'>
-        <JournalQuickWriteButton items={quickWriteItems} />
+        <JournalQuickWriteButton item={quickWriteItem} />
         {actionEl}
 
-        <div className='flex'>
-          <Link
-            href={`/assignments/${assignmentId}`}
-            className='inline-flex items-center justify-center rounded-full px-4 py-2 border text-gray-700 text-sm'
-          >
-            查看聽力練習結果
-          </Link>
-        </div>
+        {Boolean(assignmentId) && (
+          <div className='flex'>
+            <Link
+              href={`/assignments/${assignmentId}`}
+              className='inline-flex items-center justify-center rounded-full px-4 py-2 border text-gray-700 text-sm'
+            >
+              查看聽力練習結果
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

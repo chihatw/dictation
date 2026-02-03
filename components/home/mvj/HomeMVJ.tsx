@@ -12,12 +12,13 @@ export const HomeMVJ = ({
   mvjDueAtUtc,
   mvjTitle,
 }: {
-  mvjId: string;
-  mvjImageUrl: string;
-  mvjReason: string;
-  mvjDueAtUtc: Date;
-  mvjTitle: string;
+  mvjId?: string | null;
+  mvjImageUrl?: string | null;
+  mvjReason?: string | null;
+  mvjDueAtUtc?: Date | null;
+  mvjTitle?: string | null;
 }) => {
+  if (!mvjId || !mvjDueAtUtc) return null;
   const mvjDueAtTz = toZonedTime(mvjDueAtUtc, TZ);
 
   const monthStartTz = startOfMonth(mvjDueAtTz);

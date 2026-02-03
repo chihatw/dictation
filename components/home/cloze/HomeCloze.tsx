@@ -5,7 +5,7 @@ import { ClozeSpan, Journal, JournalView, SelfAward } from '@/types/dictation';
 import { makeClozeText } from '@/utils/cloze/converter';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { CarouselApi } from '../ui/carousel';
+import { CarouselApi } from '../../ui/carousel';
 
 type Props = {
   journal: JournalView;
@@ -38,7 +38,7 @@ const HomeCloze = ({ journal }: Props) => {
     const genItems = (): LineItem[] => {
       const clozeText = makeClozeText(
         journal.body?.trim() ?? '',
-        journal.cloze_spans as ClozeSpan[]
+        journal.cloze_spans as ClozeSpan[],
       );
       return clozeText
         .split('\n')
