@@ -27,13 +27,14 @@ export default async function Page(props: {
 
   // assignments: ユーザー未選択なら空配列
   const cols: Assignment[] = selectedUserId
-    ? (
+    ? ((
         await supabase
           .from('dictation_assignments')
           .select('*')
           .eq('user_id', selectedUserId) // 絞り込み
           .order('created_at', { ascending: false })
-      ).data ?? []
+          .limit(5)
+      ).data ?? [])
     : [];
 
   const nameByUid = new Map(users!.map((u) => [u.uid, u.display]));
