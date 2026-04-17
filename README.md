@@ -22,3 +22,11 @@ select public.dictation_close_day(
   ((now() at time zone 'Asia/Taipei')::date - 1)
 );
 ```
+
+### memo 2026-04-17
+
+package バージョンについて
+
+- vercel は node 22.x で特に不満はないので、そのまま
+- @types/node も 22.x に合わせる
+- eslint, typescript はメジャーアップデートなので、別ブランチで試す
