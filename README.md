@@ -29,4 +29,3 @@ package バージョンについて
 
 - vercel は node 22.x で特に不満はないので、そのまま
 - @types/node も 22.x に合わせる
-- eslint, typescript はメジャーアップデートなので、別ブランチで試す
