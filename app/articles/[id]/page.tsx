@@ -3,8 +3,10 @@
 
 import ArticleHeader from '@/components/ArticleHeader';
 import SentencesList from '@/components/SentencesList';
+import { Button } from '@/components/ui/button';
 import { useArticle } from '@/hooks/useArticle';
 import { supabase } from '@/lib/supabase/browser';
+import { ClipboardCopy } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -12,6 +14,10 @@ export default function ArticlePage() {
   const { id } = useParams<{ id: string }>();
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isCopyingJournal, setIsCopyingJournal] = useState(false);
+  const [journalCopyStatus, setJournalCopyStatus] = useState<
+    'idle' | 'ok' | 'error'
+  >('idle');
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -50,6 +56,23 @@ export default function ArticlePage() {
       elapsedMsSinceFirstPlay,
       selfAssessedComprehension,
     );
+  };
+
+  const handleCopyJournalBody = async () => {
+    if (!journal?.body) return;
+
+    setJournalCopyStatus('idle');
+    setIsCopyingJournal(true);
+    try {
+      await navigator.clipboard.writeText(journal.body);
+      setJournalCopyStatus('ok');
+      window.setTimeout(() => setJournalCopyStatus('idle'), 1800);
+    } catch {
+      setJournalCopyStatus('error');
+      window.setTimeout(() => setJournalCopyStatus('idle'), 2500);
+    } finally {
+      setIsCopyingJournal(false);
+    }
   };
 
   if (loading) {
@@ -94,6 +117,24 @@ export default function ArticlePage() {
                   return [y, m, d].join('/');
                 })()}
               </div>
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon-sm'
+                onClick={handleCopyJournalBody}
+                disabled={isCopyingJournal}
+                aria-label='複製學習日誌到剪貼簿'
+                title={
+                  journalCopyStatus === 'ok'
+                    ? '已複製'
+                    : journalCopyStatus === 'error'
+                      ? '複製失敗'
+                      : '複製學習日誌'
+                }
+                className='h-7 w-7'
+              >
+                <ClipboardCopy className='w-4 h-4' />
+              </Button>
             </div>
             <div className='text-sm'>
               <div className='rounded-lg bg-slate-50 p-2 border border-slate-200 text-slate-700'>
