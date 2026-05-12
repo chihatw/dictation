@@ -22,6 +22,9 @@ export default function AdminHomePage() {
           </div>
         </Link>
       ))}
+      <div className='text-center font-bold text-2xl text-gray-300'>
+        PR TEST
+      </div>
     </div>
   );
 }
