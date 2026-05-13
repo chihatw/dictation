@@ -3,10 +3,14 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createMiddlewareClient, withCookies } from './lib/supabase/middleware';
 
 /**
- * サインインページ以外は認証必須
- * 未ログイン時は /signin へリダイレクト
- * サインインページはログイン済みなら / へリダイレクト
+ * 認証・権限制御
+ *
+ * - / は公開
+ * - /signin は未ログイン専用
+ * - その他は認証必須
+ * - /admin は admin のみ
  */
+
 export async function proxy(request: NextRequest) {
   const { supabase, response } = createMiddlewareClient(request);
   const {
@@ -14,6 +18,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
+  const isRoot = pathname === '/';
   const isSignin = pathname.startsWith('/signin');
   const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
   const role = (user?.app_metadata as any)?.role;
@@ -24,6 +29,11 @@ export async function proxy(request: NextRequest) {
       const rootUrl = new URL('/', request.url);
       return withCookies(response, NextResponse.redirect(rootUrl));
     }
+    return response;
+  }
+
+  // ルートページは未ログインでも表示
+  if (isRoot) {
     return response;
   }
 
