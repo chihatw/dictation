@@ -51,7 +51,7 @@ export function LandingPage() {
               <p className='text-sm leading-relaxed text-neutral-500'>
                 送出後，我們會於 24 小時內以 Email 與您聯絡。
                 <br />
-                請留意 Gmail 信件與垃圾郵件匣。
+                請留意來自 Outlook 信箱的郵件，並確認垃圾郵件匣。
               </p>
 
               <p className='text-xs text-neutral-400'>
@@ -71,6 +71,15 @@ export function LandingPage() {
           <footer className='border-t border-neutral-200 pt-4 text-xs leading-relaxed text-neutral-500'>
             <p>課程採預約制。付款方式與上課時間將於課前確認。</p>
             <p>如需取消或改期，請提前聯絡。</p>
+
+            <div className='pt-3'>
+              <Link
+                href='/tokusho'
+                className='underline underline-offset-2 hover:text-neutral-700'
+              >
+                特定商取引法に基づく表記
+              </Link>
+            </div>
           </footer>
         </section>
       </main>
