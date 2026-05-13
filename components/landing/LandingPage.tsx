@@ -51,7 +51,7 @@ export function LandingPage() {
               <p className='text-sm leading-relaxed text-neutral-500'>
                 送出後，我們會於 24 小時內以 Email 與您聯絡。
                 <br />
-                請留意 Gmail 信件與垃圾郵件匣。
+                請留意來自 Outlook 信箱的郵件，並確認垃圾郵件匣。
               </p>
 
               <p className='text-xs text-neutral-400'>
