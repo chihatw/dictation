@@ -1,126 +1,104 @@
-// app/tokushoho/page.tsx  （または pages/tokushoho.tsx）
-// 特定商取引法に基づく表記 – Lang Gym 日語私人教練
-
-import type { Metadata } from 'next';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: '特定商取引法に基づく表記 | Lang Gym 日語私人教練',
-  robots: 'noindex',
 };
 
-const rows: { label: string; value: React.ReactNode }[] = [
-  {
-    label: '販売業者',
-    value: '個人事業主（氏名は請求書・お問い合わせ時に開示します）',
-  },
-  {
-    label: '所在地',
-    value: '請求書・お問い合わせ時に開示します',
-  },
-  {
-    label: '電話番号',
-    value: '請求書・お問い合わせ時に開示します',
-  },
-  {
-    label: 'メールアドレス',
-    value: (
-      <a
-        href='mailto:contact@langgym.example.com'
-        className='underline underline-offset-2'
-      >
-        contact@langgym.example.com
-      </a>
-    ),
-  },
-  {
-    label: 'サービス名',
-    value: 'Lang Gym 日語私人教練',
-  },
-  {
-    label: 'サービス内容',
-    value: 'オンライン日本語プライベートレッスン（60 分 / 回）',
-  },
-  {
-    label: '販売価格',
-    value: '1 レッスン 600 NTD（税込）',
-  },
-  {
-    label: '料金以外の費用',
-    value: 'お客様側のインターネット接続・通信費用はお客様のご負担となります。',
-  },
-  {
-    label: '支払方法',
-    value: 'クレジットカード決済（Stripe）',
-  },
-  {
-    label: '支払時期',
-    value:
-      '後払い。各レッスン終了後に請求書を発行し、受領後 7 日以内にお支払いください。',
-  },
-  {
-    label: 'サービス提供時期',
-    value: '予約確定後、指定の日時にオンラインにてレッスンを実施します。',
-  },
-  {
-    label: '返品・キャンセルについて',
-    value: (
-      <>
-        <p>
-          デジタルサービスの性質上、レッスン実施後の返金はお受けできません。
-        </p>
-        <p className='mt-1'>
-          レッスン開始 24 時間前までのキャンセルは無料です。
-          それ以降のキャンセル・無断欠席の場合は料金全額を申し受けます。
-        </p>
-      </>
-    ),
-  },
-  {
-    label: '動作環境',
-    value:
-      '安定したインターネット接続、カメラ・マイク付きデバイス、および Zoom またはその他指定ビデオ通話ツール。',
-  },
-];
-
-export default function TokushohoPage() {
+export default function TokushoPage() {
   return (
-    <main className='min-h-screen bg-[#f7f5f0] px-4 py-16 font-sans text-[#1a1a1a]'>
-      {/* ── ページヘッダー ── */}
-      <header className='mx-auto mb-12 max-w-2xl border-b border-[#1a1a1a]/20 pb-6'>
-        <p className='mb-1 text-xs uppercase tracking-[0.2em] text-[#666]'>
-          Lang Gym 日語私人教練
-        </p>
-        <h1
-          className='text-2xl font-semibold leading-snug tracking-tight'
-          style={{ fontFamily: "'Noto Serif JP', Georgia, serif" }}
-        >
-          特定商取引法に基づく表記
-        </h1>
-      </header>
+    <main className='mx-auto max-w-2xl px-6 py-12'>
+      <h1 className='text-2xl font-bold mb-8'>特定商取引法に基づく表記</h1>
 
-      {/* ── テーブル ── */}
-      <section className='mx-auto max-w-2xl'>
-        <dl className='divide-y divide-[#1a1a1a]/10 rounded-lg border border-[#1a1a1a]/10 bg-white shadow-sm'>
-          {rows.map(({ label, value }) => (
-            <div
-              key={label}
-              className='grid grid-cols-[9rem_1fr] gap-4 px-5 py-4 sm:grid-cols-[11rem_1fr]'
-            >
-              <dt className='shrink-0 text-sm font-medium text-[#555]'>
-                {label}
-              </dt>
-              <dd className='text-sm leading-relaxed text-[#1a1a1a]'>
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+      <dl className='space-y-6 text-sm leading-relaxed'>
+        <div>
+          <dt className='font-semibold'>販売業者</dt>
+          <dd>
+            個人事業主
+            <br />
+            氏名は請求があった場合、特定商取引法に基づき遅滞なく開示いたします。
+            <br />
+          </dd>
+        </div>
 
-        <p className='mt-8 text-xs leading-relaxed text-[#888]'>
-          ※ 特定商取引法第 11 条に基づき、電話番号・住所等の一部情報は
-          請求書またはメールにてご確認いただけます（消費者庁ガイドライン準拠）。
-        </p>
-      </section>
+        <div>
+          <dt className='font-semibold'>所在地</dt>
+          <dd>
+            請求があった場合、特定商取引法に基づき遅滞なく開示いたします。
+          </dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>電話番号</dt>
+          <dd>
+            請求があった場合、特定商取引法に基づき遅滞なく開示いたします。
+          </dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>お問い合わせ先</dt>
+          <dd>langgym@outlook.com</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>サービス名</dt>
+          <dd>Lang Gym 日語私人教練</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>サービス内容</dt>
+          <dd>オンライン日本語プライベートレッスン（60分/回）</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>販売価格</dt>
+          <dd>1レッスン 600NTD（税込）</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>料金以外の費用</dt>
+          <dd>
+            お客様側のインターネット接続・通信費用はお客様のご負担となります。
+          </dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>支払方法</dt>
+          <dd>クレジットカード決済（Stripe）</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>支払時期</dt>
+          <dd>レッスン終了後、Stripe を通じて請求いたします。</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>サービス提供時期</dt>
+          <dd>予約確定後、指定の日時にオンラインにてレッスンを実施します。</dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>返品・キャンセルについて</dt>
+          <dd>
+            入金後の返金には対応しておりません。
+            <br />
+            キャンセル・日程変更をご希望の場合は、事前にご連絡ください。
+          </dd>
+        </div>
+
+        <div>
+          <dt className='font-semibold'>動作環境</dt>
+          <dd>
+            安定したインターネット接続、 カメラ・マイク付きデバイス、 Google
+            Meet を利用可能な環境。
+          </dd>
+        </div>
+      </dl>
+      <div className='pt-8 text-sm text-neutral-500'>
+        <Link href='/' className='underline underline-offset-2'>
+          Lang Gym トップページへ戻る
+        </Link>
+      </div>
     </main>
   );
 }
