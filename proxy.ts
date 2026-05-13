@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse, type NextRequest } from 'next/server';
 import { createMiddlewareClient, withCookies } from './lib/supabase/middleware';
 
@@ -6,6 +5,7 @@ import { createMiddlewareClient, withCookies } from './lib/supabase/middleware';
  * 認証・権限制御
  *
  * - / は公開
+ * - /tokusho は公開
  * - /signin は未ログイン専用
  * - その他は認証必須
  * - /admin は admin のみ
@@ -18,7 +18,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
-  const isRoot = pathname === '/';
+  const isPublicPage = pathname === '/' || pathname === '/tokusho';
   const isSignin = pathname.startsWith('/signin');
   const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
   const role = (user?.app_metadata as any)?.role;
@@ -32,8 +32,8 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // ルートページは未ログインでも表示
-  if (isRoot) {
+  // 公開ページは未ログインでも表示
+  if (isPublicPage) {
     return response;
   }
 
