@@ -23,9 +23,26 @@ select public.dictation_close_day(
 );
 ```
 
-### memo 2026-04-17
+### Netlify で Stripe を利用するための工夫
 
-package バージョンについて
+Vercel と Netlify でデプロイ
+Stripe 導入において、Vercel Free では商用利用不可のため、Netlify Free を利用することにした。
+また、Netlify では Google Cloud TTS の環境変数が4KBの上限を超え設定できないため、以下のように分けることにした。
 
-- vercel は node 22.x で特に不満はないので、そのまま
-- @types/node も 22.x に合わせる
+- Vercel: Google Cloud TTS（管理者用）
+- Netlify: Stripe（ユーザー用）
+
+main ブランチに push された際
+
+- Vercel ではそのままデプロイ
+- Netlify では何もされない
+
+Netlify のデプロイは、production ブランチに push された際に行うことにする。
+運営方法は
+
+- main ブランチで開発
+- base production, compare main で Pull Request を作成すると、Netlify が Deploy Preview を作成
+- Pull Request をマージすると、Netlify が production ブランチをデプロイ
+
+- Deploy Preview は無制限
+- Deploy は1回15クレジット。Netlify Free では月300クレジットまで。
