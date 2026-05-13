@@ -4,20 +4,20 @@ import './globals.css';
 
 export const metadata = {
   metadataBase: new URL('https://dictation-eight.vercel.app'),
-  title: 'Lang Gym',
+  title: 'Lang Gym 日語私人教練',
   description: 'Lang Gym 日語私人教練｜學習日誌',
   openGraph: {
-    title: 'Lang Gym',
+    title: 'Lang Gym 日語私人教練',
     description: 'Lang Gym 日語私人教練｜學習日誌',
     url: '/',
-    siteName: 'Lang Gym',
+    siteName: 'Lang Gym 日語私人教練',
     images: ['https://dictation-eight.vercel.app/og-image.png'],
     locale: 'zh_TW ',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Lang Gym',
+    title: 'Lang Gym 日語私人教練',
     description: 'Lang Gym 日語私人教練｜學習日誌',
     images: ['https://dictation-eight.vercel.app/og-image.png'],
   },
