@@ -71,15 +71,6 @@ export function LandingPage() {
           <footer className='border-t border-neutral-200 pt-4 text-xs leading-relaxed text-neutral-500'>
             <p>課程採預約制。付款方式與上課時間將於課前確認。</p>
             <p>如需取消或改期，請提前聯絡。</p>
-
-            <div className='pt-8'>
-              <Link
-                href='/tokusho'
-                className='underline underline-offset-2 hover:text-neutral-700'
-              >
-                特定商取引法に基づく表記
-              </Link>
-            </div>
           </footer>
         </section>
       </main>
