@@ -69,7 +69,9 @@ export function LandingPage() {
           </section>
 
           <footer className='border-t border-neutral-200 pt-4 text-xs leading-relaxed text-neutral-500'>
-            <p>課程採預約制。付款方式與上課時間將於課前確認。</p>
+            <p>
+              課程採預約制，課前不需付款。課程結束後，會提供線上信用卡付款連結。
+            </p>
             <p>如需取消或改期，請提前聯絡。</p>
 
             <div className='pt-3'>
