@@ -65,10 +65,12 @@ export async function createArticle(input: unknown) {
             version: 1,
             text: s.content,
           });
-          await supabase
+          const { error: updateAudioPathErr } = await supabase
             .from('dictation_sentences')
             .update({ audio_path: path })
             .eq('id', s.id);
+
+          if (updateAudioPathErr) throw updateAudioPathErr;
         })
       );
     }

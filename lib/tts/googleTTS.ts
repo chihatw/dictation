@@ -11,11 +11,14 @@ function createGoogleTTSClient(): TextToSpeechClient {
         'base64'
       ).toString('utf-8');
       const credentials = JSON.parse(decodedCredentials);
+      const projectId = process.env.GOOGLE_PROJECT_ID ?? credentials.project_id;
+
       return new TextToSpeechClient({
-        projectId: process.env.GOOGLE_PROJECT_ID,
+        projectId,
         credentials: {
           client_email: credentials.client_email,
           private_key: credentials.private_key,
+          project_id: credentials.project_id,
         },
       });
     }
