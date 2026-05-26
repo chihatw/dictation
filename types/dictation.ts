@@ -2,7 +2,7 @@
 
 import { Database, Tables } from './supabase';
 
-type UserDb = Tables<'users'>;
+type UserDb = Tables<'profiles'>;
 type AssignmentDb = Tables<'dictation_assignments'>;
 type ArticleDb = Tables<'dictation_articles'>;
 type SentenceDb = Tables<'dictation_sentences'>;

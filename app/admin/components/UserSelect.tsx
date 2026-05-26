@@ -36,13 +36,13 @@ export function UserSelect({
         value={selectedUserId || 'none'}
         onValueChange={(v) => updateQuery(v)}
       >
-        <SelectTrigger id='user-select' className='w-[280px]'>
+        <SelectTrigger id='user-select' className='w-70'>
           <SelectValue placeholder='-- select user --' />
         </SelectTrigger>
-        <SelectContent className='w-[280px]'>
+        <SelectContent className='w-70'>
           <SelectItem value='none'>-- select user --</SelectItem>
           {users.map((u) => (
-            <SelectItem key={u.uid} value={u.uid}>
+            <SelectItem key={u.user_id} value={u.user_id}>
               {u.display}
             </SelectItem>
           ))}

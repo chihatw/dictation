@@ -195,15 +195,7 @@ export type Database = {
           title?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
-        ]
+        Relationships: []
       }
       dictation_journals: {
         Row: {
@@ -334,15 +326,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_power_indices_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
-        ]
+        Relationships: []
       }
       dictation_sentences: {
         Row: {
@@ -743,6 +727,24 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sentences: {
         Row: {
           articleId: number
@@ -790,24 +792,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      users: {
-        Row: {
-          created_at: string
-          display: string
-          uid: string
-        }
-        Insert: {
-          created_at?: string
-          display: string
-          uid: string
-        }
-        Update: {
-          created_at?: string
-          display?: string
-          uid?: string
-        }
-        Relationships: []
       }
     }
     Views: {
@@ -916,15 +900,7 @@ export type Database = {
           title?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
-        ]
+        Relationships: []
       }
       dictation_current_streak_view: {
         Row: {
@@ -940,15 +916,7 @@ export type Database = {
           created_at: string | null
           user_id: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
-        ]
+        Relationships: []
       }
       dictation_journals_view: {
         Row: {
@@ -980,13 +948,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
           },
           {
             foreignKeyName: "dictation_journals_article_id_fkey"
@@ -1029,13 +990,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
-          {
             foreignKeyName: "dictation_sentences_article_id_fkey"
             columns: ["article_id"]
             isOneToOne: false
@@ -1049,15 +1003,7 @@ export type Database = {
           created_at: string | null
           user_id: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
-          },
-        ]
+        Relationships: []
       }
       dictation_submissions_view: {
         Row: {
@@ -1090,13 +1036,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_assignments_user_id_users_uid_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["uid"]
           },
           {
             foreignKeyName: "dictation_sentences_article_id_fkey"

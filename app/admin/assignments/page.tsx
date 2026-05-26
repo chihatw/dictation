@@ -20,8 +20,8 @@ export default async function Page(props: {
 
   // users
   const { data: users, error: ue } = await supabase
-    .from('users')
-    .select('*')
+    .from('profiles')
+    .select('user_id, display')
     .order('created_at', { ascending: true });
   if (ue) throw new Error(ue.message);
 
@@ -37,7 +37,7 @@ export default async function Page(props: {
       ).data ?? [])
     : [];
 
-  const nameByUid = new Map(users!.map((u) => [u.uid, u.display]));
+  const nameByUid = new Map(users!.map((u) => [u.user_id, u.display]));
 
   return (
     <div className='space-y-4 max-w-3xl mx-auto pb-6'>

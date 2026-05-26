@@ -22,7 +22,11 @@ export default async function Page({
 
   const [{ data: user, error: ue }, { data: col, error: ce }] =
     await Promise.all([
-      supabase.from('users').select('uid, display').eq('uid', user_id).single(),
+      supabase
+        .from('profiles')
+        .select('user_id, display')
+        .eq('user_id', user_id)
+        .single(),
       supabase
         .from('dictation_assignments')
         .select('id, title, user_id, due_at')
@@ -37,7 +41,7 @@ export default async function Page({
   return (
     <div className='space-y-4'>
       <Link
-        href={`/admin/assignments?user_id=${user.uid}`}
+        href={`/admin/assignments?user_id=${user.user_id}`}
         className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-800 hover:bg-gray-50 mb-2'
       >
         <ChevronLeft className='h-4 w-4' />
