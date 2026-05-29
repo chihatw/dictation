@@ -3,6 +3,7 @@
 import { Database, Tables } from './supabase';
 
 type UserDb = Tables<'profiles'>;
+type LessonDb = Tables<'dictation_lessons'>;
 type AssignmentDb = Tables<'dictation_assignments'>;
 type ArticleDb = Tables<'dictation_articles'>;
 type SentenceDb = Tables<'dictation_sentences'>;
@@ -27,7 +28,8 @@ type User = UserDb;
 type Tag = TagDb;
 type TagMaster = TagMasterDb;
 
-export type Assignment = AssignmentDb;
+export type Assignment = AssignmentDb &
+  Pick<LessonDb, 'due_at' | 'published_at'>;
 export type Article = ArticleDb;
 type Sentence = SentenceDb;
 type Submission = SubmissionDb;

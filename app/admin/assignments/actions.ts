@@ -5,7 +5,7 @@ import { jstLocalToUtcIso } from '@/utils/jstLocalToUtcIso';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// 作成
+// TODO 作成
 export async function createAssignment(formData: FormData) {
   const supabase = await createClientAction();
   const title = String(formData.get('title') ?? '').trim();
@@ -18,7 +18,7 @@ export async function createAssignment(formData: FormData) {
 
   const { error } = await supabase
     .from('dictation_assignments')
-    .insert({ title, user_id, due_at });
+    .insert({ title, user_id, lesson_id: 'dummy' });
 
   if (error) throw new Error(error.message);
 
@@ -26,7 +26,7 @@ export async function createAssignment(formData: FormData) {
   redirect(`/admin/assignments?user_id=${user_id}`);
 }
 
-// 更新
+// TODO 更新
 export async function updateAssignment(formData: FormData) {
   const supabase = await createClientAction();
   const id = String(formData.get('id') ?? '');
@@ -42,7 +42,7 @@ export async function updateAssignment(formData: FormData) {
 
   const { error } = await supabase
     .from('dictation_assignments')
-    .update({ title, user_id, due_at })
+    .update({ title, user_id, lesson_id: 'dummy' })
     .eq('id', id);
 
   if (error) throw new Error(error.message);
@@ -67,34 +67,28 @@ export async function deleteAssignment(formData: FormData) {
   revalidatePath('/admin/assignments');
 }
 
-// 公開
+// TODO 公開
 export async function publishAssignment(formData: FormData) {
-  const supabase = await createClientAction();
-  const id = String(formData.get('id') ?? '');
-  if (!id) throw new Error('id is required');
-
-  const { error } = await supabase
-    .from('dictation_assignments')
-    .update({ published_at: new Date().toISOString() })
-    .eq('id', id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath('/admin/assignments');
+  // const supabase = await createClientAction();
+  // const id = String(formData.get('id') ?? '');
+  // if (!id) throw new Error('id is required');
+  // const { error } = await supabase
+  //   .from('dictation_assignments')
+  //   .update({ published_at: new Date().toISOString() })
+  //   .eq('id', id);
+  // if (error) throw new Error(error.message);
+  // revalidatePath('/admin/assignments');
 }
 
-// 非公開
+// TODO 非公開
 export async function unpublishAssignment(formData: FormData) {
-  const supabase = await createClientAction();
-  const id = String(formData.get('id') ?? '');
-  if (!id) throw new Error('id is required');
-
-  const { error } = await supabase
-    .from('dictation_assignments')
-    .update({ published_at: null })
-    .eq('id', id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath('/admin/assignments');
+  // const supabase = await createClientAction();
+  // const id = String(formData.get('id') ?? '');
+  // if (!id) throw new Error('id is required');
+  // const { error } = await supabase
+  //   .from('dictation_assignments')
+  //   .update({ published_at: null })
+  //   .eq('id', id);
+  // if (error) throw new Error(error.message);
+  // revalidatePath('/admin/assignments');
 }

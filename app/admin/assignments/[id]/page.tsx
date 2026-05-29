@@ -28,7 +28,7 @@ export default async function Page({
         .eq('user_id', user_id)
         .single(),
       supabase
-        .from('dictation_assignments')
+        .from('dictation_assignments_view')
         .select('id, title, user_id, due_at')
         .eq('id', id)
         .maybeSingle(),
@@ -36,7 +36,8 @@ export default async function Page({
 
   if (ue) throw new Error(ue.message);
   if (ce) throw new Error(ce.message);
-  if (!col) return notFound();
+  if (!col || !col.id || col.title == null || !col.user_id || !col.due_at)
+    return notFound();
 
   return (
     <div className='space-y-4'>

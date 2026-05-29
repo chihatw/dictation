@@ -3,7 +3,7 @@
 type DefaultValues = {
   id?: string;
   title?: string;
-  user_id?: string;
+  user_id: string;
   due_at?: string | null; // ISO(UTC) or null
 };
 
@@ -19,12 +19,12 @@ function toInputValueFromUTC(iso?: string | null) {
       d.getUTCHours() + 9,
       d.getUTCMinutes(),
       0,
-      0
-    )
+      0,
+    ),
   );
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(
-    t.getUTCDate()
+    t.getUTCDate(),
   )}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`;
 }
 

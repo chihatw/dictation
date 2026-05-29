@@ -26,15 +26,21 @@ export default async function Page(props: {
   if (ue) throw new Error(ue.message);
 
   // assignments: ユーザー未選択なら空配列
-  const cols: Assignment[] = selectedUserId
+  const cols: Omit<Assignment, 'created_at' | 'lesson_id'>[] = selectedUserId
     ? ((
         await supabase
-          .from('dictation_assignments')
-          .select('*')
+          .from('dictation_assignments_view')
+          .select('id, title, user_id, published_at, due_at')
           .eq('user_id', selectedUserId) // 絞り込み
           .order('created_at', { ascending: false })
           .limit(5)
-      ).data ?? [])
+      ).data?.map((row) => ({
+        id: row.id!,
+        title: row.title!,
+        user_id: row.user_id!,
+        published_at: row.published_at!,
+        due_at: row.due_at!,
+      })) ?? [])
     : [];
 
   const nameByUid = new Map(users!.map((u) => [u.user_id, u.display]));
@@ -74,10 +80,10 @@ export default async function Page(props: {
                     </Link>
                   </div>
                   <div className='text-xs text-gray-500'>
-                    {nameByUid.get(col.user_id) ?? col.user_id} ・{' '}
-                    {new Date(col.created_at).toLocaleString('ja-JP', {
+                    {nameByUid.get(col.user_id) ?? col.user_id} ・ {/* todo */}
+                    {/* {new Date(col.created_at).toLocaleString('ja-JP', {
                       timeZone: 'Asia/Tokyo',
-                    })}
+                    })} */}
                     {col.due_at && (
                       <>
                         {' ・ due_at '}

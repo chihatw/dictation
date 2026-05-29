@@ -33,7 +33,7 @@ export default async function Page(props: PageProps) {
   }
 
   const { data: col, error: colErr } = await supabase
-    .from('dictation_assignments')
+    .from('dictation_assignments_view')
     .select('id, title, due_at')
     .eq('id', colId)
     .maybeSingle<Pick<Assignment, 'id' | 'title' | 'due_at'>>();
@@ -59,7 +59,7 @@ export default async function Page(props: PageProps) {
   const { data: articlesRaw, error: artErr } = await supabase
     .from('dictation_article_journal_status_view')
     .select(
-      'article_id, subtitle, seq, journal_id, has_cloze_spans, journal_locked'
+      'article_id, subtitle, seq, journal_id, has_cloze_spans, journal_locked',
     )
     .eq('assignment_id', col.id)
     .order('seq', { ascending: true });
@@ -98,7 +98,7 @@ export default async function Page(props: PageProps) {
 
             <Link
               href={`/admin/articles/new?assignment_id=${encodeURIComponent(
-                col.id
+                col.id,
               )}`}
               className='inline-flex items-center rounded-md bg-black px-3 py-2 text-sm text-white'
             >

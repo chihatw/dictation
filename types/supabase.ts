@@ -173,29 +173,34 @@ export type Database = {
       dictation_assignments: {
         Row: {
           created_at: string
-          due_at: string | null
           id: string
-          published_at: string | null
+          lesson_id: string
           title: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          due_at?: string | null
           id?: string
-          published_at?: string | null
+          lesson_id: string
           title: string
           user_id: string
         }
         Update: {
           created_at?: string
-          due_at?: string | null
           id?: string
-          published_at?: string | null
+          lesson_id?: string
           title?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dictation_journals: {
         Row: {
@@ -237,6 +242,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dictation_lessons: {
+        Row: {
+          created_at: string
+          due_at: string
+          id: string
+          published_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          due_at: string
+          id?: string
+          published_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          due_at?: string
+          id?: string
+          published_at?: string | null
+        }
+        Relationships: []
       }
       dictation_mvjs: {
         Row: {
@@ -872,35 +898,20 @@ export type Database = {
           due_ym_key: string | null
           id: string | null
           is_published: boolean | null
+          lesson_id: string | null
           published_at: string | null
           title: string | null
           user_id: string | null
         }
-        Insert: {
-          due_at?: string | null
-          due_at_tpe?: never
-          due_month_tpe?: never
-          due_year_tpe?: never
-          due_ym_key?: never
-          id?: string | null
-          is_published?: never
-          published_at?: string | null
-          title?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          due_at?: string | null
-          due_at_tpe?: never
-          due_month_tpe?: never
-          due_year_tpe?: never
-          due_ym_key?: never
-          id?: string | null
-          is_published?: never
-          published_at?: string | null
-          title?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "dictation_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dictation_current_streak_view: {
         Row: {
