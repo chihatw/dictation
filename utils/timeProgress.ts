@@ -12,16 +12,16 @@ export function dueDayStartUtc(dueAtISO: string, tz = TZ): Date {
     0,
     0,
     0,
-    0
+    0,
   );
   return fromZonedTime(midnightLocal, tz);
 }
 
-// 5%刻みで丸め。
-export function timeProgress5pct(
+// 進捗率を整数パーセントで返す（小数点以下切り捨て）
+export function timeProgressInt(
   startAtISO: string | null | undefined,
   endAtISO: string | null | undefined,
-  now: Date = new Date()
+  now: Date = new Date(),
 ): number {
   if (!startAtISO || !endAtISO) return 0;
   const start = new Date(startAtISO).getTime();
@@ -31,6 +31,6 @@ export function timeProgress5pct(
   if (t <= start) return 0;
   if (t >= end) return 100;
   const raw = ((t - start) / (end - start)) * 100;
-  const snapped = 5 * Math.round(raw / 5);
-  return Math.max(0, Math.min(100, snapped));
+  const floor = Math.floor(raw);
+  return Math.max(0, Math.min(100, floor));
 }
