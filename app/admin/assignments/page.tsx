@@ -26,7 +26,7 @@ export default async function Page(props: {
   if (ue) throw new Error(ue.message);
 
   // assignments: ユーザー未選択なら空配列
-  const cols: Omit<Assignment, 'created_at' | 'lesson_id'>[] = selectedUserId
+  const cols: Omit<Assignment, 'lesson_id' | 'created_at'>[] = selectedUserId
     ? ((
         await supabase
           .from('dictation_assignments_view')
@@ -38,6 +38,7 @@ export default async function Page(props: {
         id: row.id!,
         title: row.title!,
         user_id: row.user_id!,
+        // created_at: row.created_at!,
         published_at: row.published_at!,
         due_at: row.due_at!,
       })) ?? [])
@@ -80,7 +81,7 @@ export default async function Page(props: {
                     </Link>
                   </div>
                   <div className='text-xs text-gray-500'>
-                    {nameByUid.get(col.user_id) ?? col.user_id} ・ {/* todo */}
+                    {nameByUid.get(col.user_id) ?? col.user_id} ・
                     {/* {new Date(col.created_at).toLocaleString('ja-JP', {
                       timeZone: 'Asia/Tokyo',
                     })} */}
