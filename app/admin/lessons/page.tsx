@@ -4,16 +4,66 @@ import Link from 'next/link';
 import { publishLesson, unpublishLesson } from './actions';
 import LessonForm from './LessonForm';
 
+type LessonRow = {
+  id: string;
+  created_at: string;
+  due_at: string;
+  published_at: string | null;
+  dictation_assignments: {
+    id: string;
+    profiles: { display: string };
+  }[];
+};
+
+type LessonWithAssignments = {
+  id: string;
+  created_at: string;
+  due_at: string;
+  published_at: string | null;
+  assignments: {
+    id: string;
+    display: string;
+  }[];
+};
+
+function normalizeLessons(rows: LessonRow[]): LessonWithAssignments[] {
+  return rows.map((lesson) => ({
+    id: lesson.id,
+    created_at: lesson.created_at,
+    due_at: lesson.due_at,
+    published_at: lesson.published_at,
+    assignments: lesson.dictation_assignments.map((ass) => ({
+      id: ass.id,
+      display: ass.profiles.display,
+    })),
+  }));
+}
+
 export default async function Page() {
   const supabase = await createClient();
 
-  const { data: lessons, error } = await supabase
+  const { data, error } = await supabase
     .from('dictation_lessons')
-    .select('*')
+    .select(
+      `
+    id,
+    created_at,
+    due_at,
+    published_at,
+    dictation_assignments (
+      id,
+      profiles (
+        display
+      )
+    )
+  `,
+    )
     .order('created_at', { ascending: false })
     .limit(5);
 
   if (error) throw new Error(error.message);
+
+  const lessons = normalizeLessons(data);
 
   return (
     <div className='mx-auto max-w-xl px-4 py-6'>
@@ -36,7 +86,7 @@ export default async function Page() {
                   key={lesson.id}
                   className='flex flex-wrap items-center justify-between gap-3 px-3 py-2'
                 >
-                  <div className='font-medium flex items-center gap-2'>
+                  <div className='font-medium flex items-center gap-2 '>
                     <Ticket />
                     <span>
                       {dueAt.toLocaleString('ja-JP', {
@@ -47,6 +97,17 @@ export default async function Page() {
                         timeZone: 'Asia/Tokyo',
                       })}
                     </span>
+                  </div>
+                  <div className='flex items-center gap-2 flex-wrap text-xs'>
+                    {lesson.assignments.map((ass) => (
+                      <Link
+                        key={ass.id}
+                        href={`/admin/assignments/${ass.id}`}
+                        className='border rounded px-1.5 py-1 hover:bg-gray-50'
+                      >
+                        {ass.display}
+                      </Link>
+                    ))}
                   </div>
                   <div className='flex gap-2 items-center'>
                     {lesson.published_at ? (

@@ -200,6 +200,13 @@ export type Database = {
             referencedRelation: "dictation_lessons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       dictation_journals: {
@@ -252,7 +259,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          due_at: string
+          due_at?: string
           id?: string
           published_at?: string | null
         }
@@ -911,6 +918,13 @@ export type Database = {
             referencedRelation: "dictation_lessons"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       dictation_current_streak_view: {
@@ -927,7 +941,15 @@ export type Database = {
           created_at: string | null
           user_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       dictation_journals_view: {
         Row: {
@@ -959,6 +981,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "dictation_journals_article_id_fkey"
@@ -1001,6 +1030,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "dictation_sentences_article_id_fkey"
             columns: ["article_id"]
             isOneToOne: false
@@ -1014,7 +1050,15 @@ export type Database = {
           created_at: string | null
           user_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       dictation_submissions_view: {
         Row: {
@@ -1047,6 +1091,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dictation_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "dictation_sentences_article_id_fkey"
