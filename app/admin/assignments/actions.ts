@@ -5,25 +5,23 @@ import { jstLocalToUtcIso } from '@/utils/jstLocalToUtcIso';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-// TODO 作成
 export async function createAssignment(formData: FormData) {
   const supabase = await createClientAction();
   const title = String(formData.get('title') ?? '').trim();
   const user_id = String(formData.get('user_id') ?? '');
-  const due_at_jst = formData.get('due_at_jst');
-  const due_at = due_at_jst ? jstLocalToUtcIso(String(due_at_jst)) : null;
+  const lesson_id = String(formData.get('lesson_id') ?? '');
 
   if (!title) throw new Error('title is required');
   if (!user_id) throw new Error('user_id is required');
+  if (!lesson_id) throw new Error('lesson_id is required');
 
   const { error } = await supabase
     .from('dictation_assignments')
-    .insert({ title, user_id, lesson_id: 'dummy' });
+    .insert({ title, user_id, lesson_id });
 
   if (error) throw new Error(error.message);
 
-  revalidatePath('/admin/assignments');
-  redirect(`/admin/assignments?user_id=${user_id}`);
+  revalidatePath(`/admin/lessons/${lesson_id}`);
 }
 
 // TODO 更新

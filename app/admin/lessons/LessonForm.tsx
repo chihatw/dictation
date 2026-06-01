@@ -1,7 +1,8 @@
 'use client';
 
-import { SquareArrowOutUpRight } from 'lucide-react';
+import { LoaderCircle, SquareArrowOutUpRight } from 'lucide-react';
 import Link from 'next/link';
+import { useTransition } from 'react';
 import { createLesson } from './actions';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -15,9 +16,20 @@ function defaultInputValueAt19JST() {
 }
 
 export default function LessonForm() {
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = (formData: FormData) => {
+    startTransition(async () => {
+      try {
+        await createLesson(formData);
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  };
   return (
     <div>
-      <form action={createLesson} className='flex items-center gap-2'>
+      <form action={handleSubmit} className='flex items-center gap-2'>
         <input
           type='datetime-local'
           name='due_at'
@@ -27,9 +39,11 @@ export default function LessonForm() {
         <div>
           <button
             type='submit'
-            className='rounded-md border px-3 py-2 bg-black text-white hover:cursor-pointer hover:bg-gray-800'
+            className='flex items-center gap-2 rounded-md border px-3 py-2 bg-black text-white hover:cursor-pointer hover:bg-gray-800 disabled:bg-gray-300'
+            disabled={isPending}
           >
             新規作成
+            {isPending && <LoaderCircle className='h-4 w-4 animate-spin' />}
           </button>
         </div>
       </form>

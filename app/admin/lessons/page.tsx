@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { ChevronLeft, Ticket } from 'lucide-react';
+import { Calendar, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import { publishLesson, unpublishLesson } from './actions';
 import LessonForm from './LessonForm';
@@ -74,7 +74,10 @@ export default async function Page() {
         <ChevronLeft className='h-4 w-4' />
         <span>管理者ページ</span>
       </Link>
-      <h1 className='mb-6 text-2xl font-semibold'>レッスン一覧</h1>
+      <h1 className='mb-6 text-2xl font-semibold flex items-center gap-2'>
+        <Calendar />
+        レッスン一覧
+      </h1>
       <div className='space-y-2 max-w-xl mx-auto pb-6'>
         <LessonForm />
         <div className='divide-y rounded-md border'>
@@ -86,8 +89,11 @@ export default async function Page() {
                   key={lesson.id}
                   className='flex flex-wrap items-center justify-between gap-3 px-3 py-2'
                 >
-                  <div className='font-medium flex items-center gap-2 '>
-                    <Ticket />
+                  <Link
+                    href={`/admin/lessons/${lesson.id}`}
+                    className='font-medium flex items-center gap-2 '
+                  >
+                    <Calendar />
                     <span>
                       {dueAt.toLocaleString('ja-JP', {
                         month: 'long',
@@ -97,7 +103,7 @@ export default async function Page() {
                         timeZone: 'Asia/Tokyo',
                       })}
                     </span>
-                  </div>
+                  </Link>
                   <div className='flex items-center gap-2 flex-wrap text-xs'>
                     {lesson.assignments.map((ass) => (
                       <Link
