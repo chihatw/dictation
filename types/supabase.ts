@@ -842,60 +842,6 @@ export type Database = {
         }
         Relationships: []
       }
-      dictation_article_journal_status_view: {
-        Row: {
-          all_done: boolean | null
-          article_id: string | null
-          assignment_id: string | null
-          done_count: number | null
-          full_title: string | null
-          has_cloze_spans: boolean | null
-          has_journal: boolean | null
-          journal_id: string | null
-          journal_locked: boolean | null
-          seq: number | null
-          subtitle: string | null
-          title: string | null
-          total_count: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_sentences_article_id_fkey"
-            columns: ["article_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_articles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      dictation_assignment_counts_view: {
-        Row: {
-          created_at: string | null
-          done_count: number | null
-          due_at: string | null
-          id: string | null
-          published_at: string | null
-          title: string | null
-          total_count: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_articles_assignment_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_articles_assignment_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments_view"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       dictation_assignments_view: {
         Row: {
           due_at: string | null
