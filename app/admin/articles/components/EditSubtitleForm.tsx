@@ -32,7 +32,7 @@ export function EditSubtitleForm({
           setErr(res.error ?? '更新に失敗しました');
           return;
         }
-        router.push(`/admin/articles?assignment_id=${assignmentId}`);
+        router.push(`/admin/assignments/${assignmentId}`);
       }}
       className='space-y-4'
     >

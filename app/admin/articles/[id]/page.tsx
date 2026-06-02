@@ -9,6 +9,7 @@ import { SentenceAudioPanel } from './SentenceAudioPanel';
 const AdminArticlePage = () => {
   const { id } = useParams<{ id: string }>();
 
+  // TODO: useArticle 必要か？
   const { article } = useArticle(id);
 
   const player = useAudioPlayer();
@@ -24,10 +25,10 @@ const AdminArticlePage = () => {
       <h1 className='mb-6 text-2xl font-semibold'>課題文章</h1>
       <div className='space-y-6'>
         <Link
-          href={`/admin/articles?assignment_id=${article.assignment_id}&user_id=${article.user_id}`}
+          href={`/admin/assignments/${article.assignment_id}`}
           className='inline-flex items-center rounded-md border px-3 py-2 text-sm'
         >
-          ユーザー別課題一覧に戻る
+          課題ページに戻る
         </Link>
         <div>{`${article.title} ${article.subtitle}`}</div>
         <SentenceAudioPanel

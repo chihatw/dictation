@@ -18,27 +18,29 @@ export default async function Page(props: PageProps) {
   if (!assignmentId) return notFound();
 
   const supabase = await createClient();
-  const { data: col, error } = await supabase
+  const { data: assignment, error } = await supabase
     .from('dictation_assignments')
-    .select('id, title')
+    .select('title')
     .eq('id', assignmentId)
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  if (!col) return notFound();
+  if (!assignment) return notFound();
 
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
-        <h1 className='text-xl font-semibold'>{col.title} Article 新規作成</h1>
+        <h1 className='text-xl font-semibold'>
+          {assignment.title} Article 新規作成
+        </h1>
         <Link
-          href={`/admin/articles?assignment_id=${col.id}`}
+          href={`/admin/assignments/${assignmentId}`}
           className='text-sm underline hover:no-underline'
         >
           戻る
         </Link>
       </div>
-      <ArticleCreateForm assignmentId={col.id} />
+      <ArticleCreateForm assignmentId={assignmentId} />
     </div>
   );
 }

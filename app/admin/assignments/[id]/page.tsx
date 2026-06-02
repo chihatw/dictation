@@ -1,65 +1,141 @@
 import { createClient } from '@/lib/supabase/server';
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import AssignmentForm from '../AssignmentForm';
-import { updateAssignment } from '../actions';
+import { JournalLockToggle } from '../../articles/components/JournalLockToggle';
 
 export default async function Page({
   params,
-  searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ user_id?: string }>;
+  searchParams: Promise<void>;
 }) {
   const { id } = await params;
 
-  const sp = await searchParams;
-  const user_id = sp.user_id ?? null;
-  if (!user_id) throw new Error('user_id is required in URL params.');
+  if (!id) throw new Error('ID is required');
 
   const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('dictation_articles')
+    .select(
+      `
+      id,
+      seq,
+      subtitle,
+      dictation_assignments(
+        title,profiles(display),
+        dictation_lessons(due_at)
+      ),
+      dictation_journals(
+        id,
+        locked,
+        cloze_spans
+      )
+    `,
+    )
+    .eq('assignment_id', id)
+    .order('seq');
 
-  const [{ data: user, error: ue }, { data: col, error: ce }] =
-    await Promise.all([
-      supabase
-        .from('profiles')
-        .select('user_id, display')
-        .eq('user_id', user_id)
-        .single(),
-      supabase
-        .from('dictation_assignments_view')
-        .select('id, title, user_id, due_at')
-        .eq('id', id)
-        .maybeSingle(),
-    ]);
+  if (error) throw new Error(error.message);
 
-  if (ue) throw new Error(ue.message);
-  if (ce) throw new Error(ce.message);
-  if (!col || !col.id || col.title == null || !col.user_id || !col.due_at)
-    return notFound();
+  const articles = data?.map((article) => ({
+    id: article.id,
+    due_at: article.dictation_assignments?.dictation_lessons?.due_at,
+    title: article.dictation_assignments?.title,
+    display: article.dictation_assignments?.profiles?.display,
+    subtitle: article.subtitle,
+    seq: article.seq,
+    journal_id: article.dictation_journals?.id || null,
+    journal_locked: article.dictation_journals?.locked || false,
+    has_cloze_spans:
+      Array.isArray(article.dictation_journals?.cloze_spans) &&
+      article.dictation_journals?.cloze_spans.length > 0,
+  }));
+  const article = articles[0];
+  const _dueAt = article.due_at;
+  const display = article.display;
+  const title = article.title;
+
+  if (!_dueAt) throw new Error('Due date not found');
+  if (!display) throw new Error('Profile display not found');
+  if (!title) throw new Error('Title not found');
+
+  const dueAt = new Date(_dueAt);
 
   return (
-    <div className='space-y-4'>
+    <div className='mx-auto max-w-xl px-4 py-6'>
       <Link
-        href={`/admin/assignments?user_id=${user.user_id}`}
+        href='/admin/lessons'
         className='inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm text-gray-800 hover:bg-gray-50 mb-2'
       >
         <ChevronLeft className='h-4 w-4' />
-        <span>課題一覧</span>
+        <span>レッスン一覧</span>
       </Link>
-      <h2 className='text-xl font-medium'>課題 due_at 編集</h2>
-      <AssignmentForm
-        userDisplay={user.display}
-        defaultValues={{
-          id: col.id,
-          title: col.title,
-          user_id: col.user_id,
-          due_at: col.due_at,
-        }}
-        action={updateAssignment}
-        submitLabel='保存'
-      />
+      <h1 className='mb-6 text-2xl font-semibold'>
+        <div className='mb-2'>
+          {dueAt.toLocaleString('ja-JP', {
+            month: 'long',
+            day: '2-digit',
+            weekday: 'short',
+            hour: '2-digit',
+            timeZone: 'Asia/Tokyo',
+          })}
+        </div>
+        {`${display} ${title}`}
+      </h1>
+      <div className='overflow-x-auto'>
+        <table className='w-full text-sm'>
+          <thead>
+            <tr className='text-left'>
+              <th className='px-2 py-1'>順</th>
+              <th className='px-2 py-1'>サブタイトル</th>
+              <th className='px-2 py-1'></th>
+              <th className='px-2 py-1'>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {articles.map((a) => (
+              <tr key={a.id} className='border-t'>
+                <td>{a.seq}</td>
+                <td className='px-2 py-1 flex items-center gap-1'>
+                  <Link
+                    href={`/articles/${a.id}`}
+                    className='underline underline-offset-2 flex items-center gap-1.5 h-6'
+                  >
+                    {a.subtitle}
+                  </Link>
+                  <span>{a.has_cloze_spans ? '*' : ''}</span>
+                </td>
+                <td>
+                  <Link
+                    href={`/admin/articles/${a.id}`}
+                    className='underline underline-offset-2 flex items-center gap-1.5 h-6'
+                  >
+                    ♪
+                  </Link>
+                </td>
+                <td className='px-2 py-1 space-x-2 '>
+                  <div className='flex gap-x-2 items-center'>
+                    <JournalLockToggle
+                      journalId={a.journal_id}
+                      initialLocked={a.journal_locked}
+                    />
+                    {a.journal_id ? (
+                      <Link
+                        href={`/admin/journals/${a.journal_id}`}
+                        className='rounded-md border px-2 py-1'
+                      >
+                        編輯填空題
+                      </Link>
+                    ) : (
+                      <div className='ml-2 text-slate-400'>学習日誌なし</div>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

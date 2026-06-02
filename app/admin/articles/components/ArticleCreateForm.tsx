@@ -47,7 +47,7 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
     });
 
     if (res.ok) {
-      router.push(`/admin/articles?assignment_id=${assignmentId}`);
+      router.push(`/admin/assignments/${assignmentId}`);
     } else {
       setSubmitting(false);
       alert(res.error ?? '作成に失敗しました');
