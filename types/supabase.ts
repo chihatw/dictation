@@ -161,13 +161,6 @@ export type Database = {
             referencedRelation: "dictation_assignments"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "dictation_articles_assignment_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments_view"
-            referencedColumns: ["id"]
-          },
         ]
       }
       dictation_assignments: {
@@ -842,37 +835,6 @@ export type Database = {
         }
         Relationships: []
       }
-      dictation_assignments_view: {
-        Row: {
-          due_at: string | null
-          due_at_tpe: string | null
-          due_month_tpe: number | null
-          due_year_tpe: number | null
-          due_ym_key: string | null
-          id: string | null
-          is_published: boolean | null
-          lesson_id: string | null
-          published_at: string | null
-          title: string | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dictation_assignments_lesson_id_fkey"
-            columns: ["lesson_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_lessons"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_assignments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
       dictation_current_streak_view: {
         Row: {
           current_streak_days: number | null
@@ -922,13 +884,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "dictation_articles_assignment_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments_view"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "dictation_assignments_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -966,13 +921,6 @@ export type Database = {
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "dictation_assignments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_articles_assignment_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
           },
           {
@@ -1029,13 +977,6 @@ export type Database = {
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "dictation_assignments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dictation_articles_assignment_fkey"
-            columns: ["assignment_id"]
-            isOneToOne: false
-            referencedRelation: "dictation_assignments_view"
             referencedColumns: ["id"]
           },
           {
@@ -1138,12 +1079,6 @@ export type Database = {
           seq: number
           subtitle: string
           tags: string[]
-        }[]
-      }
-      get_distinct_due_ym_keys: {
-        Args: never
-        Returns: {
-          due_ym_key: string
         }[]
       }
       get_journals: {
@@ -1262,30 +1197,6 @@ export type Database = {
       journal_vote: {
         Args: { p_delta: number; p_id: string }
         Returns: undefined
-      }
-      pick_random_cloze_journal_fast: {
-        Args: { p_uid: string }
-        Returns: {
-          article_id: string | null
-          article_seq: number | null
-          assignment_id: string | null
-          body: string | null
-          cloze_spans: Json | null
-          created_at: string | null
-          due_at: string | null
-          id: string | null
-          lines_count: number | null
-          locked: boolean | null
-          rating_score: number | null
-          self_award: Database["public"]["Enums"]["self_award_t"] | null
-          user_id: string | null
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "dictation_journals_view"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       save_dictation_journal: {
         Args: { p_article_id: string; p_body: string }

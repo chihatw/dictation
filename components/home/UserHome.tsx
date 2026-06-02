@@ -1,5 +1,4 @@
 // components/home/UserHome.tsx
-import { HomeClozeContainer } from '@/components/home/cloze/HomeClozeContainer';
 import { HomeJournalsContainer } from '@/components/home/journals/HomeJournalsContainer';
 import { HomeMVJContainer } from '@/components/home/mvj/HomeMVJContainer';
 import { NextClassContainer } from '@/components/home/nextClass/NextClassContainer';
@@ -14,7 +13,6 @@ export function UserHome({ userId }: { userId: string }) {
         <NextClassContainer userId={userId} />
         <HomeMVJContainer userId={userId} />
         <HomePowerIndexContainer userId={userId} />
-        <HomeClozeContainer userId={userId} />
         <HomeJournalsContainer userId={userId} />
       </main>
     </div>
