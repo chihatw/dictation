@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { Calendar, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import AssignmentForm from '../AssignmentForm';
+import AssignmentForm from '../../AssignmentForm';
 
 export default async function Page({
   params,
@@ -59,25 +59,10 @@ export default async function Page({
             timeZone: 'Asia/Tokyo',
           })}
         </span>
+        <span>ユーザー別課題作成</span>
       </h1>
       <div className='space-y-2 max-w-xl mx-auto pb-6'>
         <AssignmentForm users={users} lessonId={id} />
-        <div className='divide-y rounded-md border'>
-          {assignments && assignments.length > 0 ? (
-            assignments.map((assignment) => (
-              <Link
-                href={`/admin/assignments/${assignment.id}`}
-                key={assignment.id}
-                className='flex items-baseline gap-3 px-3 py-2'
-              >
-                <div className='font-medium w-14'>{assignment.display}</div>
-                <div>{`「${assignment.title}」`}</div>
-              </Link>
-            ))
-          ) : (
-            <div className='px-3 py-2 text-gray-500'>課題はありません。</div>
-          )}
-        </div>
       </div>
     </div>
   );

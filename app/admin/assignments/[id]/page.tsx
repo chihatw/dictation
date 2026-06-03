@@ -11,7 +11,7 @@ export default async function Page({
 }) {
   const { id } = await params;
 
-  if (!id) throw new Error('ID is required');
+  if (!id) throw new Error('id is required');
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -74,7 +74,7 @@ export default async function Page({
         <Folder />
         <div className='flex items-center gap-2'>{`${display} ${title}`}</div>
       </h1>
-      <div className='mb-6 '>
+      <div className='mb-4'>
         {dueAt.toLocaleString('ja-JP', {
           month: 'long',
           day: '2-digit',
@@ -82,6 +82,14 @@ export default async function Page({
           hour: '2-digit',
           timeZone: 'Asia/Tokyo',
         })}
+      </div>
+      <div className='mb-6'>
+        <Link
+          href={`/admin/assignments/${id}/new`}
+          className='bg-black rounded-md text-sm text-white hover:cursor-pointer px-3 py-2'
+        >
+          <span>ディクテーション原稿作成</span>
+        </Link>
       </div>
       <div className='overflow-x-auto'>
         <table className='w-full text-sm'>

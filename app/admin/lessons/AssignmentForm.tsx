@@ -19,8 +19,6 @@ export default function AssignmentForm({
     startTransition(async () => {
       try {
         await createAssignment(formData);
-        setUserId('');
-        setTitle('');
       } catch (e) {
         console.error(e);
       }
@@ -66,7 +64,7 @@ export default function AssignmentForm({
           className='flex items-center gap-2 rounded-md px-4 py-2 text-sm bg-black text-white hover:cursor-pointer disabled:bg-gray-300'
           disabled={!(userId && title) || isPending}
         >
-          <span>新規作成</span>
+          <span>作成</span>
           {isPending && <LoaderCircle className='h-4 w-4 animate-spin' />}
         </button>
       </div>

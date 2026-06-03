@@ -28,9 +28,6 @@ export default async function Page({
         assignment_id,
         dictation_assignments(
           title,
-          dictation_lessons(
-            due_at
-          ),
           profiles(
             display
           )
@@ -51,12 +48,9 @@ export default async function Page({
     assignment_id,
     dictation_assignments: {
       title,
-      dictation_lessons: { due_at },
       profiles: { display },
     },
   } = article;
-
-  const dueAt = new Date(due_at);
 
   const sentences = data.map((s) => ({
     id: s.id,

@@ -2,6 +2,7 @@
 
 import { createClientAction } from '@/lib/supabase/server-action';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 export async function createAssignment(formData: FormData) {
   const supabase = await createClientAction();
@@ -19,7 +20,8 @@ export async function createAssignment(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
-  revalidatePath(`/admin/lessons/${lesson_id}`);
+  revalidatePath(`/admin/lessons`);
+  redirect(`/admin/lessons`);
 }
 
 // Assignment の変更、削除は Supabase Console で

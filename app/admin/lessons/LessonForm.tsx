@@ -42,7 +42,7 @@ export default function LessonForm() {
             className='flex items-center gap-2 rounded-md border px-3 py-2 bg-black text-white hover:cursor-pointer hover:bg-gray-800 disabled:bg-gray-300'
             disabled={isPending}
           >
-            新規作成
+            レッスン作成
             {isPending && <LoaderCircle className='h-4 w-4 animate-spin' />}
           </button>
         </div>

@@ -1,43 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
-import { Calendar, ChevronLeft } from 'lucide-react';
+import { Calendar, ChevronLeft, Folder, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { publishLesson, unpublishLesson } from './actions';
 import LessonForm from './LessonForm';
-
-type LessonRow = {
-  id: string;
-  created_at: string;
-  due_at: string;
-  published_at: string | null;
-  dictation_assignments: {
-    id: string;
-    profiles: { display: string };
-  }[];
-};
-
-type LessonWithAssignments = {
-  id: string;
-  created_at: string;
-  due_at: string;
-  published_at: string | null;
-  assignments: {
-    id: string;
-    display: string;
-  }[];
-};
-
-function normalizeLessons(rows: LessonRow[]): LessonWithAssignments[] {
-  return rows.map((lesson) => ({
-    id: lesson.id,
-    created_at: lesson.created_at,
-    due_at: lesson.due_at,
-    published_at: lesson.published_at,
-    assignments: lesson.dictation_assignments.map((ass) => ({
-      id: ass.id,
-      display: ass.profiles.display,
-    })),
-  }));
-}
 
 export default async function Page() {
   const supabase = await createClient();
@@ -52,6 +17,7 @@ export default async function Page() {
     published_at,
     dictation_assignments (
       id,
+      title,
       profiles (
         display
       )
@@ -63,7 +29,17 @@ export default async function Page() {
 
   if (error) throw new Error(error.message);
 
-  const lessons = normalizeLessons(data);
+  const lessons = data.map((lesson) => ({
+    id: lesson.id,
+    created_at: lesson.created_at,
+    due_at: lesson.due_at,
+    published_at: lesson.published_at,
+    assignments: lesson.dictation_assignments.map((ass) => ({
+      id: ass.id,
+      title: ass.title,
+      display: ass.profiles.display,
+    })),
+  }));
 
   return (
     <div className='mx-auto max-w-xl px-4 py-6'>
@@ -89,11 +65,7 @@ export default async function Page() {
                   key={lesson.id}
                   className='flex flex-wrap items-center justify-between gap-3 px-3 py-2'
                 >
-                  <Link
-                    href={`/admin/lessons/${lesson.id}`}
-                    className='font-medium flex items-center gap-2 '
-                  >
-                    <Calendar />
+                  <div className='font-medium flex items-center gap-2'>
                     <span>
                       {dueAt.toLocaleString('ja-JP', {
                         month: 'long',
@@ -103,15 +75,24 @@ export default async function Page() {
                         timeZone: 'Asia/Tokyo',
                       })}
                     </span>
-                  </Link>
+                    <Link
+                      href={`/admin/lessons/${lesson.id}/new`}
+                      className='inline-flex items-center justify-center bg-black text-white rounded p-1'
+                      title='ユーザー別課題作成'
+                    >
+                      <Plus className='h-4 w-4 ' />
+                    </Link>
+                  </div>
                   <div className='flex items-center gap-2 flex-wrap text-xs'>
                     {lesson.assignments.map((ass) => (
                       <Link
                         key={ass.id}
                         href={`/admin/assignments/${ass.id}`}
-                        className='border rounded px-1.5 py-1 hover:bg-gray-50'
+                        className='border rounded px-1.5 py-1 hover:bg-gray-50 flex items-center justify-center gap-1'
+                        title={ass.title}
                       >
-                        {ass.display}
+                        <Folder className='w-4 h-4' />
+                        <span>{ass.display}</span>
                       </Link>
                     ))}
                   </div>
