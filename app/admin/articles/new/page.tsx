@@ -9,6 +9,7 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[]>>;
 };
 
+// todo どこから接続されるの？
 export default async function Page(props: PageProps) {
   await props.params;
   const sp = await props.searchParams;
