@@ -14,17 +14,41 @@ export default async function Page({
   if (!id) throw new Error('id is required');
 
   const supabase = await createClient();
-  const { data, error } = await supabase
+
+  const { data: assignment, error: asse } = await supabase
+    .from('dictation_assignments')
+    .select(
+      `
+      title,
+      dictation_lessons(
+        due_at
+      ),
+      profiles(
+        display
+      )
+    `,
+    )
+    .eq('id', id)
+    .single();
+
+  if (asse) throw new Error(asse.message);
+  if (!assignment) throw new Error('assignment not found');
+
+  const {
+    title,
+    profiles: { display },
+    dictation_lessons: { due_at: _dueAt },
+  } = assignment;
+
+  const dueAt = new Date(_dueAt);
+
+  const { data, error: ae } = await supabase
     .from('dictation_articles')
     .select(
       `
       id,
       seq,
       subtitle,
-      dictation_assignments(
-        title,profiles(display),
-        dictation_lessons(due_at)
-      ),
       dictation_journals(
         id,
         locked,
@@ -35,13 +59,11 @@ export default async function Page({
     .eq('assignment_id', id)
     .order('seq');
 
-  if (error) throw new Error(error.message);
+  if (ae) throw new Error(ae.message);
+  if (!data) throw new Error('articles not found');
 
-  const articles = data?.map((article) => ({
+  const articles = data.map((article) => ({
     id: article.id,
-    due_at: article.dictation_assignments?.dictation_lessons?.due_at,
-    title: article.dictation_assignments?.title,
-    display: article.dictation_assignments?.profiles?.display,
     subtitle: article.subtitle,
     seq: article.seq,
     journal_id: article.dictation_journals?.id || null,
@@ -50,16 +72,6 @@ export default async function Page({
       Array.isArray(article.dictation_journals?.cloze_spans) &&
       article.dictation_journals?.cloze_spans.length > 0,
   }));
-  const article = articles[0];
-  const _dueAt = article.due_at;
-  const display = article.display;
-  const title = article.title;
-
-  if (!_dueAt) throw new Error('Due date not found');
-  if (!display) throw new Error('Profile display not found');
-  if (!title) throw new Error('Title not found');
-
-  const dueAt = new Date(_dueAt);
 
   return (
     <div className='mx-auto max-w-xl px-4 py-6'>

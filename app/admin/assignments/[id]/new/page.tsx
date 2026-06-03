@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { ChevronLeft, Folder } from 'lucide-react';
 import Link from 'next/link';
+import ArticleForm from './ArticleForm';
 
 export default async function Page({
   params,
@@ -49,6 +50,7 @@ export default async function Page({
         </div>
         <div>ディクテーション原稿作成</div>
       </h1>
+      <ArticleForm assignment_id={id} />
     </div>
   );
 }

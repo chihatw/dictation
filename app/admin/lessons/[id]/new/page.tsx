@@ -11,25 +11,14 @@ export default async function Page({
   const { id } = await params;
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('dictation_assignments')
-    .select(
-      `
-    id,title,profiles(display),dictation_lessons(due_at)
-    `,
-    )
-    .eq('lesson_id', id);
+    .from('dictation_lessons')
+    .select('due_at')
+    .eq('id', id)
+    .single();
   if (error) throw new Error(error.message);
+  if (!data) throw new Error('lesson not found');
 
-  const assignments = data.map((ass) => ({
-    id: ass.id,
-    title: ass.title,
-    display: ass.profiles.display,
-    due_at: ass.dictation_lessons.due_at,
-  }));
-
-  const assignment = assignments[0];
-
-  const dueAt = assignment?.due_at ? new Date(assignment.due_at) : null;
+  const dueAt = data.due_at ? new Date(data.due_at) : null;
 
   if (!dueAt) throw new Error('Due date not found');
 
