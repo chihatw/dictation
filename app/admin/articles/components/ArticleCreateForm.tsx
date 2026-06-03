@@ -1,16 +1,13 @@
 // app/admin/articles/_components/ArticleCreateForm.tsx
 'use client';
 
-import { TTSPlayButton } from '@/components/audio/TTSPlayButton';
 import {
   DEFAULT_RATE,
   DEFAULT_VOICE,
   VOICES,
   VoiceOption,
-  clampRateForDB,
   isReasonableRate,
 } from '@/lib/tts/constants';
-import { splitIntoSentences } from '@/lib/tts/splitSentences';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createArticle } from '../actions';
@@ -23,8 +20,6 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
   const [voice, setVoice] = useState<VoiceOption>(DEFAULT_VOICE);
   const [rate, setRate] = useState<number>(DEFAULT_RATE);
   const [submitting, setSubmitting] = useState(false);
-
-  const previewText = splitIntoSentences(body).join(' ');
 
   const canSubmit =
     assignmentId &&
@@ -102,23 +97,6 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           className='h-40 w-full rounded-md border px-3 py-2 text-sm'
-        />
-      </div>
-
-      <div>
-        <TTSPlayButton
-          text={previewText}
-          voiceName={voice}
-          speakingRate={clampRateForDB(rate)}
-          variant='outline'
-          size='sm'
-          className='rounded-md'
-          labels={{
-            idle: '本文をプレビュー再生',
-            loading: '音声準備中…',
-            stop: '停止',
-            aria: '本文を読み上げ',
-          }}
         />
       </div>
 

@@ -42,9 +42,12 @@ export default async function Page({
         <ChevronLeft className='h-4 w-4' />
         <span>原稿一覧</span>
       </Link>
-      <h1 className='text-2xl font-semibold flex items-center gap-2 mb-2'>
-        <Folder />
-        <div className='flex items-center gap-2'>{`${display} ${title}`}</div>
+      <h1 className='text-2xl font-semibold mb-2'>
+        <div className='flex items-center gap-2 '>
+          <Folder />
+          <div className='flex items-center gap-2'>{`${display} ${title}`}</div>
+        </div>
+        <div>ディクテーション原稿作成</div>
       </h1>
     </div>
   );

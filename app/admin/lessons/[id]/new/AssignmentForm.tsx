@@ -1,8 +1,8 @@
 'use client';
 
+import { createAssignment } from '@/app/admin/lessons/[id]/new/actions';
 import { LoaderCircle } from 'lucide-react';
 import { useState, useTransition } from 'react';
-import { createAssignment } from '../assignments/actions';
 
 export default function AssignmentForm({
   users,

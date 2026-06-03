@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { Calendar, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import AssignmentForm from '../../AssignmentForm';
+import AssignmentForm from './AssignmentForm';
 
 export default async function Page({
   params,
