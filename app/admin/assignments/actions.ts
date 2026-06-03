@@ -1,9 +1,7 @@
 'use server';
 
 import { createClientAction } from '@/lib/supabase/server-action';
-import { jstLocalToUtcIso } from '@/utils/jstLocalToUtcIso';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 export async function createAssignment(formData: FormData) {
   const supabase = await createClientAction();
@@ -24,69 +22,5 @@ export async function createAssignment(formData: FormData) {
   revalidatePath(`/admin/lessons/${lesson_id}`);
 }
 
-// TODO 更新
-export async function updateAssignment(formData: FormData) {
-  const supabase = await createClientAction();
-  const id = String(formData.get('id') ?? '');
-  const title = String(formData.get('title') ?? '').trim();
-  const user_id = String(formData.get('user_id') ?? '');
-  const due_at_jst = formData.get('due_at_jst');
-
-  if (!id) throw new Error('id is required');
-  if (!title) throw new Error('title is required');
-  if (!user_id) throw new Error('user_id is required');
-
-  const due_at = due_at_jst ? jstLocalToUtcIso(String(due_at_jst)) : null;
-
-  const { error } = await supabase
-    .from('dictation_assignments')
-    .update({ title, user_id, lesson_id: 'dummy' })
-    .eq('id', id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath('/admin/assignments');
-  redirect(`/admin/assignments?user_id=${user_id}`);
-}
-
-// 削除
-export async function deleteAssignment(formData: FormData) {
-  const supabase = await createClientAction();
-  const id = String(formData.get('id') ?? '');
-  if (!id) throw new Error('id is required');
-
-  const { error } = await supabase
-    .from('dictation_assignments')
-    .delete()
-    .eq('id', id);
-
-  if (error) throw new Error(error.message);
-
-  revalidatePath('/admin/assignments');
-}
-
-// TODO 公開
-export async function publishAssignment(formData: FormData) {
-  // const supabase = await createClientAction();
-  // const id = String(formData.get('id') ?? '');
-  // if (!id) throw new Error('id is required');
-  // const { error } = await supabase
-  //   .from('dictation_assignments')
-  //   .update({ published_at: new Date().toISOString() })
-  //   .eq('id', id);
-  // if (error) throw new Error(error.message);
-  // revalidatePath('/admin/assignments');
-}
-
-// TODO 非公開
-export async function unpublishAssignment(formData: FormData) {
-  // const supabase = await createClientAction();
-  // const id = String(formData.get('id') ?? '');
-  // if (!id) throw new Error('id is required');
-  // const { error } = await supabase
-  //   .from('dictation_assignments')
-  //   .update({ published_at: null })
-  //   .eq('id', id);
-  // if (error) throw new Error(error.message);
-  // revalidatePath('/admin/assignments');
-}
+// Assignment の変更、削除は Supabase Console で
+// publish, unpublish は lessons のプロパティ
