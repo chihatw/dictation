@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, FileMusic, Folder } from 'lucide-react';
 import Link from 'next/link';
 import { JournalLockToggle } from '../../articles/components/JournalLockToggle';
 
@@ -70,18 +70,19 @@ export default async function Page({
         <ChevronLeft className='h-4 w-4' />
         <span>レッスン一覧</span>
       </Link>
-      <h1 className='mb-6 text-2xl font-semibold'>
-        <div className='mb-2'>
-          {dueAt.toLocaleString('ja-JP', {
-            month: 'long',
-            day: '2-digit',
-            weekday: 'short',
-            hour: '2-digit',
-            timeZone: 'Asia/Tokyo',
-          })}
-        </div>
-        {`${display} ${title}`}
+      <h1 className='text-2xl font-semibold flex items-center gap-2 mb-2'>
+        <Folder />
+        <div className='flex items-center gap-2'>{`${display} ${title}`}</div>
       </h1>
+      <div className='mb-6 '>
+        {dueAt.toLocaleString('ja-JP', {
+          month: 'long',
+          day: '2-digit',
+          weekday: 'short',
+          hour: '2-digit',
+          timeZone: 'Asia/Tokyo',
+        })}
+      </div>
       <div className='overflow-x-auto'>
         <table className='w-full text-sm'>
           <thead>
@@ -109,8 +110,9 @@ export default async function Page({
                   <Link
                     href={`/admin/articles/${a.id}`}
                     className='underline underline-offset-2 flex items-center gap-1.5 h-6'
+                    title='音声チェック'
                   >
-                    ♪
+                    <FileMusic className='h-4 w-4' />
                   </Link>
                 </td>
                 <td className='px-2 py-1 space-x-2 '>

@@ -45,7 +45,7 @@ export function SentenceAudioList({
             {audioUrl ? (
               <button
                 type='button'
-                className='inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm'
+                className='inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:cursor-pointer hover:bg-gray-50'
                 onClick={showStop ? onStop : () => onPlay(audioUrl)}
                 disabled={showLoading}
                 aria-busy={showLoading}

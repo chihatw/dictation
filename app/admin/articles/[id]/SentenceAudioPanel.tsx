@@ -1,6 +1,6 @@
 'use client';
 
-import type { PlayerAPI } from '@/hooks/useAudioPlayer';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { Loader2, Play, Square } from 'lucide-react';
 import { useState } from 'react';
 import { SentenceAudioList } from './SentenceAudioList';
@@ -12,13 +12,14 @@ type Sentence = {
 };
 
 type Props = {
-  audioFullUrl?: string;
+  audioFullUrl: string | null;
   sentences: Sentence[];
-  player: PlayerAPI;
 };
 
-export function SentenceAudioPanel({ audioFullUrl, sentences, player }: Props) {
+export function SentenceAudioPanel({ audioFullUrl, sentences }: Props) {
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
+
+  const player = useAudioPlayer();
 
   const startFromBeginning = async (url: string) => {
     player.pause();
@@ -44,7 +45,7 @@ export function SentenceAudioPanel({ audioFullUrl, sentences, player }: Props) {
       {audioFullUrl ? (
         <button
           type='button'
-          className='inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm'
+          className='inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm hover:cursor-pointer hover:bg-gray-50'
           onClick={fullStop ? stop : () => startFromBeginning(audioFullUrl)}
           disabled={fullLoading}
           aria-busy={fullLoading}
