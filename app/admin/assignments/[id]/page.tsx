@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { ChevronLeft, FileMusic, Folder } from 'lucide-react';
 import Link from 'next/link';
-import { JournalLockToggle } from '../../articles/components/JournalLockToggle';
+import { JournalLockToggle } from './JournalLockToggle';
 
 export default async function Page({
   params,
@@ -128,6 +128,7 @@ export default async function Page({
                     <JournalLockToggle
                       journalId={a.journal_id}
                       initialLocked={a.journal_locked}
+                      assignment_id={id}
                     />
                     {a.journal_id ? (
                       <Link
