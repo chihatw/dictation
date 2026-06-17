@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import Script from 'next/script';
 
@@ -56,6 +56,18 @@ export function LandingPage() {
 
               <p className='text-xs text-neutral-400'>
                 課程諮詢表單使用 Tally 提供。
+                <br />
+                若表單無法顯示，可
+                <a
+                  href='https://tally.so/r/0Q10JP'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='inline-flex items-center gap-1 underline'
+                >
+                  直接開啟表單
+                  <ExternalLink className='h-3 w-3' />
+                </a>
+                。
               </p>
             </div>
 

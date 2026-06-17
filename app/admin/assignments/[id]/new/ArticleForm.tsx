@@ -1,21 +1,21 @@
-// app/admin/articles/_components/ArticleCreateForm.tsx
 'use client';
 
-import { TTSPlayButton } from '@/components/audio/TTSPlayButton';
 import {
   DEFAULT_RATE,
   DEFAULT_VOICE,
-  VOICES,
-  VoiceOption,
-  clampRateForDB,
   isReasonableRate,
+  VoiceOption,
+  VOICES,
 } from '@/lib/tts/constants';
-import { splitIntoSentences } from '@/lib/tts/splitSentences';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { createArticle } from '../actions';
+import { createArticle } from './actions';
 
-export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
+export default function ArticleForm({
+  assignment_id,
+}: {
+  assignment_id: string;
+}) {
   const router = useRouter();
 
   const [subtitle, setSubtitle] = useState('');
@@ -24,10 +24,8 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
   const [rate, setRate] = useState<number>(DEFAULT_RATE);
   const [submitting, setSubmitting] = useState(false);
 
-  const previewText = splitIntoSentences(body).join(' ');
-
   const canSubmit =
-    assignmentId &&
+    assignment_id &&
     subtitle.trim().length > 0 &&
     body.trim().length > 0 &&
     VOICES.includes(voice) &&
@@ -39,7 +37,7 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
     setSubmitting(true);
 
     const res = await createArticle({
-      assignmentId,
+      assignmentId: assignment_id,
       subtitle: subtitle.trim(),
       body,
       ttsVoiceName: voice,
@@ -47,7 +45,7 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
     });
 
     if (res.ok) {
-      router.push(`/admin/articles?assignment_id=${assignmentId}`);
+      router.push(`/admin/assignments/${assignment_id}`);
     } else {
       setSubmitting(false);
       alert(res.error ?? '作成に失敗しました');
@@ -105,29 +103,12 @@ export function ArticleCreateForm({ assignmentId }: { assignmentId: string }) {
         />
       </div>
 
-      <div>
-        <TTSPlayButton
-          text={previewText}
-          voiceName={voice}
-          speakingRate={clampRateForDB(rate)}
-          variant='outline'
-          size='sm'
-          className='rounded-md'
-          labels={{
-            idle: '本文をプレビュー再生',
-            loading: '音声準備中…',
-            stop: '停止',
-            aria: '本文を読み上げ',
-          }}
-        />
-      </div>
-
       <button
         onClick={onSubmit}
         disabled={!canSubmit}
         className='rounded-md bg-black px-4 py-2 text-white disabled:opacity-50'
       >
-        {submitting ? '作成中…' : '作成する'}
+        {submitting ? '作成中…' : '原稿&音声作成'}
       </button>
     </div>
   );

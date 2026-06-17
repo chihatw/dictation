@@ -4,14 +4,19 @@
 import { cn } from '@/lib/utils';
 import { Lock, Unlock } from 'lucide-react';
 import { useOptimistic, useTransition } from 'react';
-import { setJournalLocked } from '../actions';
+import { setJournalLocked } from './actions';
 
 type Props = {
   journalId: string | null;
   initialLocked: boolean | null;
+  assignment_id: string;
 };
 
-export function JournalLockToggle({ journalId, initialLocked }: Props) {
+export function JournalLockToggle({
+  journalId,
+  initialLocked,
+  assignment_id,
+}: Props) {
   // journal がない場合は単なるダミー表示
   if (!journalId) {
     return null;
@@ -21,7 +26,7 @@ export function JournalLockToggle({ journalId, initialLocked }: Props) {
 
   const [optimisticLocked, setOptimisticLocked] = useOptimistic(
     initialLocked ?? false,
-    (_current, next: boolean) => next
+    (_current, next: boolean) => next,
   );
 
   const handleClick = () => {
@@ -33,7 +38,7 @@ export function JournalLockToggle({ journalId, initialLocked }: Props) {
       setOptimisticLocked(next);
 
       // 2. サーバ側を更新（await しなくてよい。エラーは catch で拾う）
-      setJournalLocked(journalId, next).catch(() => {
+      setJournalLocked(journalId, next, assignment_id).catch(() => {
         // エラー時にロールバックしたい場合も transition 内で
         startTransition(() => {
           setOptimisticLocked(!next);
@@ -49,7 +54,7 @@ export function JournalLockToggle({ journalId, initialLocked }: Props) {
       onClick={handleClick}
       className={cn(
         'rounded-md border px-2 py-1 disabled:opacity-50',
-        optimisticLocked && 'border-red-500 bg-red-50 border-[0.5px]'
+        optimisticLocked && 'border-red-500 bg-red-50 border-[0.5px]',
       )}
       disabled={isPending}
       aria-pressed={optimisticLocked}

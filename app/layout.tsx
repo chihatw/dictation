@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Noto_Sans_TC } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
 export const metadata = {
@@ -36,7 +37,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='zh-Hant' className={cn('h-full', notoSansTC.className)}>
-      <body className='min-h-dvh bg-gray-100 antialiased'>{children}</body>
+      <body className='min-h-dvh bg-gray-100 antialiased'>
+        <NextTopLoader
+          color='#0f172a'
+          height={3}
+          showSpinner={false}
+          zIndex={9999}
+          shadow={false}
+        />
+        {children}
+      </body>
     </html>
   );
 }

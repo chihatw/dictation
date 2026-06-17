@@ -45,7 +45,7 @@ export default function ArticleHeader({
 
         {isAdmin && (
           <Link
-            href={`/admin/articles?assignment_id=${article.assignment_id}&user_id=${article.user_id}`}
+            href={`/admin/assignments/${article.assignment_id}`}
             className='rounded-md border px-2 py-1 text-sm hover:bg-gray-50'
           >
             管理者課題詳細ページ

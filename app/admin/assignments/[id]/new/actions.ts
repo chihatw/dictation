@@ -27,7 +27,7 @@ export async function createArticle(input: unknown) {
   // 1) 記事作成（audio_path_full は null のまま）
   const { data: ins, error: rpcErr } = await supabase.rpc(
     'insert_article_with_next_seq',
-    { p_assignment_id: data.assignmentId, p_subtitle: data.subtitle.trim() }
+    { p_assignment_id: data.assignmentId, p_subtitle: data.subtitle.trim() },
   );
 
   if (rpcErr || !ins?.[0]?.id)
@@ -65,11 +65,13 @@ export async function createArticle(input: unknown) {
             version: 1,
             text: s.content,
           });
-          await supabase
+          const { error: updateAudioPathErr } = await supabase
             .from('dictation_sentences')
             .update({ audio_path: path })
             .eq('id', s.id);
-        })
+
+          if (updateAudioPathErr) throw updateAudioPathErr;
+        }),
       );
     }
   } catch {
@@ -103,37 +105,4 @@ export async function createArticle(input: unknown) {
 
   revalidatePath('/admin/articles');
   return { ok: true, articleId, sentenceCount: rows.length };
-}
-
-export async function updateSubtitle(formData: FormData) {
-  const id = String(formData.get('id') ?? '');
-  const subtitle = String(formData.get('subtitle') ?? '').trim();
-  if (!id || !subtitle) return { ok: false, error: '入力が不正です' };
-
-  const supabase = await createClientAction();
-  const { error } = await supabase
-    .from('dictation_articles')
-    .update({ subtitle })
-    .eq('id', id);
-
-  if (error) return { ok: false, error: error.message };
-  revalidatePath('/admin/articles');
-  return { ok: true };
-}
-
-export async function setJournalLocked(journalId: string, locked: boolean) {
-  const supabase = await createClientAction();
-
-  const { error } = await supabase
-    .from('dictation_journals')
-    .update({ locked })
-    .eq('id', journalId);
-
-  if (error) {
-    // ロールバックしたい場合は、呼び出し側でキャッチできるようにそのまま投げる
-    throw new Error(error.message);
-  }
-
-  // 一覧を再取得させる
-  revalidatePath('/admin/articles');
 }

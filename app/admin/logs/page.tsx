@@ -29,8 +29,8 @@ export default function LogsPage() {
   useEffect(() => {
     (async () => {
       const { data, error } = await supabase
-        .from('users')
-        .select('uid, display')
+        .from('profiles')
+        .select('user_id, display')
         .order('created_at', { ascending: true });
       if (error) {
         console.error(error);
@@ -114,7 +114,7 @@ export default function LogsPage() {
         >
           <option value=''>— 選択してください —</option>
           {users.map((u) => (
-            <option key={u.uid} value={u.uid}>
+            <option key={u.user_id} value={u.user_id}>
               {u.display}
             </option>
           ))}

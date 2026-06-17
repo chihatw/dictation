@@ -2,7 +2,8 @@
 
 import { Database, Tables } from './supabase';
 
-type UserDb = Tables<'users'>;
+type UserDb = Tables<'profiles'>;
+type LessonDb = Tables<'dictation_lessons'>;
 type AssignmentDb = Tables<'dictation_assignments'>;
 type ArticleDb = Tables<'dictation_articles'>;
 type SentenceDb = Tables<'dictation_sentences'>;
@@ -14,8 +15,6 @@ type MVJDb = Tables<'dictation_mvjs'>;
 
 type JournalViewDb =
   Database['public']['Views']['dictation_journals_view']['Row'];
-type ArticleViewDb =
-  Database['public']['Views']['dictation_article_journal_status_view']['Row'];
 
 export type SelfAward = Database['public']['Enums']['self_award_t'];
 export type MVJScope = Database['public']['Enums']['mvj_scope_t'];
@@ -27,7 +26,8 @@ type User = UserDb;
 type Tag = TagDb;
 type TagMaster = TagMasterDb;
 
-export type Assignment = AssignmentDb;
+export type Assignment = AssignmentDb &
+  Pick<LessonDb, 'due_at' | 'published_at'>;
 export type Article = ArticleDb;
 type Sentence = SentenceDb;
 type Submission = SubmissionDb;
@@ -35,7 +35,6 @@ export type Journal = JournalDb;
 export type MVJ = MVJDb;
 
 export type JournalView = JournalViewDb;
-export type ArticleView = ArticleViewDb;
 
 // JOIN 用の外部キーを外したもの
 type SubmissionCore = Omit<Submission, 'sentence_id'>;

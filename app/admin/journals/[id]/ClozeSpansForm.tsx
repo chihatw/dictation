@@ -1,5 +1,5 @@
 'use client';
-import { ClozeObjLine, ClozeSpan, Journal } from '@/types/dictation';
+import { ClozeObjLine, ClozeSpan } from '@/types/dictation';
 import {
   makeClozeText,
   parseCloze,
@@ -19,18 +19,23 @@ import {
 import ClozeRow from '@/components/cloze/ClozeRow';
 import { updateJournalClozeSpans } from './actions';
 
-type Props = { journal: Journal; assignmentId?: string; userId?: string };
+type Props = {
+  id: string;
+  body: string;
+  cloze_spans: ClozeSpan[];
+  assignment_id: string;
+};
 
-const ClozeSpansForm = ({ journal, assignmentId, userId }: Props) => {
+const ClozeSpansForm = ({ id, body, cloze_spans, assignment_id }: Props) => {
   const router = useRouter();
-  const JOURNAL_BODY = useMemo(() => journal.body, [journal]);
+  const JOURNAL_BODY = useMemo(() => body, [body]);
   const CLOZE_OBJ_LINES = useMemo(() => {
-    const _clozeText = makeClozeText(journal.body, journal.cloze_spans);
+    const _clozeText = makeClozeText(body, cloze_spans);
     return _clozeText
       .split('\n')
       .filter(Boolean)
       .map((clozeText) => parseCloze(clozeText));
-  }, [journal]);
+  }, [body, cloze_spans]);
 
   const [clozeText, setClozeText] = useState('');
   const [clozeSpans, setClozeSpans] = useState<ClozeSpan[]>([]);
@@ -44,7 +49,7 @@ const ClozeSpansForm = ({ journal, assignmentId, userId }: Props) => {
 
   // clozeText, clozeSpans, clozeParts の初期化
   useEffect(() => {
-    const _clozeText = makeClozeText(journal.body, journal.cloze_spans);
+    const _clozeText = makeClozeText(body, cloze_spans);
 
     const _clozeObjLines = _clozeText
       .split('\n')
@@ -52,9 +57,9 @@ const ClozeSpansForm = ({ journal, assignmentId, userId }: Props) => {
       .map((clozeText) => parseCloze(clozeText));
 
     setClozeText(_clozeText);
-    setClozeSpans(journal.cloze_spans);
+    setClozeSpans(cloze_spans);
     setClozeObjLines(_clozeObjLines);
-  }, [journal]);
+  }, [body, cloze_spans]);
 
   // テキストエリアの高さ調節
   useEffect(() => {
@@ -83,19 +88,15 @@ const ClozeSpansForm = ({ journal, assignmentId, userId }: Props) => {
   async function action(formData: FormData) {
     const raw = formData.get('spans') as string;
     const spans = JSON.parse(raw) as ClozeSpan[];
-    await updateJournalClozeSpans({ id: journal.id, spans });
+    await updateJournalClozeSpans({ id, spans });
   }
 
   const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
       try {
         await action(formData);
-        if (assignmentId && userId) {
-          router.push(
-            `/admin/articles?assignment_id=${encodeURIComponent(
-              assignmentId
-            )}&user_id=${encodeURIComponent(userId)}`
-          );
+        if (assignment_id) {
+          router.push(`/admin/assignments/${assignment_id}}`);
         }
       } catch (e) {
         console.error(e);
@@ -105,7 +106,7 @@ const ClozeSpansForm = ({ journal, assignmentId, userId }: Props) => {
 
   const canSubmit =
     !parseError &&
-    JSON.stringify(journal.cloze_spans) !== JSON.stringify(clozeSpans) &&
+    JSON.stringify(cloze_spans) !== JSON.stringify(clozeSpans) &&
     !isPending;
 
   return (

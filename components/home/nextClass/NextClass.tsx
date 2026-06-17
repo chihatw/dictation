@@ -1,5 +1,5 @@
 import { formatDueTW } from '@/utils/home/formatDate';
-import { dueDayStartUtc, timeProgress5pct } from '@/utils/timeProgress';
+import { dueDayStartUtc, timeProgressInt } from '@/utils/timeProgress';
 import { CircleQuestionMark } from 'lucide-react';
 
 export const NextClass = ({
@@ -11,7 +11,7 @@ export const NextClass = ({
   dueAt: string | null | undefined;
 }) => {
   const endAt = dueAt ? dueDayStartUtc(dueAt).toISOString() : null;
-  const timeProgress = timeProgress5pct(startAt, endAt);
+  const timeProgress = timeProgressInt(startAt, endAt);
   const dueStr = formatDueTW(dueAt);
   return (
     <section className='rounded-xl border p-5 space-y-3 bg-white'>
