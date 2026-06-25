@@ -1,7 +1,15 @@
 import { createClient } from '@/lib/supabase/server';
-import { Calendar, ChevronLeft, Folder, Plus } from 'lucide-react';
+import {
+  Calendar,
+  Check,
+  ChevronLeft,
+  Folder,
+  Plus,
+  Ticket,
+} from 'lucide-react';
 import Link from 'next/link';
 import { publishLesson, unpublishLesson } from './actions';
+import CopyableLessonDate from './CopyableLessonDate';
 import LessonForm from './LessonForm';
 
 export default async function Page() {
@@ -19,6 +27,9 @@ export default async function Page() {
       id,
       title,
       user_id
+    ),
+    dictation_tickets (
+      id
     )
   `,
     )
@@ -55,6 +66,7 @@ export default async function Page() {
     created_at: lesson.created_at,
     due_at: lesson.due_at,
     published_at: lesson.published_at,
+    hasTicket: lesson.dictation_tickets !== null,
     assignments: lesson.dictation_assignments.map((ass) => ({
       id: ass.id,
       title: ass.title,
@@ -81,21 +93,38 @@ export default async function Page() {
           {lessons && lessons.length > 0 ? (
             lessons.map((lesson) => {
               const dueAt = new Date(lesson.due_at);
+              const dueAtLabel = dueAt.toLocaleString('ja-JP', {
+                month: 'long',
+                day: '2-digit',
+                weekday: 'short',
+                hour: '2-digit',
+                timeZone: 'Asia/Tokyo',
+              });
+
               return (
                 <div
                   key={lesson.id}
                   className='flex flex-wrap items-center justify-between gap-3 px-3 py-2'
                 >
-                  <div className='font-medium flex items-center gap-2'>
-                    <span>
-                      {dueAt.toLocaleString('ja-JP', {
-                        month: 'long',
-                        day: '2-digit',
-                        weekday: 'short',
-                        hour: '2-digit',
-                        timeZone: 'Asia/Tokyo',
-                      })}
+                  <div className='flex items-center gap-2'>
+                    <span
+                      title={
+                        lesson.hasTicket ? 'チケット作成済み' : 'チケット未作成'
+                      }
+                      aria-label={
+                        lesson.hasTicket ? 'チケット作成済み' : 'チケット未作成'
+                      }
+                    >
+                      {lesson.hasTicket ? (
+                        <Check className='h-5 w-5 ' />
+                      ) : (
+                        <Ticket className='h-5 w-5 ' />
+                      )}
                     </span>
+                    <CopyableLessonDate
+                      lessonId={lesson.id}
+                      label={dueAtLabel}
+                    />
                     <Link
                       href={`/admin/lessons/${lesson.id}/new`}
                       className='inline-flex items-center justify-center bg-black text-white rounded p-1'
