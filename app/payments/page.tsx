@@ -25,47 +25,80 @@ export default async function PaymentsPage() {
 
   if (!user) redirect('/signin');
 
-  const { data, error } = await supabase
-    .from('dictation_tickets')
-    .select(
-      `
-        id,
-        duration,
-        fee,
-        paid,
-        dictation_lessons!inner (
-          due_at,
-          dictation_assignments!inner (
-            user_id
+  const [ticketsResult, unpaidTicketsResult] = await Promise.all([
+    supabase
+      .from('dictation_tickets')
+      .select(
+        `
+          id,
+          duration,
+          fee,
+          paid,
+          dictation_lessons!inner (
+            due_at,
+            dictation_assignments!inner (
+              user_id
+            )
           )
-        )
-      `,
-    )
-    .eq('dictation_lessons.dictation_assignments.user_id', user.id)
-    .order('dictation_lessons(due_at)', { ascending: false })
-    .limit(10);
+        `,
+      )
+      .eq('dictation_lessons.dictation_assignments.user_id', user.id)
+      .order('dictation_lessons(due_at)', { ascending: false })
+      .limit(10),
+    supabase
+      .from('dictation_tickets')
+      .select(
+        `
+          fee,
+          dictation_lessons!inner (
+            dictation_assignments!inner (
+              user_id
+            )
+          )
+        `,
+      )
+      .eq('paid', false)
+      .eq('dictation_lessons.dictation_assignments.user_id', user.id),
+  ]);
 
-  if (error) throw new Error(error.message);
+  if (ticketsResult.error) throw new Error(ticketsResult.error.message);
+  if (unpaidTicketsResult.error) {
+    throw new Error(unpaidTicketsResult.error.message);
+  }
+
+  const tickets = ticketsResult.data;
+  const unpaidTotal = unpaidTicketsResult.data.reduce(
+    (total, ticket) => total + ticket.fee,
+    0,
+  );
 
   return (
     <main className='mx-auto w-full max-w-3xl px-4 py-10'>
       <section className='rounded-lg border bg-white p-6 shadow-sm'>
         <h1 className='text-2xl font-semibold'>課程費用</h1>
 
-        {data.length === 0 ? null : (
-          <div className='mt-6 overflow-x-auto'>
-            <div className='text-xl font-semibold mb-6 py-2 flex justify-center items-end'>
-              <div className='pr-2 flex items-center gap-x-2'>
-                <TicketCheck className='h-8 w-8 -mb-1' />
-                待結算總額
-              </div>
-              <div>
-                NT$<span className='text-6xl font-extrabold pl-2'>{0}</span>
-              </div>
+        <div className='mt-6 overflow-x-auto'>
+          <div className='text-xl font-semibold mb-6 py-2 flex justify-center items-end'>
+            <div className='pr-2 flex items-center gap-x-2'>
+              <TicketCheck className='h-8 w-8 -mb-1' />
+              待結算總額
             </div>
+            <div>
+              NT$
+              <span className='text-6xl font-extrabold pl-2'>
+                {formatFee(unpaidTotal)}
+              </span>
+            </div>
+          </div>
+
+          {tickets.length === 0 ? (
+            <p className='rounded-md border p-4 text-sm text-gray-600'>
+              課程費用紀錄尚未建立。
+            </p>
+          ) : (
             <table className='w-full text-left text-sm'>
               <tbody className='divide-y'>
-                {data.map((ticket) => (
+                {tickets.map((ticket) => (
                   <tr key={ticket.id}>
                     <td className='whitespace-nowrap px-3 py-3'>
                       {ticket.paid ? (
@@ -89,8 +122,8 @@ export default async function PaymentsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
+          )}
+        </div>
       </section>
     </main>
   );
