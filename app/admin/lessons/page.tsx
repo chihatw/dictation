@@ -18,9 +18,7 @@ export default async function Page() {
     dictation_assignments (
       id,
       title,
-      profiles (
-        display
-      )
+      user_id
     )
   `,
     )
@@ -28,6 +26,29 @@ export default async function Page() {
     .limit(5);
 
   if (error) throw new Error(error.message);
+
+  const userIds = [
+    ...new Set(
+      data.flatMap((lesson) =>
+        lesson.dictation_assignments.map((assignment) => assignment.user_id),
+      ),
+    ),
+  ];
+
+  const profilesByUserId = new Map<string, string>();
+
+  if (userIds.length > 0) {
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('user_id, display')
+      .in('user_id', userIds);
+
+    if (profilesError) throw new Error(profilesError.message);
+
+    profiles.forEach((profile) => {
+      profilesByUserId.set(profile.user_id, profile.display);
+    });
+  }
 
   const lessons = data.map((lesson) => ({
     id: lesson.id,
@@ -37,7 +58,7 @@ export default async function Page() {
     assignments: lesson.dictation_assignments.map((ass) => ({
       id: ass.id,
       title: ass.title,
-      display: ass.profiles.display,
+      display: profilesByUserId.get(ass.user_id) ?? '不明なユーザー',
     })),
   }));
 
