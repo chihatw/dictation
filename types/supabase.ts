@@ -521,6 +521,41 @@ export type Database = {
           },
         ]
       }
+      dictation_tickets: {
+        Row: {
+          created_at: string
+          duration: number
+          fee: number
+          id: string
+          lesson_id: string
+          paid: boolean
+        }
+        Insert: {
+          created_at?: string
+          duration: number
+          fee: number
+          id?: string
+          lesson_id: string
+          paid?: boolean
+        }
+        Update: {
+          created_at?: string
+          duration?: number
+          fee?: number
+          id?: string
+          lesson_id?: string
+          paid?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dictation_tickets_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: true
+            referencedRelation: "dictation_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mirror_workout_results: {
         Row: {
           correctRatio: number
