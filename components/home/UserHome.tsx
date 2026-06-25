@@ -7,8 +7,10 @@ import TodayPanelContainer from '@/components/home/todayPanel/TodayPanelContaine
 
 export function UserHome({ userId }: { userId: string }) {
   return (
-    <div className='min-h-screen p-6'>
-      <main className='mx-auto max-w-2xl space-y-6'>
+    <div className='mx-auto min-h-screen w-full max-w-2xl px-4 pb-10'>
+      {/* <AppHeader /> */}
+      <div className='h-14' />
+      <main className='space-y-6'>
         <TodayPanelContainer />
         <NextClassContainer userId={userId} />
         <HomeMVJContainer userId={userId} />

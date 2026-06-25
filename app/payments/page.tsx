@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic';
 
+import { AppHeader } from '@/components/shared/AppHeader';
 import { createClient } from '@/lib/supabase/server';
 import { Check, TicketCheck } from 'lucide-react';
 import { redirect } from 'next/navigation';
@@ -73,58 +74,61 @@ export default async function PaymentsPage() {
   );
 
   return (
-    <main className='mx-auto w-full max-w-3xl px-4 py-10'>
-      <section className='rounded-lg border bg-white p-6 shadow-sm'>
-        <h1 className='text-2xl font-semibold'>課程費用</h1>
+    <div className='mx-auto min-h-screen w-full max-w-2xl px-4 pb-10'>
+      <AppHeader />
+      <main>
+        <section className='rounded-lg border bg-white p-6 shadow-sm'>
+          <h1 className='text-2xl font-semibold'>課程費用</h1>
 
-        <div className='mt-6 overflow-x-auto'>
-          <div className='text-xl font-semibold mb-6 py-2 flex justify-center items-end'>
-            <div className='pr-2 flex items-center gap-x-2'>
-              <TicketCheck className='h-8 w-8 -mb-1' />
-              待結算總額
+          <div className='mt-6 overflow-x-auto'>
+            <div className='text-xl font-semibold mb-6 py-2 flex justify-center items-end'>
+              <div className='pr-2 flex items-center gap-x-2'>
+                <TicketCheck className='h-8 w-8 -mb-1' />
+                待結算總額
+              </div>
+              <div>
+                NT$
+                <span className='text-6xl font-extrabold pl-2'>
+                  {formatFee(unpaidTotal)}
+                </span>
+              </div>
             </div>
-            <div>
-              NT$
-              <span className='text-6xl font-extrabold pl-2'>
-                {formatFee(unpaidTotal)}
-              </span>
-            </div>
+
+            {tickets.length === 0 ? (
+              <p className='rounded-md border p-4 text-sm text-gray-600'>
+                課程費用紀錄尚未建立。
+              </p>
+            ) : (
+              <table className='w-full text-left text-sm'>
+                <tbody className='divide-y'>
+                  {tickets.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td className='whitespace-nowrap px-3 py-3'>
+                        {ticket.paid ? (
+                          <span className='flex items-center gap-x-2'>
+                            <Check /> 已結算
+                          </span>
+                        ) : (
+                          <span>待結算</span>
+                        )}
+                      </td>
+                      <td className='whitespace-nowrap px-3 py-3'>
+                        {formatDateTime(ticket.dictation_lessons.due_at)}
+                      </td>
+                      <td className='whitespace-nowrap px-3 py-3'>
+                        {ticket.duration}分鐘課程
+                      </td>
+                      <td className='whitespace-nowrap px-3 py-3'>
+                        NT${formatFee(ticket.fee)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
-
-          {tickets.length === 0 ? (
-            <p className='rounded-md border p-4 text-sm text-gray-600'>
-              課程費用紀錄尚未建立。
-            </p>
-          ) : (
-            <table className='w-full text-left text-sm'>
-              <tbody className='divide-y'>
-                {tickets.map((ticket) => (
-                  <tr key={ticket.id}>
-                    <td className='whitespace-nowrap px-3 py-3'>
-                      {ticket.paid ? (
-                        <span className='flex items-center gap-x-2'>
-                          <Check /> 已結算
-                        </span>
-                      ) : (
-                        <span>待結算</span>
-                      )}
-                    </td>
-                    <td className='whitespace-nowrap px-3 py-3'>
-                      {formatDateTime(ticket.dictation_lessons.due_at)}
-                    </td>
-                    <td className='whitespace-nowrap px-3 py-3'>
-                      {ticket.duration}分鐘課程
-                    </td>
-                    <td className='whitespace-nowrap px-3 py-3'>
-                      NT${formatFee(ticket.fee)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </div>
   );
 }
