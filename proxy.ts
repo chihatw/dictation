@@ -6,6 +6,16 @@ const PUBLIC_PREFIXES = ['/dev'];
 const SIGNIN_PREFIXES = ['/signin'];
 const ADMIN_PREFIXES = ['/admin'];
 
+export const config = {
+  matcher: [
+    /*
+     * Exclude Next.js internals and static files from auth redirects.
+     * If these are proxied, production CSS/JS chunks can be redirected to /signin.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)',
+  ],
+};
+
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
