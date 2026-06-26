@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createMiddlewareClient, withCookies } from './lib/supabase/middleware';
 
 const PUBLIC_PATHS = ['/', '/tokusho'];
-const PUBLIC_PREFIXES = ['/dev'];
+const DEV_PREFIXES = ['/dev'];
 const SIGNIN_PREFIXES = ['/signin'];
 const ADMIN_PREFIXES = ['/admin'];
 
@@ -19,11 +19,19 @@ export const config = {
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  const isPublicPage =
-    PUBLIC_PATHS.includes(pathname) ||
-    PUBLIC_PREFIXES.some(
-      (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
-    );
+  const isDevRoute = DEV_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
+  );
+
+  // /dev 配下は開発環境のみ認証なしで通す
+  if (isDevRoute) {
+    if (process.env.NODE_ENV === 'production') {
+      return new NextResponse(null, { status: 404 });
+    }
+    return NextResponse.next();
+  }
+
+  const isPublicPage = PUBLIC_PATHS.includes(pathname);
   const isSignin = SIGNIN_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix),
   );
