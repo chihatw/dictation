@@ -23,17 +23,14 @@ export async function proxy(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
   );
 
-  // /dev 配下は開発環境のみ認証なしで通す
+  // /dev 配下は認証なしで通す
   if (isDevRoute) {
-    if (process.env.NODE_ENV === 'production') {
-      return new NextResponse(null, { status: 404 });
-    }
     return NextResponse.next();
   }
 
   const isPublicPage = PUBLIC_PATHS.includes(pathname);
-  const isSignin = SIGNIN_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix),
+  const isSignin = SIGNIN_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
   );
   const isAdminRoute = ADMIN_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(prefix + '/'),
