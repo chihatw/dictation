@@ -1,11 +1,11 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireAdminAction } from '@/lib/auth/guards';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function createAssignment(formData: FormData) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const title = String(formData.get('title') ?? '').trim();
   const user_id = String(formData.get('user_id') ?? '');
   const lesson_id = String(formData.get('lesson_id') ?? '');

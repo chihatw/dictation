@@ -1,11 +1,11 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireAdminAction } from '@/lib/auth/guards';
 import { jstLocalToUtcIso } from '@/utils/jstLocalToUtcIso';
 import { revalidatePath } from 'next/cache';
 
 export async function createLesson(formData: FormData) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const due_at = formData.get('due_at');
 
   if (!due_at) throw new Error('due_at is required');
@@ -19,7 +19,7 @@ export async function createLesson(formData: FormData) {
 }
 
 export async function publishLesson(formData: FormData) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const id = String(formData.get('id') ?? '');
   if (!id) throw new Error('id is required');
 
@@ -33,7 +33,7 @@ export async function publishLesson(formData: FormData) {
 }
 
 export async function unpublishLesson(formData: FormData) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const id = String(formData.get('id') ?? '');
   if (!id) throw new Error('id is required');
 

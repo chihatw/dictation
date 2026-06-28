@@ -1,6 +1,6 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireUserAction } from '@/lib/auth/guards';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -10,7 +10,7 @@ export async function saveDictationJournalAction(
 ) {
   if (!articleId || !body.trim()) return;
 
-  const supabase = await createClientAction();
+  const { supabase } = await requireUserAction();
   const { error } = await supabase.rpc('save_dictation_journal', {
     p_article_id: articleId,
     p_body: body,
@@ -27,7 +27,7 @@ export async function saveDictationJournalFromHome(
 ) {
   if (!articleId || !body.trim()) return { ok: false };
 
-  const supabase = await createClientAction();
+  const { supabase } = await requireUserAction();
   const { error } = await supabase.rpc('save_dictation_journal', {
     p_article_id: articleId,
     p_body: body,

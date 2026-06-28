@@ -1,8 +1,9 @@
 // app/actions.ts (Server Action)
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireUserAction } from '@/lib/auth/guards';
 import { JournalPage } from '@/types/dictation';
+import { notFound } from 'next/navigation';
 
 type JournalRowWithMeta = {
   id: string;
@@ -18,7 +19,11 @@ type JournalRowWithMeta = {
 };
 
 export async function fetchMoreJournals(userId: string, before: string) {
-  const supabase = await createClientAction();
+  const { supabase, user } = await requireUserAction();
+
+  if (userId !== user.id) {
+    notFound();
+  }
 
   const { data, error } = await supabase.rpc('get_journals_more', {
     p_uid: userId,

@@ -1,6 +1,6 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireAdminAction } from '@/lib/auth/guards';
 import { clampRateForDB } from '@/lib/tts/constants';
 import { synthesizeToStorage } from '@/lib/tts/persist';
 import { splitIntoSentences } from '@/lib/tts/splitSentences';
@@ -22,7 +22,7 @@ export async function createArticle(input: unknown) {
   const sentences = splitIntoSentences(data.body);
   if (sentences.length === 0) return { ok: false, error: '本文が空です' };
 
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
 
   // 1) 記事作成（audio_path_full は null のまま）
   const { data: ins, error: rpcErr } = await supabase.rpc(

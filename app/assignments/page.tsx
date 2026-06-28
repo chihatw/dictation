@@ -1,7 +1,7 @@
 // ユーザー毎に表示を変更するので、動的レンダリングを強制
 export const dynamic = 'force-dynamic';
 
-import { createClient } from '@/lib/supabase/server';
+import { requireUser } from '@/lib/auth/guards';
 import Link from 'next/link';
 
 // YYYY/M/D（Asia/Taipei）で整形。タイトルの開始xを固定するため日付欄は固定幅。
@@ -15,17 +15,12 @@ function formatYMDTaipei(iso: string) {
 }
 
 export default async function Page() {
-  const supabase = await createClient();
-
-  // 認証済み前提（middlewareで非ログインを排除）
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, user } = await requireUser();
 
   const { data: cols } = await supabase
     .from('dictation_assignments')
     .select('id, title, created_at')
-    .eq('user_id', user!.id)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   return (

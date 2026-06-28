@@ -1,5 +1,4 @@
 'use client';
-import { updateJournalClozeSpans } from '@/app/admin/journals/[id]/actions';
 import ClozeRow from '@/components/cloze/ClozeRow';
 import { ClozeObjLine, ClozeSpan, Journal } from '@/types/dictation';
 import {
@@ -17,6 +16,7 @@ import {
   useState,
   useTransition,
 } from 'react';
+import { updateOwnJournalClozeSpans } from './actions';
 
 type Props = {
   journal: Journal;
@@ -102,7 +102,7 @@ const ClozeSpansUserForm = ({ journal }: Props) => {
   async function action(formData: FormData) {
     const raw = formData.get('spans') as string;
     const spans = JSON.parse(raw) as ClozeSpan[];
-    await updateJournalClozeSpans({ id: journal.id, spans });
+    await updateOwnJournalClozeSpans({ id: journal.id, spans });
   }
 
   const handleSubmit = (formData: FormData) => {

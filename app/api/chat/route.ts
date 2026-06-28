@@ -1,8 +1,18 @@
 import { chat } from '@/lib/chat';
 import { ChatMessage } from '@/lib/chat/types';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   const { history, newMessage } = (await req.json()) as {
     history: ChatMessage[];
     newMessage: string;

@@ -1,9 +1,19 @@
 import { synthesizeText } from '@/lib/tts';
+import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs'; // ← Edge で動かさない
 
 export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.app_metadata?.role !== 'admin') {
+    return new NextResponse(null, { status: 404 });
+  }
+
   const { text, languageCode, voiceName, speakingRate, pitch, volumeGainDb } =
     await req.json();
 

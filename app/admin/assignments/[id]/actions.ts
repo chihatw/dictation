@@ -1,6 +1,6 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireAdminAction } from '@/lib/auth/guards';
 import { revalidatePath } from 'next/cache';
 
 export async function setJournalLocked(
@@ -8,7 +8,7 @@ export async function setJournalLocked(
   locked: boolean,
   assignment_id: string,
 ) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
 
   const { error } = await supabase
     .from('dictation_journals')

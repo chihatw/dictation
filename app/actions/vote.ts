@@ -1,7 +1,7 @@
 // app/journals/actions.ts
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { requireUserAction } from '@/lib/auth/guards';
 
 export async function voteAction(
   prev: { score: number; error: string | null },
@@ -11,13 +11,9 @@ export async function voteAction(
   const delta = Number(formData.get('delta') || 0);
   const current = Number(formData.get('current') || 0);
 
-  const supa = await createClient();
-  const {
-    data: { user },
-  } = await supa.auth.getUser();
-  if (!user) return { score: current, error: 'unauthorized' };
+  const { supabase } = await requireUserAction();
 
-  const { error } = await supa.rpc('journal_vote', {
+  const { error } = await supabase.rpc('journal_vote', {
     p_id: id,
     p_delta: delta,
   });

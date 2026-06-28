@@ -2,7 +2,7 @@
 // app/articles/[id]/action.ts
 
 import { chat } from '@/lib/chat';
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireUserAction } from '@/lib/auth/guards';
 import { z } from 'zod';
 
 type CreateRes = {
@@ -37,9 +37,7 @@ export async function createFeedbackAndLogAction(input: unknown) {
     selfAssessedComprehension,
   } = parsed.data;
 
-  const supabase = await createClientAction();
-  const { data: _data } = await supabase.auth.getUser();
-  if (!_data.user?.id) return { ok: false as const, error: '未認証です。' };
+  const { supabase } = await requireUserAction();
 
   let aiFeedback = '';
   try {

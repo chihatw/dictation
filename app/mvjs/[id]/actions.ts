@@ -1,12 +1,12 @@
 // app/mvjs/[id]/actions.ts
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireUserAction } from '@/lib/auth/guards';
 import { redirect } from 'next/navigation';
 import { extractPathFromPublicUrl } from './utils';
 
 export async function submitMvjAndAwardsAction(formData: FormData) {
-  const supabase = await createClientAction();
+  const { supabase, user } = await requireUserAction();
   const mvjId = String(formData.get('mvjId') ?? '');
   const reason = String(formData.get('reason') ?? '').trim();
   const initialIds = JSON.parse(
@@ -17,9 +17,7 @@ export async function submitMvjAndAwardsAction(formData: FormData) {
   const oldImageUrl = String(formData.get('oldImageUrl') ?? '');
   const file = formData.get('image') as File | null;
 
-  const { data: userRes, error: userErr } = await supabase.auth.getUser();
-  if (userErr || !userRes?.user) throw new Error('auth required');
-  const uid = userRes.user.id;
+  const uid = user.id;
 
   const bucket = 'dictation-mvj';
   let publicUrl: string | null = null;

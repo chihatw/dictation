@@ -1,9 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { AppHeader } from '@/components/shared/AppHeader';
-import { createClient } from '@/lib/supabase/server';
+import { requireUser } from '@/lib/auth/guards';
 import { Check, TicketCheck } from 'lucide-react';
-import { redirect } from 'next/navigation';
 
 function formatDateTime(iso: string) {
   return new Intl.DateTimeFormat('ja-JP', {
@@ -19,12 +18,7 @@ function formatFee(fee: number) {
 }
 
 export default async function PaymentsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect('/signin');
+  const { supabase, user } = await requireUser();
 
   const [ticketsResult, unpaidTicketsResult] = await Promise.all([
     supabase

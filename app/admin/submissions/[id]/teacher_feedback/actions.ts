@@ -1,13 +1,13 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireAdminAction } from '@/lib/auth/guards';
 import { TagWithLabel } from '@/types/dictation';
 
 export async function setSubmissionTeacherFeedback(
   submissionId: string,
   note_md: string | null
 ) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const { error } = await supabase
     .from('dictation_submissions')
     .update({ teacher_feedback_md: note_md })
@@ -16,7 +16,7 @@ export async function setSubmissionTeacherFeedback(
 }
 
 export async function addFeedbackTag(submissionId: string, label: string) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const trimmed = label.trim();
   if (!trimmed) throw new Error('empty label');
 
@@ -49,7 +49,7 @@ export async function addFeedbackTag(submissionId: string, label: string) {
 }
 
 export async function deleteFeedbackTag(tagId: string) {
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
   const { error } = await supabase
     .from('dictation_teacher_feedback_tags')
     .delete()

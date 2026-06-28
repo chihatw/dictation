@@ -1,6 +1,6 @@
 'use server';
 
-import { createClientAction } from '@/lib/supabase/server-action';
+import { requireAdminAction } from '@/lib/auth/guards';
 import { ClozeSpan } from '@/types/dictation';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -20,7 +20,7 @@ export async function updateJournalClozeSpans(params: {
     return { ok: false as const, error: 'invalid spans' };
   }
 
-  const supabase = await createClientAction();
+  const { supabase } = await requireAdminAction();
 
   const { error } = await supabase
     .from('dictation_journals')
